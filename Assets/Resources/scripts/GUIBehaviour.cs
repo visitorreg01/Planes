@@ -16,7 +16,7 @@ public class GUIBehaviour : MonoBehaviour {
 			GUI.Box(new Rect(10,50,100,90), "");
 			if(GUI.Button(new Rect(20,60,80,20), "Step")) 
 			{
-				GameStorage.getInstance().registerFriendlyShuttle(new Vector2(10,10),15);
+				GameStorage.getInstance().registerFriendlyShuttle(new Vector2(10,10),93);
         	}
 			if(GUI.Button(new Rect(20,90,80,20),"Clear"))
 			{
@@ -34,6 +34,7 @@ public class GUIBehaviour : MonoBehaviour {
 	
 	void MoveObjects()
 	{
-		
+		GameStorage.getInstance().fixTime();
+		GameStorage.getInstance().isRunning=true;
 	}
 }
