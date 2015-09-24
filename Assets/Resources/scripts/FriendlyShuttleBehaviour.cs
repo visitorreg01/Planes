@@ -21,6 +21,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	float newAngle;
 	bool needToUpdateAttackIconPosition = false;
 	
+	//Path
+	Vector2 point1,point2,point3;
+	float d;
+	float t;
+	
 	//mechanics
 	float angle=0;
 	Vector2 directionalVector;
@@ -109,15 +114,29 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		checkShuttleClickState();
 		checkAttackIconClickState();
 		
+		CalculatePath();
 		if(selected)
 		{
-			attackIcon.SetActive(true);
+			if(!GameStorage.getInstance().isRunning)
+			{
+				t=0;
+				attackIcon.SetActive(true);
+				DrawLine();
+			}
+			else
+			{
+				attackIcon.SetActive(false);
+				clearLine();
+			}
 		}
 		else
 		{
 			attackIcon.SetActive(false);
+			clearLine();
 		}
 		
+		if(GameStorage.getInstance().isRunning)
+			Accelerate();
 		
 		if(attackIconCaptured)
 			dragAttackIcon();
@@ -127,7 +146,13 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
-		GUI.Label(new Rect(150,20,500,20),angle+" ");
+		
+	}
+	
+	private void clearLine()
+	{
+		LineRenderer lr = gameObject.GetComponent<LineRenderer>();
+		lr.SetVertexCount(0);
 	}
 	
 	public void checkShuttleClickState()
@@ -149,6 +174,37 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			return mangle;
 		else
 			return (180-mangle)+180;
+	}
+	
+	private void Accelerate()
+	{
+		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
+		{
+			//Debug.Log(t);
+			float x,y;
+			t+=1*Time.deltaTime/3;
+			
+			x = Mathf.Pow(1-t,2)*point1.x+2*(1-t)*t*point2.x+t*t*point3.x;
+			y = Mathf.Pow(1-t,2)*point1.y+2*(1-t)*t*point2.y+t*t*point3.y;
+			Vector2 pos = new Vector2(x-transform.position.x,y-transform.position.z);
+			
+			float nAngle;
+			Vector2 v1 = new Vector2(0,5);
+			float mySinPhi = (v1.x*pos.y - v1.y*pos.x);
+			nAngle = Vector2.Angle(v1,pos);
+			if(mySinPhi>0)
+				nAngle=(180-nAngle)+180;
+			angle=nAngle;
+			transform.position=new Vector3(x,shuttleH,y);
+			
+			
+		}
+		else
+		{
+			updateAttackPosition();
+			t=0;
+			GameStorage.getInstance().isRunning=false;
+		}
 	}
 	
 	public void dragAttackIcon()
@@ -244,12 +300,23 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	private void CalculatePath()
 	{
-		Vector2 point1 = new Vector2(transform.position.x,transform.position.z);
-		Vector2 point3 = new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);
-		float d = new Vector2(point3.x-point1.x,point3.y-point1.y).magnitude;
-		Vector2 point2 = (Quaternion.Euler(0,0,angle)*new Vector2(0,1)*d);
-		point2=new Vector2(point2.x+point1.x,point2.y+point1.y);
-		
+		if(!GameStorage.getInstance().isRunning)
+		{
+			point1 = new Vector2(transform.position.x,transform.position.z);
+			point3 = new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);
+			d = new Vector2(point3.x-point1.x,point3.y-point1.y).magnitude/2;
+			point2 = (Quaternion.Euler(0,0,-angle)*new Vector2(0,1)*d);
+			point2=new Vector2(point2.x+point1.x,point2.y+point1.y);
+			trackDots.Clear();
+			float x,y,tt;
+			float step = 0.005f;
+			for(tt=0f;tt<=1;tt+=step)
+			{
+				x = Mathf.Pow(1-tt,2)*point1.x+2*(1-tt)*tt*point2.x+tt*tt*point3.x;
+				y = Mathf.Pow(1-tt,2)*point1.y+2*(1-tt)*tt*point2.y+tt*tt*point3.y;
+				trackDots.Add(new Vector2(x,y));
+			}
+		}
 	}
 	
 	private void DrawLine()
