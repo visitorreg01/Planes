@@ -14,6 +14,7 @@ public class GameStorage {
 	public bool isRunning=false;
 	
 	private ArrayList friendlyGameObjectsList;
+	private ArrayList enemyGameObjectsList;
 	
 	private GameObject friendlyUnitPrefab;
 	
@@ -22,15 +23,25 @@ public class GameStorage {
 	public GameStorage()
 	{
 		friendlyGameObjectsList = new ArrayList();
+		enemyGameObjectsList = new ArrayList();
 	}
 	
-	public void registerFriendlyShuttle()
+	public void updateIcons()
+	{
+		foreach(GameObject f in GameStorage.getInstance().getFiendlyShuttles())
+		{
+			f.GetComponent<FriendlyShuttleBehaviour>().updateAttackPosition();
+			f.GetComponent<FriendlyShuttleBehaviour>().t=0;
+		}
+	}
+	
+	public void createFriendlyShuttle()
 	{
 		GameObject c = (GameObject) GameObject.Instantiate(Resources.Load("prefab/friendlyShuttlePrefab") as GameObject);
 		friendlyGameObjectsList.Add(c);
 	}
 	
-	public void registerFriendlyShuttle(Vector2 pos, float angle)
+	public void createFriendlyShuttle(Vector2 pos, float angle)
 	{
 		GameObject c = (GameObject) GameObject.Instantiate(Resources.Load("prefab/friendlyShuttlePrefab") as GameObject);
 		c.GetComponent<FriendlyShuttleBehaviour>().setPosition(pos);
@@ -38,18 +49,24 @@ public class GameStorage {
 		friendlyGameObjectsList.Add(c);
 	}
 	
-	public void registerFriendlyShuttle(float angle)
+	public void createFriendlyShuttle(float angle)
 	{
 		GameObject c = (GameObject) GameObject.Instantiate(Resources.Load("prefab/friendlyShuttlePrefab") as GameObject);
 		c.GetComponent<FriendlyShuttleBehaviour>().setAngle(angle);
 		friendlyGameObjectsList.Add(c);
 	}
 	
-	public void registerFriendlyShuttle(Vector2 pos)
+	public void createFriendlyShuttle(Vector2 pos)
 	{
 		GameObject c = (GameObject) GameObject.Instantiate(Resources.Load("prefab/friendlyShuttlePrefab") as GameObject);
 		c.GetComponent<FriendlyShuttleBehaviour>().setPosition(pos);
 		friendlyGameObjectsList.Add(c);
+	}
+	
+	public void addFriendlyShuttle(GameObject s)
+	{
+		if(!friendlyGameObjectsList.Contains(s))
+			friendlyGameObjectsList.Add(s);
 	}
 	
 	public void removeFriendlyShuttle(GameObject s)

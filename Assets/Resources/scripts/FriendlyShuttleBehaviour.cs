@@ -11,6 +11,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	//const
 	const float shuttleH=5;
 	const float attackIconH=6;
+	const float attackIconDistMin=2f;
 	const float attackIconDist=6f;
 	const float maxTurnAngle = 55;
 	
@@ -24,7 +25,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	//Path
 	Vector2 point1,point2,point3;
 	float d;
-	float t;
+	public float t;
 	
 	//mechanics
 	float angle=0;
@@ -66,8 +67,9 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	private void updateAttackIconPosition()
 	{
-		Vector2 vec =Quaternion.Euler(0,0,-angle)*(new Vector2(0,1)*attackIconDist);
-		attackIcon.transform.position=new Vector3(vec.x+transform.position.x,6,vec.y+transform.position.z);
+		float ds = (attackIconDist-attackIconDistMin)/2+attackIconDistMin;
+		Vector2 vec =Quaternion.Euler(0,0,-angle)*(new Vector2(0,1)*ds);
+		attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
 	}
 	
 	void Start()
@@ -75,7 +77,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		attackIcon = Instantiate(Resources.Load("prefab/attackIcon") as GameObject);
 		attackIcon.SetActive(false);
 		LineRenderer lr = gameObject.AddComponent<LineRenderer>();
-		lr.SetWidth(0.025f, 0.025f);
+		lr.SetWidth(0.05f, 0.05f);
+		GameStorage.getInstance().addFriendlyShuttle(this.gameObject);
 	}
 	
 	void Update()
@@ -115,29 +118,32 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		checkAttackIconClickState();
 		
 		CalculatePath();
+		DrawLine();
 		if(selected)
 		{
 			if(!GameStorage.getInstance().isRunning)
 			{
-				t=0;
 				attackIcon.SetActive(true);
-				DrawLine();
 			}
 			else
 			{
 				attackIcon.SetActive(false);
-				clearLine();
 			}
 		}
 		else
 		{
 			attackIcon.SetActive(false);
-			clearLine();
 		}
 		
 		if(GameStorage.getInstance().isRunning)
+		{
 			Accelerate();
-		
+			clearLine();
+		}
+		else
+		{
+			DrawLine();
+		}
 		if(attackIconCaptured)
 			dragAttackIcon();
 		
@@ -196,12 +202,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				nAngle=(180-nAngle)+180;
 			angle=nAngle;
 			transform.position=new Vector3(x,shuttleH,y);
-			
-			
+			updateAttackIconPosition();
 		}
 		else
 		{
-			updateAttackPosition();
+			GameStorage.getInstance().updateIcons();
 			t=0;
 			GameStorage.getInstance().isRunning=false;
 		}
@@ -232,17 +237,17 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 					vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDist;
 				attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
 			}
-			else if(dst<=2)
+			else if(dst<=attackIconDistMin)
 			{
 				if(Mathf.Abs(ds)>=maxTurnAngle)
 				{
 					if(ds<0)
-						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+55,360))*new Vector2(0,1)*2;
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+55,360))*new Vector2(0,1)*attackIconDistMin;
 					else
-						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-55,360))*new Vector2(0,1)*2;
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-55,360))*new Vector2(0,1)*attackIconDistMin;
 				}
 				else
-					vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*2;
+					vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDistMin;
 				attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
 			}
 			else
