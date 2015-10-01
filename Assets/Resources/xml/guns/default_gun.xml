@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<gun
+	id="1"
+	gunName="default Gun"
+	damage="20"
+	reuse="1.0"
+	attackAngle="50.0"
+	attackRange="5.0"/>

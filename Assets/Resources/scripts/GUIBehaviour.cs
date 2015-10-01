@@ -3,6 +3,13 @@ using System.Collections;
 
 public class GUIBehaviour : MonoBehaviour {
 
+	
+	void Start()
+	{
+		GameStorage.getInstance();
+		Templates.getInstance();
+	}
+	
 	bool viewMenu=false;
 	void OnGUI()
 	{
