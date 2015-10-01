@@ -273,9 +273,9 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				if(Mathf.Abs(ds)>=maxTurnAngle)
 				{
 					if(ds<0)
-						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+55,360))*new Vector2(0,1)*attackIconDist;
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+maxTurnAngle,360))*new Vector2(0,1)*attackIconDist;
 					else
-						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-55,360))*new Vector2(0,1)*attackIconDist;
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-maxTurnAngle,360))*new Vector2(0,1)*attackIconDist;
 				}
 				else
 					vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDist;
@@ -286,9 +286,9 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				if(Mathf.Abs(ds)>=maxTurnAngle)
 				{
 					if(ds<0)
-						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+55,360))*new Vector2(0,1)*attackIconDistMin;
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+maxTurnAngle,360))*new Vector2(0,1)*attackIconDistMin;
 					else
-						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-55,360))*new Vector2(0,1)*attackIconDistMin;
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-maxTurnAngle,360))*new Vector2(0,1)*attackIconDistMin;
 				}
 				else
 					vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDistMin;
@@ -299,9 +299,9 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				if(Mathf.Abs(ds)>=maxTurnAngle)
 				{
 					if(ds<0)
-						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+55,360))*new Vector2(0,1)*dst;
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+maxTurnAngle,360))*new Vector2(0,1)*dst;
 					else
-						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-55,360))*new Vector2(0,1)*dst;
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-maxTurnAngle,360))*new Vector2(0,1)*dst;
 					attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
 				}
 				else
