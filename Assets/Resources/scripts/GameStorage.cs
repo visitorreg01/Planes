@@ -154,9 +154,11 @@ public class GameStorage {
 			return (180-mangle)+180;
 	}
 	
-	public ArrayList getEnemiesInFireZone(GameObject friendlyShuttle, Templates.GunOnShuttle gun)
+	public GameObject getEnemyInFireZone(GameObject friendlyShuttle, Templates.GunOnShuttle gun)
 	{
-		ArrayList retList = new ArrayList();
+		GameObject ret = null;
+		float dist=0;
+		float mindist=-1;
 		Templates.GunTemplate gunTemp = Templates.getInstance().getGunTemplate(gun.gunId);
 		Vector2 gunPos = new Vector2(friendlyShuttle.transform.position.x+gun.pos.x,friendlyShuttle.transform.position.z+gun.pos.y);
 		float gunAngle = Mathf.Repeat(friendlyShuttle.GetComponent<FriendlyShuttleBehaviour>().getAngle()+gun.turnAngle,360);
@@ -165,10 +167,24 @@ public class GameStorage {
 		foreach(GameObject enemy in getEnemyShuttles())
 		{
 			pos2=new Vector2(enemy.transform.position.x,enemy.transform.position.z);
-			if(Vector2.Distance(pos1,pos2)<=gunTemp.attackRange && Mathf.Abs(getAngleDst(gunAngle,getAngleRelative(friendlyShuttle,enemy)))<=gunTemp.attackAngle)
-				retList.Add(enemy);
+			if((dist=Vector2.Distance(pos1,pos2))<=gunTemp.attackRange && Mathf.Abs(getAngleDst(gunAngle,getAngleRelative(friendlyShuttle,enemy)))<=gunTemp.attackAngle)
+			{
+				if(mindist<0)
+				{
+					ret=enemy;
+					mindist=dist;
+				}
+				else
+				{
+					if(dist<mindist)
+					{
+						ret=enemy;
+						mindist=dist;
+					}
+				}
+			}
 		}
-		return retList;
+		return ret;
 	}
 	
 	public GameObject[] getEnemyShuttles()

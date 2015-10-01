@@ -206,7 +206,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
 		{
 			Templates.GunTemplate gunTemp;
-			ArrayList enemyList;
+			GameObject enemy;
 			foreach(Templates.GunOnShuttle gun in temp.guns)
 			{
 				gunTemp=Templates.getInstance().getGunTemplate(gun.gunId);
@@ -214,8 +214,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 					if(gun.shotTime+gunTemp.reuse<Time.time)
 						gun.ready=true;
 				
-				enemyList=GameStorage.getInstance().getEnemiesInFireZone(gameObject,gun);
-				if(enemyList.Count>0)
+				enemy=GameStorage.getInstance().getEnemyInFireZone(gameObject,gun);
+				if(enemy!=null)
 				{
 					if(gun.ready)
 					{
@@ -223,7 +223,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 						gun.shotTime=Time.time;
 						gun.ready=false;
 						// WARN
-						((GameObject)enemyList[0]).GetComponent<EnemyShuttleBehaviour>().Attacked(gameObject,gunTemp.damage);
+						enemy.GetComponent<EnemyShuttleBehaviour>().Attacked(gameObject,gunTemp.damage);
 						// WARN
 					}
 				}

@@ -38,6 +38,8 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	public void Attacked(GameObject attacker, int damage)
 	{
 		this.hp-=damage;
+		if(this.hp<=0)
+			this.Die();
 	}
 	
 	// Use this for initialization
@@ -68,9 +70,14 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			focused=false;
 	}
 	
+	public void Die()
+	{
+		GameStorage.getInstance().removeEnemyShuttle(this.gameObject);
+	}
+	
 	public void ByeBye()
 	{
-		Destroy(this);
+		Destroy(this.gameObject);
 	}
 	
 	void OnGUI()
