@@ -27,12 +27,30 @@ public class GameStorage {
 		enemyGameObjectsList = new ArrayList();
 	}
 	
-	public void updateIcons()
+	public void StepStart()
 	{
-		foreach(GameObject f in GameStorage.getInstance().getFiendlyShuttles())
+		fixTime();
+		isRunning=true;
+		foreach(GameObject f in GameStorage.getInstance().getFriendlyShuttles())
 		{
-			f.GetComponent<FriendlyShuttleBehaviour>().updateAttackPosition();
-			f.GetComponent<FriendlyShuttleBehaviour>().t=0;
+			f.GetComponent<FriendlyShuttleBehaviour>().StepStart();
+		}
+		foreach(GameObject f in GameStorage.getInstance().getEnemyShuttles())
+		{
+			f.GetComponent<EnemyShuttleBehaviour>().StepStart();
+		}
+	}
+	
+	public void StepStop()
+	{
+		isRunning=false;
+		foreach(GameObject f in GameStorage.getInstance().getFriendlyShuttles())
+		{
+			f.GetComponent<FriendlyShuttleBehaviour>().StepEnd();
+		}
+		foreach(GameObject f in GameStorage.getInstance().getEnemyShuttles())
+		{
+			f.GetComponent<EnemyShuttleBehaviour>().StepEnd();
 		}
 	}
 	
@@ -76,7 +94,7 @@ public class GameStorage {
 		s.GetComponent<FriendlyShuttleBehaviour>().ByeBye();
 	}
 	
-	public GameObject[] getFiendlyShuttles()
+	public GameObject[] getFriendlyShuttles()
 	{
 		GameObject[] lst = new GameObject[friendlyGameObjectsList.Count];
 		int i;
@@ -162,12 +180,11 @@ public class GameStorage {
 		Templates.GunTemplate gunTemp = Templates.getInstance().getGunTemplate(gun.gunId);
 		Vector2 gunPos = new Vector2(friendlyShuttle.transform.position.x+gun.pos.x,friendlyShuttle.transform.position.z+gun.pos.y);
 		float gunAngle = Mathf.Repeat(friendlyShuttle.GetComponent<FriendlyShuttleBehaviour>().getAngle()+gun.turnAngle,360);
-		Vector2 pos1,pos2;
-		pos1=new Vector2(friendlyShuttle.transform.position.x,friendlyShuttle.transform.position.z);
+		Vector2 pos2;
 		foreach(GameObject enemy in getEnemyShuttles())
 		{
 			pos2=new Vector2(enemy.transform.position.x,enemy.transform.position.z);
-			if((dist=Vector2.Distance(pos1,pos2))<=gunTemp.attackRange && Mathf.Abs(getAngleDst(gunAngle,getAngleRelative(friendlyShuttle,enemy)))<=gunTemp.attackAngle)
+			if((dist=Vector2.Distance(gunPos,pos2))<=gunTemp.attackRange && Mathf.Abs(getAngleDst(gunAngle,getAngleRelative(friendlyShuttle,enemy)))<=gunTemp.attackAngle)
 			{
 				if(mindist<0)
 				{
@@ -179,6 +196,38 @@ public class GameStorage {
 					if(dist<mindist)
 					{
 						ret=enemy;
+						mindist=dist;
+					}
+				}
+			}
+		}
+		return ret;
+	}
+	
+	public GameObject getFriendlyInFireZone(GameObject enemyShuttle, Templates.GunOnShuttle gun)
+	{
+		GameObject ret = null;
+		float dist=0;
+		float mindist=-1;
+		Templates.GunTemplate gunTemp = Templates.getInstance().getGunTemplate(gun.gunId);
+		Vector2 gunPos = new Vector2(enemyShuttle.transform.position.x+gun.pos.x,enemyShuttle.transform.position.z+gun.pos.y);
+		float gunAngle = Mathf.Repeat(enemyShuttle.GetComponent<EnemyShuttleBehaviour>().getAngle()+gun.turnAngle,360);
+		Vector2 pos2;
+		foreach(GameObject friendly in getFriendlyShuttles())
+		{
+			pos2=new Vector2(friendly.transform.position.x,friendly.transform.position.z);
+			if((dist=Vector2.Distance(gunPos,pos2))<=gunTemp.attackRange && Mathf.Abs(getAngleDst(gunAngle,getAngleRelative(enemyShuttle,friendly)))<=gunTemp.attackAngle)
+			{
+				if(mindist<0)
+				{
+					ret=friendly;
+					mindist=dist;
+				}
+				else
+				{
+					if(dist<mindist)
+					{
+						ret=friendly;
 						mindist=dist;
 					}
 				}

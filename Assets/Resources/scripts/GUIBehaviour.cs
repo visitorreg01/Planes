@@ -24,15 +24,8 @@ public class GUIBehaviour : MonoBehaviour {
 			
 			if(GUI.Button(new Rect(20,60,80,20),"Do step"))
 			{
-				MoveObjects();
+				GameStorage.getInstance().StepStart();
 			}
 		}
-	}
-	
-	void MoveObjects()
-	{
-		GameStorage.getInstance().fixTime();
-		GameStorage.getInstance().isRunning=true;
-		
 	}
 }

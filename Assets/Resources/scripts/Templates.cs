@@ -61,6 +61,7 @@ public class Templates {
 		public int damage;
 		public float reuse;
 		public float attackAngle,attackRange;
+		public float[] defectsChance = new float[Enum.GetNames(typeof(Defects.DefectType)).Length];
 	}
 	
 	public PlaneTemplate getPlaneTemplate(PlaneTemplates id)
@@ -88,7 +89,25 @@ public class Templates {
 		foreach(PlaneTemplate p in planeClasses)
 		{
 			if(p.id==(int)id)
-				return p;
+			{
+				PlaneTemplate t = new PlaneTemplate();
+				t.classname=p.classname;
+				t.description=p.description;
+				t.hp=p.hp;
+				t.id=p.id;
+				t.maxRange=p.maxRange;
+				t.maxTurnAngle=p.maxTurnAngle;
+				t.minRange=p.minRange;
+				foreach(GunOnShuttle f in p.guns)
+				{
+					GunOnShuttle z = new GunOnShuttle();
+					z.gunId=f.gunId;
+					z.pos=f.pos;
+					z.turnAngle=f.turnAngle;
+					t.guns.Add(z);
+				}
+				return t;
+			}
 		}
 		return null;
 	}
@@ -130,6 +149,23 @@ public class Templates {
 							p.attackAngle=float.Parse(m.Value);
 						else if(m.Name=="attackRange")
 							p.attackRange=float.Parse(m.Value);
+					}
+					
+					foreach(XmlNode m in x.ChildNodes)
+					{
+						if(m.Name=="defectChance")
+						{
+							int id=-1;
+							float chance=-1;
+							foreach(XmlNode l in m.Attributes)
+							{
+								if(l.Name=="id")
+									id=int.Parse(l.Value);
+								else if(l.Name=="chance")
+									chance=float.Parse(l.Value);
+							}
+							p.defectsChance[id]=chance;
+						}
 					}
 					
 					gunClasses.Add(p);

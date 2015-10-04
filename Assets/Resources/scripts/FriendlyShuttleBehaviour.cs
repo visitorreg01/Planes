@@ -17,6 +17,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	float attackIconDist=6f;
 	float maxTurnAngle = 55;
 	int hp = 300;
+	float lastFired=0f;
 	
 	
 	
@@ -30,7 +31,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	//Path
 	Vector2 point1,point2,point3;
 	float d;
-	public float t;
+	float t;
 	
 	//mechanics
 	float angle=0;
@@ -44,6 +45,10 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	bool selected = false;
 	bool attackIconCaptured = false;
 	bool spawn=true;
+	
+	private Defects.Defect curDefect = null;
+	bool earnedDefect = false;
+	bool defectInUse = false;
 	
 	//objects
 	GameObject attackIcon;
@@ -72,7 +77,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	private void updateAttackIconPosition()
 	{
-		float ds = (attackIconDist-attackIconDistMin)/2+attackIconDistMin;
+		float ds;
+		if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
+			ds=temp.minRange*((Defects.EngineCrash)curDefect).newRangeCoeff;
+		else
+			ds = (attackIconDist-attackIconDistMin)/2+attackIconDistMin;
 		Vector2 vec =Quaternion.Euler(0,0,-angle)*(new Vector2(0,1)*ds);
 		attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
 	}
@@ -96,6 +105,9 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void Update()
 	{
+		if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn))
+			maxTurnAngle=0f;
+		
 		if(needToUpdatePosition)
 		{
 			transform.position=newPos;
@@ -201,36 +213,83 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			return (180-mangle)+180;
 	}
 	
+	public void Attacked(GameObject attacker, int damage, Defects.Defect defect)
+	{
+		Debug.Log("Get damage: "+damage);
+		if(curDefect==null && defect!=null)
+		{
+			Debug.Log("Earned defect: "+defect);
+			curDefect=defect;
+			earnedDefect=true;
+		}
+		this.hp-=damage;
+		if(this.hp<=0)
+			this.Die();
+	}
+	
 	private void Accelerate()
 	{
 		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
 		{
-			Templates.GunTemplate gunTemp;
-			GameObject enemy;
-			foreach(Templates.GunOnShuttle gun in temp.guns)
+			if(!(defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns)))
 			{
-				gunTemp=Templates.getInstance().getGunTemplate(gun.gunId);
-				if(!gun.ready)
-					if(gun.shotTime+gunTemp.reuse<Time.time)
-						gun.ready=true;
-				
-				enemy=GameStorage.getInstance().getEnemyInFireZone(gameObject,gun);
-				if(enemy!=null)
+				Templates.GunTemplate gunTemp;
+				GameObject enemy;
+				foreach(Templates.GunOnShuttle gun in temp.guns)
 				{
-					if(gun.ready)
+					gunTemp=Templates.getInstance().getGunTemplate(gun.gunId);
+					if(!gun.ready)
+						if(gun.shotTime+gunTemp.reuse<Time.time)
+							gun.ready=true;
+					
+					enemy=GameStorage.getInstance().getEnemyInFireZone(gameObject,gun);
+					if(enemy!=null)
 					{
-						Debug.Log("FIRE!");
-						gun.shotTime=Time.time;
-						gun.ready=false;
-						// WARN
-						enemy.GetComponent<EnemyShuttleBehaviour>().Attacked(gameObject,gunTemp.damage);
-						// WARN
+						if(gun.ready)
+						{
+							gun.shotTime=Time.time;
+							gun.ready=false;
+							// WARN
+							
+							int defect=-1,i;
+							float ch = UnityEngine.Random.Range(0.0f,100f);
+							float lower=0.0f,upper;
+							for(i=0;i<gunTemp.defectsChance.Length;i++)
+							{
+								upper=gunTemp.defectsChance[i]+lower;
+								if(ch>=lower && ch<=upper)
+								{
+									defect=i;
+									break;
+								}
+								else
+									lower=upper;
+							}
+							
+							enemy.GetComponent<EnemyShuttleBehaviour>().Attacked(gameObject,gunTemp.damage, Defects.getDefect(defect));
+						}
 					}
 				}
 			}
 			
+			if(defectInUse && curDefect.GetType() == typeof(Defects.Fired))
+			{
+				Defects.Fired fire = (Defects.Fired)curDefect;
+				if(lastFired==0)
+				{
+					Attacked(null,fire.damage,null);
+					lastFired=Time.time;
+				}
+				else
+				{
+					if(Time.time>=lastFired+fire.reuse)
+					{
+						Attacked(null,fire.damage,null);
+						lastFired=Time.time;
+					}
+				}
+			}
 			
-			//Debug.Log("enemies: "+GameStorage.getInstance().getEnemiesInFireZone(gameObject,(Templates.GunOnShuttle)temp.guns[0]).Count);
 			float x,y;
 			t+=1*Time.deltaTime/3;
 			
@@ -250,9 +309,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		}
 		else
 		{
-			GameStorage.getInstance().updateIcons();
-			t=0;
-			GameStorage.getInstance().isRunning=false;
+			GameStorage.getInstance().StepStop();
 		}
 	}
 	
@@ -268,48 +325,146 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		
 		float cos = (Vector2.Dot(v1,v2)/(v1.magnitude*v2.magnitude));
 		
+		if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
+		{
+			if(Mathf.Abs(ds)>maxTurnAngle)
+			{
+				if(ds<0)
+					vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+maxTurnAngle,360))*new Vector2(0,1)*attackIconDistMin*((Defects.EngineCrash)curDefect).newRangeCoeff;
+				else
+					vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-maxTurnAngle,360))*new Vector2(0,1)*attackIconDistMin*((Defects.EngineCrash)curDefect).newRangeCoeff;
+			}
+			else
+				vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDistMin*((Defects.EngineCrash)curDefect).newRangeCoeff;
+			
+			attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
+		}
+		else
+		{
 			if(dst>=attackIconDist)
 			{
-				if(Mathf.Abs(ds)>=maxTurnAngle)
+				if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
 				{
-					if(ds<0)
+					if(Mathf.Abs(ds)>maxTurnAngle && ds<=0)
 						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+maxTurnAngle,360))*new Vector2(0,1)*attackIconDist;
+					else if(ds>0)
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle,360))*new Vector2(0,1)*attackIconDist;
 					else
+						vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDist;
+				}
+				else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnRight))
+				{
+					if(Mathf.Abs(ds)>maxTurnAngle && ds>=0)
 						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-maxTurnAngle,360))*new Vector2(0,1)*attackIconDist;
+					else if(ds<0)
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle,360))*new Vector2(0,1)*attackIconDist;
+					else
+						vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDist;
 				}
 				else
-					vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDist;
+				{
+					if(Mathf.Abs(ds)>=maxTurnAngle)
+					{
+						if(ds<0)
+							vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+maxTurnAngle,360))*new Vector2(0,1)*attackIconDist;
+						else
+							vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-maxTurnAngle,360))*new Vector2(0,1)*attackIconDist;
+					}
+					else
+						vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDist;
+				}
 				attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
 			}
 			else if(dst<=attackIconDistMin)
 			{
-				if(Mathf.Abs(ds)>=maxTurnAngle)
+				if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
 				{
-					if(ds<0)
+					if(Mathf.Abs(ds)>maxTurnAngle && ds<=0)
 						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+maxTurnAngle,360))*new Vector2(0,1)*attackIconDistMin;
+					else if(ds>0)
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle,360))*new Vector2(0,1)*attackIconDistMin;
 					else
+						vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDistMin;
+				}
+				else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnRight))
+				{
+					if(Mathf.Abs(ds)>maxTurnAngle && ds>=0)
 						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-maxTurnAngle,360))*new Vector2(0,1)*attackIconDistMin;
+					else if(ds<0)
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle,360))*new Vector2(0,1)*attackIconDistMin;
+					else
+						vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDistMin;
 				}
 				else
-					vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDistMin;
+				{
+					if(Mathf.Abs(ds)>=maxTurnAngle)
+					{
+						if(ds<0)
+							vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+maxTurnAngle,360))*new Vector2(0,1)*attackIconDistMin;
+						else
+							vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-maxTurnAngle,360))*new Vector2(0,1)*attackIconDistMin;
+					}
+					else
+						vec = Quaternion.Euler(0,0,-getAttackAngle())*new Vector2(0,1)*attackIconDistMin;
+				}
 				attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
 			}
 			else
 			{
-				if(Mathf.Abs(ds)>=maxTurnAngle)
+				if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
 				{
-					if(ds<0)
+					if(Mathf.Abs(ds)>maxTurnAngle && ds<=0)
+					{
 						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+maxTurnAngle,360))*new Vector2(0,1)*dst;
+						attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
+					}
+					else if(ds>0)
+					{
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle,360))*new Vector2(0,1)*dst;
+						attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
+					}
 					else
+					{
+						vec = new Vector2(mouse.x,mouse.y);
+						attackIcon.transform.position=new Vector3(vec.x,attackIconH,vec.y);
+					}
+				}
+				else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnRight))
+				{
+					if(Mathf.Abs(ds)>maxTurnAngle && ds>=0)
+					{
 						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-maxTurnAngle,360))*new Vector2(0,1)*dst;
-					attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
+						attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
+					}
+					else if(ds<0)
+					{
+						vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle,360))*new Vector2(0,1)*dst;
+						attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
+					}
+					else
+					{
+						vec = new Vector2(mouse.x,mouse.y);
+						attackIcon.transform.position=new Vector3(vec.x,attackIconH,vec.y);
+					}
 				}
 				else
 				{
-					vec = new Vector2(mouse.x,mouse.y);
-					attackIcon.transform.position=new Vector3(vec.x,attackIconH,vec.y);
+					if(Mathf.Abs(ds)>=maxTurnAngle)
+					{
+						if(ds<0)
+							vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+maxTurnAngle,360))*new Vector2(0,1)*dst;
+						else
+							vec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-maxTurnAngle,360))*new Vector2(0,1)*dst;
+						attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
+					}
+					else
+					{
+						vec = new Vector2(mouse.x,mouse.y);
+						attackIcon.transform.position=new Vector3(vec.x,attackIconH,vec.y);
+					}
 				}
 			}
+		}
 	}
 	
 	public void checkAttackIconClickState()
@@ -318,6 +473,26 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			attackIconCaptured=true;
 		if(Input.GetMouseButtonUp(0))
 			attackIconCaptured=false;
+	}
+	
+	public void StepStart()
+	{
+		if(earnedDefect)
+			defectInUse=true;
+	}
+	
+	public void StepEnd()
+	{
+		if(defectInUse)
+		{
+			if(curDefect.GetType() == typeof(Defects.DisableTurn))
+				maxTurnAngle=temp.maxTurnAngle;
+			defectInUse=false;
+			earnedDefect=false;
+			curDefect=null;
+		}
+		t=0;
+		updateAttackPosition();
 	}
 	
 	private float getAngleDst(float fr, float to)
@@ -336,9 +511,14 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			return Mathf.Abs(a);
 	}
 	
+	public void Die()
+	{
+		GameStorage.getInstance().removeFriendlyShuttle(this.gameObject);
+	}
+	
 	public void ByeBye()
 	{
-		Destroy(this);
+		Destroy(this.gameObject);
 	}
 	
 	private bool isMouseOver(GameObject o)
