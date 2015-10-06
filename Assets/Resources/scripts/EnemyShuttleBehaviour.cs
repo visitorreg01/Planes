@@ -8,7 +8,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	int shuttleH = 5;
 	
-	float angle=0;
+	public float angle=0;
 	int hp;
 	
 	float newAngle;
@@ -16,6 +16,19 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	private Defects.Defect curDefect = null;
 	bool earnedDefect = false;
 	bool defectInUse = false;
+	
+	Vector2 point1,point2,point3,point4;
+	float t=0;
+	
+	// orientation
+	float cos,sin;
+	Vector2 movePoint;
+	
+	//DEBUG!
+	public GameObject viewGO = null;
+	
+	float attackAngle=0;
+	float attackRange=0;
 	
 	bool focused=false;
 	bool needToUpdateAngle=false;
@@ -35,7 +48,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	public float getAngle()
 	{
-		return angle;
+		return Mathf.Repeat(angle,360);
 	}
 	
 	public void StepStart()
@@ -46,12 +59,14 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	public void StepEnd()
 	{
+		calculateMovePosition();
 		if(defectInUse)
 		{
 			defectInUse=false;
 			earnedDefect=false;
 			curDefect=null;
 		}
+		t=0;
 	}
 	
 	private void Accelerate()
@@ -97,21 +112,21 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 				}
 			}
 			
-//			float x,y;
-//			t+=1*Time.deltaTime/3;
-//			
-//			x = Mathf.Pow(1-t,2)*point1.x+2*(1-t)*t*point2.x+t*t*point3.x;
-//			y = Mathf.Pow(1-t,2)*point1.y+2*(1-t)*t*point2.y+t*t*point3.y;
-//			Vector2 pos = new Vector2(x-transform.position.x,y-transform.position.z);
-//			
-//			float nAngle;
-//			Vector2 v1 = new Vector2(0,5);
-//			float mySinPhi = (v1.x*pos.y - v1.y*pos.x);
-//			nAngle = Vector2.Angle(v1,pos);
-//			if(mySinPhi>0)
-//				nAngle=(180-nAngle)+180;
-//			angle=nAngle;
-//			transform.position=new Vector3(x,shuttleH,y);
+			float x,y;
+			t+=1*Time.deltaTime/3;
+			
+			x = Mathf.Pow(1-t,2)*point1.x+2*(1-t)*t*point2.x+t*t*point3.x;
+			y = Mathf.Pow(1-t,2)*point1.y+2*(1-t)*t*point2.y+t*t*point3.y;
+			Vector2 pos = new Vector2(x-transform.position.x,y-transform.position.z);
+			
+			float nAngle;
+			Vector2 v1 = new Vector2(0,5);
+			float mySinPhi = (v1.x*pos.y - v1.y*pos.x);
+			nAngle = Vector2.Angle(v1,pos);
+			if(mySinPhi>0)
+				nAngle=(180-nAngle)+180;
+			angle=nAngle;
+			transform.position=new Vector3(x,shuttleH,y);
 		}
 		else
 		{
@@ -136,6 +151,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 		GameStorage.getInstance().addEnemyShuttle(this.gameObject);
 		temp = Templates.getInstance().getPlaneTemplate(Template);
 		hp=temp.hp;
+		calculateMovePosition();
 	}
 	
 	// Update is called once per frame
@@ -184,6 +200,71 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			GUI.Label(new Rect(vec.x+2,Screen.height-vec.y+20,100,20),("HP: "+hp+"/"+temp.hp));
 			GUI.Label(new Rect(vec.x+2,Screen.height-vec.y+40,100,180),temp.description);
 		}
+	}
+	
+	private float getAttackIconAngle()
+	{
+		
+		Vector2 v1 = new Vector2(0,5);
+		Vector2 v2 = new Vector2(movePoint.x-transform.position.x,movePoint.y-transform.position.z);
+		float mySinPhi = (v1.x*v2.y - v1.y*v2.x);
+		float mangle = Vector2.Angle(v1,v2);
+		if(mySinPhi<=0)
+			return mangle;
+		else
+			return (180-mangle)+180;
+	}
+	
+	private void calculateMovePosition()
+	{
+		GameObject target = GameStorage.getInstance().getNearbyTarget(gameObject);
+		Vector2 firstVec = new Vector2(target.transform.position.x-transform.position.x,target.transform.position.z-transform.position.z);
+		Vector2 secondVec = Quaternion.Euler(0,0,this.getAngle())*(new Vector2(0,5));
+		sin = (firstVec.x*secondVec.y-firstVec.y*secondVec.x);
+		cos = (firstVec.x*secondVec.x+firstVec.y*secondVec.y)/(firstVec.magnitude*secondVec.magnitude);
+		
+		Vector2 v1 = new Vector2(0,5);
+		float mySinPhi = (v1.x*firstVec.y - v1.y*firstVec.x);
+		float mangle = Vector2.Angle(v1,firstVec);
+		if(mySinPhi>=0)
+			mangle=(180-mangle)+180;
+		
+		float dist = UnityEngine.Random.Range(temp.minRange,temp.maxRange);
+		float between = GameStorage.getInstance().getAngleDst(getAngle(),mangle);
+		float newAngle;
+		if(Mathf.Abs(between)>temp.maxTurnAngle)
+		{
+			if(GameStorage.getInstance().getAngleDst(getAngle(),mangle)>0)
+				newAngle=Mathf.Repeat(getAngle()-UnityEngine.Random.Range(0.0f,temp.maxTurnAngle),360);
+			else
+				newAngle=Mathf.Repeat(getAngle()+UnityEngine.Random.Range(0.0f,temp.maxTurnAngle),360);
+		}
+		else
+		{
+			newAngle=Mathf.Repeat(getAngle()-between,360);
+		}
+		
+		movePoint=new Vector2(0,0);
+		movePoint=Quaternion.Euler(0,0,-newAngle)*new Vector2(0,1)*5;
+		
+		movePoint=new Vector2(movePoint.x+transform.position.x,movePoint.y+transform.position.z);
+		
+		
+		if(viewGO!=null)
+			viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
+		
+		point1=new Vector2(transform.position.x,transform.position.z);
+		float dd = Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(movePoint.x,movePoint.y));
+		Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
+		Vector3 tempVec = GetComponent<Renderer>().bounds.ClosestPoint(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
+		point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
+		//point2*=dd;
+		point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
+		
+		point4=new Vector2(movePoint.x,movePoint.y);
+		Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
+		point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
+		point3 = point3+point2+pointz;
 	}
 	
 	private bool isMouseOver(GameObject o)

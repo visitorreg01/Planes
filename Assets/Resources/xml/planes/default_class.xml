@@ -2,10 +2,10 @@
 <plane 
 	id="1"
 	classname="default-class"
-	hp="5000"
-	minRange="3.0"
-	maxRange="9.0"
-	maxTurnAngle="55"
+	hp="250"
+	minRange="2.5"
+	maxRange="6.0"
+	maxTurnAngle="75"
 	description="This unit is a default class for planes">
 	<gun id="1" pos="0,0" turnAngle="0.0"/>
 </plane>

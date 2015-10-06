@@ -69,7 +69,25 @@ public class Templates {
 		foreach(PlaneTemplate p in planeClasses)
 		{
 			if(p.id==(int)id)
-				return p;
+			{
+				PlaneTemplate t = new PlaneTemplate();
+				t.classname=p.classname;
+				t.description=p.description;
+				t.hp=p.hp;
+				t.id=p.id;
+				t.maxRange=p.maxRange;
+				t.maxTurnAngle=p.maxTurnAngle;
+				t.minRange=p.minRange;
+				foreach(GunOnShuttle f in p.guns)
+				{
+					GunOnShuttle z = new GunOnShuttle();
+					z.gunId=f.gunId;
+					z.pos=f.pos;
+					z.turnAngle=f.turnAngle;
+					t.guns.Add(z);
+				}
+				return t;
+			}
 		}
 		return null;
 	}

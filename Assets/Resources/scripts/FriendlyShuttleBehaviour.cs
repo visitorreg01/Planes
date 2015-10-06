@@ -29,12 +29,12 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	bool needToUpdateAttackIconPosition = false;
 	
 	//Path
-	Vector2 point1,point2,point3;
+	Vector2 point1,point2,point3,point4;
 	float d;
 	float t;
 	
 	//mechanics
-	float angle=0;
+	public float angle=0;
 	Vector2 directionalVector;
 	float sinPhi;
 	Vector2 attackVec;
@@ -213,6 +213,19 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			return (180-mangle)+180;
 	}
 	
+	private float getAttackIconAngle()
+	{
+		
+		Vector2 v1 = new Vector2(0,5);
+		Vector2 v2 = new Vector2(attackIcon.transform.position.x-transform.position.x,attackIcon.transform.position.z-transform.position.z);
+		float mySinPhi = (v1.x*v2.y - v1.y*v2.x);
+		float mangle = Vector2.Angle(v1,v2);
+		if(mySinPhi<=0)
+			return mangle;
+		else
+			return (180-mangle)+180;
+	}
+	
 	public void Attacked(GameObject attacker, int damage, Defects.Defect defect)
 	{
 		Debug.Log("Get damage: "+damage);
@@ -293,8 +306,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			float x,y;
 			t+=1*Time.deltaTime/3;
 			
-			x = Mathf.Pow(1-t,2)*point1.x+2*(1-t)*t*point2.x+t*t*point3.x;
-			y = Mathf.Pow(1-t,2)*point1.y+2*(1-t)*t*point2.y+t*t*point3.y;
+			x = Mathf.Pow((1-t),3)*point1.x+3*(1-t)*(1-t)*t*point2.x+3*(1-t)*t*t*point3.x+t*t*t*point4.x;
+			y = Mathf.Pow((1-t),3)*point1.y+3*(1-t)*(1-t)*t*point2.y+3*(1-t)*t*t*point3.y+t*t*t*point4.y;
 			Vector2 pos = new Vector2(x-transform.position.x,y-transform.position.z);
 			
 			float nAngle;
@@ -483,6 +496,9 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	public void StepEnd()
 	{
+		Vector2 vvec = Quaternion.Euler(0,0,getAngle())*new Vector2(0,1);
+		Debug.Log(GetComponent<Renderer>().bounds.ClosestPoint(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z)));
+		
 		if(defectInUse)
 		{
 			if(curDefect.GetType() == typeof(Defects.DisableTurn))
@@ -531,18 +547,27 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	{
 		if(!GameStorage.getInstance().isRunning)
 		{
-			point1 = new Vector2(transform.position.x,transform.position.z);
-			point3 = new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);
-			d = new Vector2(point3.x-point1.x,point3.y-point1.y).magnitude/2;
-			point2 = (Quaternion.Euler(0,0,-angle)*new Vector2(0,1)*d);
-			point2=new Vector2(point2.x+point1.x,point2.y+point1.y);
+			point1=new Vector2(transform.position.x,transform.position.z);
+			float dd = Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z));
+			Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
+			Vector3 tempVec = GetComponent<Renderer>().bounds.ClosestPoint(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
+			point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
+			//point2*=dd;
+			point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
+			
+			point4=new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);
+			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
+			point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
+			point3 = point3+point2+pointz;
+			
+			
 			trackDots.Clear();
 			float x,y,tt;
 			float step = 0.005f;
 			for(tt=0f;tt<=1;tt+=step)
 			{
-				x = Mathf.Pow(1-tt,2)*point1.x+2*(1-tt)*tt*point2.x+tt*tt*point3.x;
-				y = Mathf.Pow(1-tt,2)*point1.y+2*(1-tt)*tt*point2.y+tt*tt*point3.y;
+				x = Mathf.Pow((1-tt),3)*point1.x+3*(1-tt)*(1-tt)*tt*point2.x+3*(1-tt)*tt*tt*point3.x+tt*tt*tt*point4.x;
+				y = Mathf.Pow((1-tt),3)*point1.y+3*(1-tt)*(1-tt)*tt*point2.y+3*(1-tt)*tt*tt*point3.y+tt*tt*tt*point4.y;
 				trackDots.Add(new Vector2(x,y));
 			}
 		}

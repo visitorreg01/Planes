@@ -103,7 +103,7 @@ public class GameStorage {
 		return lst;
 	}
 	
-	private float getAngleDst(float fr, float to)
+	public float getAngleDst(float fr, float to)
 	{
 		Vector2 v1 = Quaternion.Euler(0,0,fr)*new Vector2(0,5);
 		Vector2 v2 = Quaternion.Euler(0,0,to)*new Vector2(0,5);
@@ -230,6 +230,32 @@ public class GameStorage {
 						ret=friendly;
 						mindist=dist;
 					}
+				}
+			}
+		}
+		return ret;
+	}
+	
+	public GameObject getNearbyTarget(GameObject attacker)
+	{
+		GameObject ret=null;
+		float dst=-1;
+		Vector2 pos1,pos2;
+		pos1 = new Vector2(attacker.transform.position.x,attacker.transform.position.z);
+		foreach(GameObject target in getFriendlyShuttles())
+		{
+			pos2 = new Vector2(target.transform.position.x,target.transform.position.z);
+			if(dst<0)
+			{
+				ret=target;
+				dst = Vector2.Distance(pos1,pos2);
+			}
+			else
+			{
+				if(dst>Vector2.Distance(pos1,pos2))
+				{
+					ret=target;
+					dst=Vector2.Distance(pos1,pos2);
 				}
 			}
 		}
