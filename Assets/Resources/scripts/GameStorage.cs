@@ -16,6 +16,12 @@ public class GameStorage {
 	
 	private ArrayList friendlyGameObjectsList;
 	private ArrayList enemyGameObjectsList;
+	private ArrayList gasList;
+	private ArrayList gasRemoveList;
+	private ArrayList rocketList;
+	private ArrayList rocketRemoveList;
+	private ArrayList thorpedeList;
+	private ArrayList thorpedeRemoveList;
 	
 	private GameObject friendlyUnitPrefab;
 	
@@ -25,6 +31,12 @@ public class GameStorage {
 	{
 		friendlyGameObjectsList = new ArrayList();
 		enemyGameObjectsList = new ArrayList();
+		gasList=new ArrayList();
+		gasRemoveList=new ArrayList();
+		rocketList = new ArrayList();
+		rocketRemoveList = new ArrayList();
+		thorpedeList = new ArrayList();
+		thorpedeRemoveList = new ArrayList();
 	}
 	
 	public void StepStart()
@@ -45,12 +57,45 @@ public class GameStorage {
 	{
 		isRunning=false;
 		foreach(GameObject f in GameStorage.getInstance().getFriendlyShuttles())
-		{
 			f.GetComponent<FriendlyShuttleBehaviour>().StepEnd();
-		}
 		foreach(GameObject f in GameStorage.getInstance().getEnemyShuttles())
-		{
 			f.GetComponent<EnemyShuttleBehaviour>().StepEnd();
+		gasRemoveList.Clear();
+		foreach(GameObject f in GameStorage.getInstance().getGasUnits())
+		{
+			if(f.GetComponent<GasBehaviour>().updateStepCounter()==3)
+				gasRemoveList.Add(f);
+		}
+		
+		foreach(GameObject f in gasRemoveList)
+		{
+			gasList.Remove(f);
+			f.GetComponent<GasBehaviour>().Die();
+		}
+		rocketRemoveList.Clear();
+		foreach(GameObject f in GameStorage.getInstance().getRocketUnits())
+		{
+			if(f.GetComponent<RocketBehaviour>().updateStepCounter()==5)
+				rocketRemoveList.Add(f);
+		}
+		
+		foreach(GameObject f in rocketRemoveList)
+		{
+			rocketList.Remove(f);
+			f.GetComponent<RocketBehaviour>().Die();
+		}
+		
+		thorpedeRemoveList.Clear();
+		foreach(GameObject f in GameStorage.getInstance().getThorpedeUnits())
+		{
+			if(f.GetComponent<ThorpedeBehaviour>().updateStepCounter()==5)
+				thorpedeRemoveList.Add(f);
+		}
+		
+		foreach(GameObject f in thorpedeRemoveList)
+		{
+			thorpedeList.Remove(f);
+			f.GetComponent<ThorpedeBehaviour>().Die();
 		}
 	}
 	
@@ -236,6 +281,52 @@ public class GameStorage {
 		return ret;
 	}
 	
+	public void registerGasUnit(GameObject o)
+	{
+		gasList.Add(o);
+	}
+	
+	public void removeGasUnit(GameObject o)
+	{
+		gasList.Remove(o);
+	}
+	
+	public ArrayList getGasUnits()
+	{
+		return gasList;
+	}
+	
+	public void registerRocketUnit(GameObject o)
+	{
+		rocketList.Add(o);
+	}
+	
+	public void removeRocketUnit(GameObject o)
+	{
+		rocketList.Remove(o);
+	}
+	
+	public ArrayList getRocketUnits()
+	{
+		return rocketList;
+	}
+	
+	public void registerThorpedeUnit(GameObject o)
+	{
+		thorpedeList.Add(o);
+	}
+	
+	public void removeThorpedeUnit(GameObject o)
+	{
+		thorpedeList.Remove(o);
+	}
+	
+	public ArrayList getThorpedeUnits()
+	{
+		return thorpedeList;
+	}
+	
+	
 	public GameObject getNearbyTarget(GameObject attacker)
 	{
 		GameObject ret=null;
@@ -243,6 +334,32 @@ public class GameStorage {
 		Vector2 pos1,pos2;
 		pos1 = new Vector2(attacker.transform.position.x,attacker.transform.position.z);
 		foreach(GameObject target in getFriendlyShuttles())
+		{
+			pos2 = new Vector2(target.transform.position.x,target.transform.position.z);
+			if(dst<0)
+			{
+				ret=target;
+				dst = Vector2.Distance(pos1,pos2);
+			}
+			else
+			{
+				if(dst>Vector2.Distance(pos1,pos2))
+				{
+					ret=target;
+					dst=Vector2.Distance(pos1,pos2);
+				}
+			}
+		}
+		return ret;
+	}
+	
+	public GameObject getNearbyEnemy(GameObject attacker)
+	{
+		GameObject ret=null;
+		float dst=-1;
+		Vector2 pos1,pos2;
+		pos1 = new Vector2(attacker.transform.position.x,attacker.transform.position.z);
+		foreach(GameObject target in getEnemyShuttles())
 		{
 			pos2 = new Vector2(target.transform.position.x,target.transform.position.z);
 			if(dst<0)

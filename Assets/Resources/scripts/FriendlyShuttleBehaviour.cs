@@ -10,6 +10,15 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	public Templates.PlaneTemplates Template;
 	private Templates.PlaneTemplate temp;
 	
+	//abil positions
+	Vector3 firstAbilPos,secondAbilPos,thirdAbilPos,fourthAbilPos;
+	// abil rotateDirection
+	int turnRotateDir=1;
+	float routeDist=0.0f;
+	int gasSpawned=0;
+	bool rocketSpawned=false;
+	bool thorpedeSpawned=false;
+	
 	//const
 	float shuttleH=5;
 	float attackIconH=6;
@@ -18,8 +27,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	float maxTurnAngle = 55;
 	int hp = 300;
 	float lastFired=0f;
+	bool abilityInReuse=false;
+	Abilities.AbilityType origin0,origin1,origin2,origin3;
 	
-	
+	Abilities.AbilityType activeAbil=Abilities.AbilityType.none;
+	Abilities.AbilityType prevAbil = Abilities.AbilityType.none;
 	
 	//operations
 	bool needToUpdatePosition = false;
@@ -44,6 +56,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	bool focused = false;
 	bool selected = false;
 	bool attackIconCaptured = false;
+	bool attackIconFocused = false;
 	bool spawn=true;
 	
 	private Defects.Defect curDefect = null;
@@ -68,6 +81,18 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	{
 		newAngle=angle;
 		needToUpdateAngle=true;
+	}
+	
+	private void loadOriginAbilities()
+	{
+		if(temp.abilities.Count>=1)
+			temp.abilities[0]=(int)origin0;
+		if(temp.abilities.Count>=2)
+			temp.abilities[1]=(int)origin1;
+		if(temp.abilities.Count>=3)
+			temp.abilities[2]=(int)origin2;
+		if(temp.abilities.Count>=4)
+			temp.abilities[3]=(int)origin3;
 	}
 	
 	public float getAngle()
@@ -100,7 +125,105 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		maxTurnAngle = temp.maxTurnAngle;
 		hp=temp.hp;
 		
+		if(temp.abilities.Count>=1)
+			origin0=(Abilities.AbilityType) temp.abilities[0];
+		if(temp.abilities.Count>=2)
+			origin1=(Abilities.AbilityType) temp.abilities[1];
+		if(temp.abilities.Count>=3)
+			origin2=(Abilities.AbilityType) temp.abilities[2];
+		if(temp.abilities.Count>=4)
+			origin3=(Abilities.AbilityType) temp.abilities[3];
+		
 		Debug.Log("Guns: "+temp.guns.Count);
+	}
+	
+	void AbilitySwitched()
+	{
+		if(activeAbil==Abilities.AbilityType.none)
+		{
+			if(prevAbil==Abilities.AbilityType.halfRoundTurn)
+			{
+				maxTurnAngle=temp.maxTurnAngle;
+				attackIconDist=temp.maxRange;
+				attackIconDistMin=temp.minRange;
+				
+				updateAttackIconPosition();
+			}
+			
+			if(prevAbil==Abilities.AbilityType.homingMissle)
+			{
+				rocketSpawned=false;
+			}
+			
+			if(prevAbil==Abilities.AbilityType.homingThorpede)
+			{
+				thorpedeSpawned=false;
+			}
+			
+			if(prevAbil==Abilities.AbilityType.gas)
+			{
+				gasSpawned=0;
+				routeDist=0f;
+			}
+			
+			if(prevAbil==Abilities.AbilityType.turnAround)
+			{
+				maxTurnAngle=temp.maxTurnAngle;
+				attackIconDist=temp.maxRange;
+				attackIconDistMin=temp.minRange;
+				
+				updateAttackIconPosition();
+			}
+			
+			if(prevAbil==Abilities.AbilityType.doubleThrottle)
+			{
+				attackIconDist=temp.maxRange;
+				attackIconDistMin=temp.minRange;
+				
+				float dst = Vector2.Distance(new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z),new Vector2(transform.position.x,transform.position.z));
+				float angles = getAttackIconAngle();
+				
+				Vector2 newPosAt=Quaternion.Euler(0,0,-angles)*new Vector2(0,1)*dst/2;
+				attackIcon.transform.position=new Vector3(newPosAt.x+transform.position.x,0,newPosAt.y+transform.position.z);
+			}
+		}
+		else
+		{
+			if(activeAbil==Abilities.AbilityType.doubleThrottle)
+			{
+				attackIconDist=temp.maxRange*2;
+				attackIconDistMin=temp.minRange*2;
+				
+				float dst = Vector2.Distance(new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z),new Vector2(transform.position.x,transform.position.z));
+				float angles = getAttackIconAngle();
+				
+				Vector2 newPosAt=Quaternion.Euler(0,0,-angles)*new Vector2(0,1)*dst*2;
+				attackIcon.transform.position=new Vector3(newPosAt.x+transform.position.x,0,newPosAt.y+transform.position.z);
+			
+			}
+			
+			if(activeAbil==Abilities.AbilityType.halfRoundTurn)
+			{
+				maxTurnAngle=0;
+				attackIconDist=0.7f*temp.minRange;
+				attackIconDistMin=0.7f*temp.minRange;
+				turnRotateDir=UnityEngine.Random.Range(0,2);
+					if(turnRotateDir==0)
+						turnRotateDir=-1;
+				updateAttackIconPosition();
+			}
+			
+			if(activeAbil==Abilities.AbilityType.turnAround)
+			{
+				maxTurnAngle=0;
+				attackIconDist=(temp.minRange+temp.maxRange)/2;
+				attackIconDistMin=attackIconDist;
+				turnRotateDir=UnityEngine.Random.Range(0,2);
+					if(turnRotateDir==0)
+						turnRotateDir=-1;
+				updateAttackIconPosition();
+			}
+		}
 	}
 	
 	void Update()
@@ -184,6 +307,58 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			GUI.Label(new Rect(vec.x+2,Screen.height-vec.y+20,100,20),("HP: "+hp+"/"+temp.hp));
 			GUI.Label(new Rect(vec.x+2,Screen.height-vec.y+40,100,180),temp.description);
 		}
+		
+		if(temp.abilities.Count>0 && attackIconFocused && !attackIconCaptured && !abilityInReuse && !earnedDefect)
+		{
+			firstAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x-1f,0,attackIcon.transform.position.z));
+			secondAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x+1f,0,attackIcon.transform.position.z));
+			thirdAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z+1f));
+			fourthAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z-1f));
+			if(temp.abilities.Count>=1)
+			{
+				if(GUI.Button(new Rect(firstAbilPos.x-10,Screen.height-firstAbilPos.y-10,20,20),temp.abilities[0].ToString()))
+				{
+					Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[0];
+					prevAbil=activeAbil;
+					temp.abilities[0]=(int)activeAbil;
+					activeAbil=selectedAbil;
+					AbilitySwitched();
+				}
+			}
+			if(temp.abilities.Count>=2)
+			{
+				if(GUI.Button(new Rect(secondAbilPos.x-10,Screen.height-secondAbilPos.y-10,20,20),temp.abilities[1].ToString()))
+				{
+					Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[1];
+					prevAbil=activeAbil;
+					temp.abilities[1]=(int)activeAbil;
+					activeAbil=selectedAbil;
+					AbilitySwitched();
+				}
+			}
+			if(temp.abilities.Count>=3)
+			{
+				if(GUI.Button(new Rect(thirdAbilPos.x-10,Screen.height-thirdAbilPos.y-10,20,20),temp.abilities[2].ToString()))
+				{
+					Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[2];
+					prevAbil=activeAbil;
+					temp.abilities[2]=(int)activeAbil;
+					activeAbil=selectedAbil;
+					AbilitySwitched();
+				}
+			}
+			if(temp.abilities.Count>=4)
+			{
+				if(GUI.Button(new Rect(fourthAbilPos.x-10,Screen.height-fourthAbilPos.y-10,20,20),temp.abilities[3].ToString()))
+				{
+					Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[3];
+					prevAbil=activeAbil;
+					temp.abilities[3]=(int)activeAbil;
+					activeAbil=selectedAbil;
+					AbilitySwitched();
+				}
+			}
+		}
 	}
 	
 	private void clearLine()
@@ -197,7 +372,15 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		if((Input.GetMouseButtonDown(0) && isMouseOver(gameObject)) || (Input.GetMouseButtonDown(0) && isMouseOver(attackIcon)))
 			selected=true;
 		else if(Input.GetMouseButtonDown(0) && !isMouseOver(gameObject))
-			selected=false;
+		{
+			if(temp.abilities.Count>0)
+			{
+				if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>1.7f)
+					selected=false;
+			}
+			else
+				selected=false;
+		}
 	}
 	
 	private float getAttackAngle()
@@ -228,23 +411,25 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	public void Attacked(GameObject attacker, int damage, Defects.Defect defect)
 	{
-		Debug.Log("Get damage: "+damage);
-		if(curDefect==null && defect!=null)
+		if(activeAbil!=Abilities.AbilityType.shield)
 		{
-			Debug.Log("Earned defect: "+defect);
-			curDefect=defect;
-			earnedDefect=true;
+			if(curDefect==null && defect!=null)
+			{
+				Debug.Log("Earned defect: "+defect);
+				curDefect=defect;
+				earnedDefect=true;
+			}
+			this.hp-=damage;
+			if(this.hp<=0)
+				this.Die();
 		}
-		this.hp-=damage;
-		if(this.hp<=0)
-			this.Die();
 	}
 	
 	private void Accelerate()
 	{
 		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
 		{
-			if(!(defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns)))
+			if(!(defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns)) && activeAbil!=Abilities.AbilityType.gas && activeAbil!=Abilities.AbilityType.homingMissle && activeAbil!=Abilities.AbilityType.homingThorpede)
 			{
 				Templates.GunTemplate gunTemp;
 				GameObject enemy;
@@ -308,16 +493,48 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			
 			x = Mathf.Pow((1-t),3)*point1.x+3*(1-t)*(1-t)*t*point2.x+3*(1-t)*t*t*point3.x+t*t*t*point4.x;
 			y = Mathf.Pow((1-t),3)*point1.y+3*(1-t)*(1-t)*t*point2.y+3*(1-t)*t*t*point3.y+t*t*t*point4.y;
-			Vector2 pos = new Vector2(x-transform.position.x,y-transform.position.z);
 			
-			float nAngle;
-			Vector2 v1 = new Vector2(0,5);
-			float mySinPhi = (v1.x*pos.y - v1.y*pos.x);
-			nAngle = Vector2.Angle(v1,pos);
-			if(mySinPhi>0)
-				nAngle=(180-nAngle)+180;
-			angle=nAngle;
-			transform.position=new Vector3(x,shuttleH,y);
+			if(activeAbil==Abilities.AbilityType.halfRoundTurn)
+				angle=Mathf.Repeat(angle+(180/3*Time.deltaTime*turnRotateDir),360);
+			else if(activeAbil==Abilities.AbilityType.turnAround)
+				angle=Mathf.Repeat(angle+(360/3*Time.deltaTime*turnRotateDir),360);
+			else
+			{
+				Vector2 pos = new Vector2(x-transform.position.x,y-transform.position.z);
+				float nAngle;
+				Vector2 v1 = new Vector2(0,5);
+				float mySinPhi = (v1.x*pos.y - v1.y*pos.x);
+				nAngle = Vector2.Angle(v1,pos);
+				if(mySinPhi>0)
+					nAngle=(180-nAngle)+180;
+				angle=nAngle;
+				if(activeAbil==Abilities.AbilityType.gas)
+				{
+					if(routeDist>=gasSpawned*Abilities.GasParameters.betweenDist)
+					{
+						Instantiate(Resources.Load("prefab/gasPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						gasSpawned++;
+					}
+					routeDist+=pos.magnitude;
+				}
+				if(activeAbil==Abilities.AbilityType.homingMissle && !rocketSpawned)
+				{
+					if(t>=1.0/3.0)
+					{
+						Instantiate(Resources.Load("prefab/rocketPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						rocketSpawned=true;
+					}
+				}
+				if(activeAbil==Abilities.AbilityType.homingThorpede && !thorpedeSpawned)
+				{
+					if(t>=1.0/3.0)
+					{
+						Instantiate(Resources.Load("prefab/thorpedePrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						thorpedeSpawned=true;
+					}
+				}
+			}
+			transform.position=new Vector3(x,0,y);
 			updateAttackIconPosition();
 		}
 		else
@@ -332,11 +549,6 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		float dst = new Vector2(mouse.x-transform.position.x,mouse.y-transform.position.z).magnitude;
 		Vector2 vec;
 		float ds = getAngleDst(angle,getAttackAngle());
-		
-		Vector2 v1 = Quaternion.Euler(0,0,angle)*new Vector2(0,5);
-		Vector2 v2 = Quaternion.Euler(0,0,getAttackAngle())*new Vector2(0,5);
-		
-		float cos = (Vector2.Dot(v1,v2)/(v1.magnitude*v2.magnitude));
 		
 		if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
 		{
@@ -482,10 +694,30 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	public void checkAttackIconClickState()
 	{
+		if(selected)
+		{
+			if(isMouseOver(attackIcon))
+				attackIconFocused=true;
+			else
+			{
+				if(temp.abilities.Count>0)
+				{
+					if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>1.7f)
+						attackIconFocused=false;
+				}
+				else
+					attackIconFocused=false;
+			}
+		}
+		
 		if(Input.GetMouseButtonDown(0) && isMouseOver(attackIcon))
+		{
 			attackIconCaptured=true;
+		}
 		if(Input.GetMouseButtonUp(0))
+		{
 			attackIconCaptured=false;
+		}
 	}
 	
 	public void StepStart()
@@ -496,9 +728,20 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	public void StepEnd()
 	{
-		Vector2 vvec = Quaternion.Euler(0,0,getAngle())*new Vector2(0,1);
-		Debug.Log(GetComponent<Renderer>().bounds.ClosestPoint(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z)));
+		if(activeAbil==Abilities.AbilityType.none && abilityInReuse)
+		{
+			abilityInReuse=false;
+			loadOriginAbilities();
+		}
 		
+		if(activeAbil!=Abilities.AbilityType.none && !abilityInReuse)
+		{
+			prevAbil=activeAbil;
+			abilityInReuse=true;
+			activeAbil=Abilities.AbilityType.none;
+			
+			AbilitySwitched();
+		}
 		if(defectInUse)
 		{
 			if(curDefect.GetType() == typeof(Defects.DisableTurn))
@@ -548,7 +791,6 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		if(!GameStorage.getInstance().isRunning)
 		{
 			point1=new Vector2(transform.position.x,transform.position.z);
-			float dd = Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z));
 			Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
 			Vector3 tempVec = GetComponent<Renderer>().bounds.ClosestPoint(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
 			point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);

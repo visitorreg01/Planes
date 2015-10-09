@@ -6,10 +6,11 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	public Templates.PlaneTemplates Template;
 	private Templates.PlaneTemplate temp;
 	
-	int shuttleH = 5;
+	int shuttleH = 0;
 	
 	public float angle=0;
 	int hp;
+	float lastFired=0f;
 	
 	float newAngle;
 	Vector2 newPos;
@@ -21,14 +22,10 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	float t=0;
 	
 	// orientation
-	float cos,sin;
 	Vector2 movePoint;
 	
 	//DEBUG!
 	public GameObject viewGO = null;
-	
-	float attackAngle=0;
-	float attackRange=0;
 	
 	bool focused=false;
 	bool needToUpdateAngle=false;
@@ -73,41 +70,61 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	{
 		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
 		{
-			
-			Templates.GunTemplate gunTemp;
-			GameObject friendly;
-			foreach(Templates.GunOnShuttle gun in temp.guns)
+			if(!(defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns)))
 			{
-				gunTemp=Templates.getInstance().getGunTemplate(gun.gunId);
-				if(!gun.ready)
-					if(gun.shotTime+gunTemp.reuse<Time.time)
-						gun.ready=true;
-				
-				friendly=GameStorage.getInstance().getFriendlyInFireZone(gameObject,gun);
-				if(friendly!=null)
+				Templates.GunTemplate gunTemp;
+				GameObject friendly;
+				foreach(Templates.GunOnShuttle gun in temp.guns)
 				{
-					if(gun.ready)
+					gunTemp=Templates.getInstance().getGunTemplate(gun.gunId);
+					if(!gun.ready)
+						if(gun.shotTime+gunTemp.reuse<Time.time)
+							gun.ready=true;
+					
+					friendly=GameStorage.getInstance().getFriendlyInFireZone(gameObject,gun);
+					if(friendly!=null)
 					{
-						gun.shotTime=Time.time;
-						gun.ready=false;
-						// WARN
-						
-						int defect=-1,i;
-						float ch = UnityEngine.Random.Range(0.0f,100f);
-						float lower=0.0f,upper;
-						for(i=0;i<gunTemp.defectsChance.Length;i++)
+						if(gun.ready)
 						{
-							upper=gunTemp.defectsChance[i]+lower;
-							if(ch>=lower && ch<=upper)
+							gun.shotTime=Time.time;
+							gun.ready=false;
+							// WARN
+							
+							int defect=-1,i;
+							float ch = UnityEngine.Random.Range(0.0f,100f);
+							float lower=0.0f,upper;
+							for(i=0;i<gunTemp.defectsChance.Length;i++)
 							{
-								defect=i;
-								break;
+								upper=gunTemp.defectsChance[i]+lower;
+								if(ch>=lower && ch<=upper)
+								{
+									defect=i;
+									break;
+								}
+								else
+									lower=upper;
 							}
-							else
-								lower=upper;
+							
+							friendly.GetComponent<FriendlyShuttleBehaviour>().Attacked(gameObject,gunTemp.damage, Defects.getDefect(defect));
 						}
-						
-						friendly.GetComponent<FriendlyShuttleBehaviour>().Attacked(gameObject,gunTemp.damage, Defects.getDefect(defect));
+					}
+				}
+			}
+				
+			if(defectInUse && curDefect.GetType() == typeof(Defects.Fired))
+			{
+				Defects.Fired fire = (Defects.Fired)curDefect;
+				if(lastFired==0)
+				{
+					Attacked(null,fire.damage,null);
+					lastFired=Time.time;
+				}
+				else
+				{
+					if(Time.time>=lastFired+fire.reuse)
+					{
+						Attacked(null,fire.damage,null);
+						lastFired=Time.time;
 					}
 				}
 			}
@@ -219,9 +236,6 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	{
 		GameObject target = GameStorage.getInstance().getNearbyTarget(gameObject);
 		Vector2 firstVec = new Vector2(target.transform.position.x-transform.position.x,target.transform.position.z-transform.position.z);
-		Vector2 secondVec = Quaternion.Euler(0,0,this.getAngle())*(new Vector2(0,5));
-		sin = (firstVec.x*secondVec.y-firstVec.y*secondVec.x);
-		cos = (firstVec.x*secondVec.x+firstVec.y*secondVec.y)/(firstVec.magnitude*secondVec.magnitude);
 		
 		Vector2 v1 = new Vector2(0,5);
 		float mySinPhi = (v1.x*firstVec.y - v1.y*firstVec.x);
@@ -229,23 +243,34 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 		if(mySinPhi>=0)
 			mangle=(180-mangle)+180;
 		
-		float dist = UnityEngine.Random.Range(temp.minRange,temp.maxRange);
 		float between = GameStorage.getInstance().getAngleDst(getAngle(),mangle);
-		float newAngle;
-		if(Mathf.Abs(between)>temp.maxTurnAngle)
-		{
-			if(GameStorage.getInstance().getAngleDst(getAngle(),mangle)>0)
-				newAngle=Mathf.Repeat(getAngle()-UnityEngine.Random.Range(0.0f,temp.maxTurnAngle),360);
-			else
-				newAngle=Mathf.Repeat(getAngle()+UnityEngine.Random.Range(0.0f,temp.maxTurnAngle),360);
-		}
+		float nnewAngle;
+		
+		if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnRight))
+			nnewAngle=Mathf.Repeat(getAngle()-UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
+		else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
+			nnewAngle=Mathf.Repeat(getAngle()+UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
+		else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn))
+			nnewAngle=getAngle();
 		else
 		{
-			newAngle=Mathf.Repeat(getAngle()-between,360);
+			if(Mathf.Abs(between)>temp.maxTurnAngle)
+			{
+				if(between>0)
+					nnewAngle=Mathf.Repeat(getAngle()-temp.maxTurnAngle,360);
+				else
+					nnewAngle=Mathf.Repeat(getAngle()+temp.maxTurnAngle,360);
+			}
+			else
+				nnewAngle=Mathf.Repeat(getAngle()-between,360);
 		}
 		
 		movePoint=new Vector2(0,0);
-		movePoint=Quaternion.Euler(0,0,-newAngle)*new Vector2(0,1)*5;
+		
+		if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
+			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*((Defects.EngineCrash)curDefect).newRangeCoeff;
+		else
+			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange);
 		
 		movePoint=new Vector2(movePoint.x+transform.position.x,movePoint.y+transform.position.z);
 		
@@ -254,11 +279,9 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
 		
 		point1=new Vector2(transform.position.x,transform.position.z);
-		float dd = Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(movePoint.x,movePoint.y));
 		Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
 		Vector3 tempVec = GetComponent<Renderer>().bounds.ClosestPoint(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
 		point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
-		//point2*=dd;
 		point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
 		
 		point4=new Vector2(movePoint.x,movePoint.y);

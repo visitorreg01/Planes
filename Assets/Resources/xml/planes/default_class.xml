@@ -8,4 +8,6 @@
 	maxTurnAngle="75"
 	description="This unit is a default class for planes">
 	<gun id="1" pos="0,0" turnAngle="0.0"/>
+	<ability id="6"/>
+	<ability id="4"/>
 </plane>

@@ -3,7 +3,7 @@
 	id="1"
 	gunName="default Gun"
 	damage="20"
-	reuse="0.3"
+	reuse="1"
 	attackAngle="70.0"
 	attackRange="5.0">
 	<defectChance id="0" chance="7"/>

@@ -52,6 +52,7 @@ public class Templates {
 		public float minRange,maxRange,maxTurnAngle;
 		public string description;
 		public ArrayList guns = new ArrayList();
+		public ArrayList abilities = new ArrayList();
 	}
 	
 	public class GunTemplate
@@ -86,6 +87,9 @@ public class Templates {
 					z.turnAngle=f.turnAngle;
 					t.guns.Add(z);
 				}
+				
+				foreach(int abilId in p.abilities)
+					t.abilities.Add(abilId);
 				return t;
 			}
 		}
@@ -124,6 +128,9 @@ public class Templates {
 					z.turnAngle=f.turnAngle;
 					t.guns.Add(z);
 				}
+				
+				foreach(int abilId in p.abilities)
+					t.abilities.Add(abilId);
 				return t;
 			}
 		}
@@ -244,6 +251,16 @@ public class Templates {
 									gos.turnAngle=float.Parse(l.Value);
 							}
 							p.guns.Add(gos);
+						}
+						else if(m.Name=="ability")
+						{
+							int id=-1;
+							foreach(XmlNode l in m.Attributes)
+							{
+								if(l.Name=="id")
+									id=int.Parse(l.Value);
+							}
+							p.abilities.Add(id);
 						}
 					}
 					planeClasses.Add(p);
