@@ -6,19 +6,19 @@ public static class Abilities
 	public enum AbilityType : int
 	{
 		none=-1,
-		halfRoundTurn=0, // DONE pla
-		turnAround=1, // DONE pla
-		doubleThrottle=2, // DONE pla
-		gas=3, // DONE pla
-		homingMissle=4, // DONE pla
+		halfRoundTurn=0, // DONE pla, ai
+		turnAround=1, // DONE pla, ai
+		doubleThrottle=2, // DONE pla, ai
+		gas=3, // DONE pla, ai
+		homingMissle=4, // DONE pla, ai
 		shield=5, //DONE pla
-		homingThorpede=6 
+		homingThorpede=6 // DONE pla, ai
 	}
 	
 	public static class GasParameters
 	{
 		public const float gasRange=0.5f;
-		public const float gasReuse=1f;
+		public const float gasReuse=0.5f;
 		public const int gasDamage=20;
 		public const float betweenDist=1f;
 	}

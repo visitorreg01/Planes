@@ -11,18 +11,26 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	public float angle=0;
 	int hp;
 	float lastFired=0f;
-	
+	int turnRotateDir=1;
 	float newAngle;
 	Vector2 newPos;
 	private Defects.Defect curDefect = null;
 	bool earnedDefect = false;
 	bool defectInUse = false;
+	float routeDist=0.0f;
+	int gasSpawned=0;
+	bool rocketSpawned=false;
+	bool thorpedeSpawned=false;
 	
 	Vector2 point1,point2,point3,point4;
 	float t=0;
 	
+	Abilities.AbilityType activeAbil=Abilities.AbilityType.none;
+	Abilities.AbilityType prevAbil = Abilities.AbilityType.none;
+	
 	// orientation
 	Vector2 movePoint;
+	bool abilityInReuse=false;
 	
 	//DEBUG!
 	public GameObject viewGO = null;
@@ -54,9 +62,51 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			defectInUse=true;
 	}
 	
+	void AbilitySwitched()
+	{
+		if(activeAbil==Abilities.AbilityType.none)
+		{
+			if(prevAbil==Abilities.AbilityType.homingMissle)
+			{
+				rocketSpawned=false;
+			}
+			
+			if(prevAbil==Abilities.AbilityType.homingThorpede)
+			{
+				thorpedeSpawned=false;
+			}
+			
+			if(prevAbil==Abilities.AbilityType.gas)
+			{
+				gasSpawned=0;
+				routeDist=0f;
+			}
+		}
+		else
+		{
+			if(activeAbil==Abilities.AbilityType.halfRoundTurn)
+			{
+				turnRotateDir=UnityEngine.Random.Range(0,2);
+					if(turnRotateDir==0)
+						turnRotateDir=-1;
+			}
+		}
+	}
+	
 	public void StepEnd()
 	{
-		calculateMovePosition();
+		if(activeAbil==Abilities.AbilityType.none && abilityInReuse)
+		{
+			abilityInReuse=false;
+		}
+		
+		if(activeAbil!=Abilities.AbilityType.none && !abilityInReuse)
+		{
+			prevAbil=activeAbil;
+			abilityInReuse=true;
+			activeAbil=Abilities.AbilityType.none;
+			AbilitySwitched();
+		}
 		if(defectInUse)
 		{
 			defectInUse=false;
@@ -64,13 +114,28 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			curDefect=null;
 		}
 		t=0;
+		
+		if(!abilityInReuse && !earnedDefect)
+			TryChoiceAbil();
+		calculateMovePosition();
+	}
+	
+	void TryChoiceAbil()
+	{
+		if(UnityEngine.Random.Range(0,100)>=0)
+		{
+			prevAbil=activeAbil;
+			activeAbil=(Abilities.AbilityType) temp.abilities[UnityEngine.Random.Range(0,temp.abilities.Count)];
+			AbilitySwitched();
+			Debug.Log("USED: "+activeAbil);
+		}
 	}
 	
 	private void Accelerate()
 	{
 		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
 		{
-			if(!(defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns)))
+			if(!(defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns)) && activeAbil!=Abilities.AbilityType.gas && activeAbil!=Abilities.AbilityType.homingMissle && activeAbil!=Abilities.AbilityType.homingThorpede)
 			{
 				Templates.GunTemplate gunTemp;
 				GameObject friendly;
@@ -136,14 +201,49 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			y = Mathf.Pow(1-t,2)*point1.y+2*(1-t)*t*point2.y+t*t*point3.y;
 			Vector2 pos = new Vector2(x-transform.position.x,y-transform.position.z);
 			
-			float nAngle;
-			Vector2 v1 = new Vector2(0,5);
-			float mySinPhi = (v1.x*pos.y - v1.y*pos.x);
-			nAngle = Vector2.Angle(v1,pos);
-			if(mySinPhi>0)
-				nAngle=(180-nAngle)+180;
-			angle=nAngle;
-			transform.position=new Vector3(x,shuttleH,y);
+			if(activeAbil==Abilities.AbilityType.halfRoundTurn)
+				angle=Mathf.Repeat(angle+(180/3*Time.deltaTime*turnRotateDir),360);
+			else if(activeAbil==Abilities.AbilityType.turnAround)
+				angle=Mathf.Repeat(angle+(360/3*Time.deltaTime*turnRotateDir),360);
+			else
+			{
+				float nAngle;
+				Vector2 v1 = new Vector2(0,5);
+				float mySinPhi = (v1.x*pos.y - v1.y*pos.x);
+				nAngle = Vector2.Angle(v1,pos);
+				if(mySinPhi>0)
+					nAngle=(180-nAngle)+180;
+				angle=nAngle;
+				if(activeAbil==Abilities.AbilityType.gas)
+				{
+					if(routeDist>=gasSpawned*Abilities.GasParameters.betweenDist)
+					{
+						GameObject go = (GameObject) Instantiate(Resources.Load("prefab/gasPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						go.GetComponent<GasBehaviour>().enemy=true;
+						gasSpawned++;
+					}
+					routeDist+=pos.magnitude;
+				}
+				if(activeAbil==Abilities.AbilityType.homingMissle && !rocketSpawned)
+				{
+					if(t>=1.0/3.0)
+					{
+						GameObject go = (GameObject) Instantiate(Resources.Load("prefab/rocketPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						go.GetComponent<RocketBehaviour>().enemy=true;
+						rocketSpawned=true;
+					}
+				}
+				if(activeAbil==Abilities.AbilityType.homingThorpede && !thorpedeSpawned)
+				{
+					if(t>=1.0/3.0)
+					{
+						GameObject go = (GameObject) Instantiate(Resources.Load("prefab/thorpedePrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						go.GetComponent<ThorpedeBehaviour>().enemy=true;
+						thorpedeSpawned=true;
+					}
+				}
+			}
+			transform.position=new Vector3(x,0,y);
 		}
 		else
 		{
@@ -153,14 +253,17 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	public void Attacked(GameObject attacker, int damage, Defects.Defect defect)
 	{
-		if(curDefect==null && defect!=null)
+		if(activeAbil!=Abilities.AbilityType.shield)
 		{
-			curDefect=defect;
-			earnedDefect=true;
+			if(curDefect==null && defect!=null)
+			{
+				curDefect=defect;
+				earnedDefect=true;
+			}
+			this.hp-=damage;
+			if(this.hp<=0)
+				this.Die();
 		}
-		this.hp-=damage;
-		if(this.hp<=0)
-			this.Die();
 	}
 	
 	// Use this for initialization
@@ -250,7 +353,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			nnewAngle=Mathf.Repeat(getAngle()-UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
 		else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
 			nnewAngle=Mathf.Repeat(getAngle()+UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
-		else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn))
+		else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn) || activeAbil==Abilities.AbilityType.halfRoundTurn || activeAbil==Abilities.AbilityType.turnAround)
 			nnewAngle=getAngle();
 		else
 		{
@@ -269,6 +372,12 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 		
 		if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
 			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*((Defects.EngineCrash)curDefect).newRangeCoeff;
+		else if(activeAbil==Abilities.AbilityType.doubleThrottle)
+			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange)*2;
+		else if(activeAbil==Abilities.AbilityType.halfRoundTurn)
+			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*0.7f;
+		else if(activeAbil==Abilities.AbilityType.turnAround)
+			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*((temp.minRange+temp.maxRange)/2.0f);
 		else
 			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange);
 		

@@ -47,7 +47,6 @@ public class ThorpedeBehaviour : MonoBehaviour {
 		if(spawned && GameStorage.getInstance().isRunning)
 			transform.position=new Vector3(transform.position.x+dx,0,transform.position.z+dy);
 		
-		CalculatePath();
 		if(!spawned && !GameStorage.getInstance().isRunning)
 		{
 			if(!enemy)
@@ -61,7 +60,7 @@ public class ThorpedeBehaviour : MonoBehaviour {
 				
 				if(attackIconCaptured)
 					dragAttackIcon();
-				
+				CalculatePath();
 				DrawLine();
 			}
 		}
@@ -171,6 +170,16 @@ public class ThorpedeBehaviour : MonoBehaviour {
 					this.Die();
 				}
 			}
+			else
+			{
+				GameObject target = GameStorage.getInstance().getNearbyTarget(this.gameObject);
+				if(GetComponent<Renderer>().bounds.Intersects(target.GetComponent<Renderer>().bounds))
+				{
+					target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.ThorpedeParameters.damage,null);
+					GameStorage.getInstance().removeThorpedeUnit(this.gameObject);
+					this.Die();
+				}
+			}
 			
 			if(!enemy)
 				updateAttackIconPosition();
@@ -213,7 +222,52 @@ public class ThorpedeBehaviour : MonoBehaviour {
 			spawned=false;
 			updateAttackIconPosition();
 		}
+		
+		if(enemy)
+		{
+			CalculateAttackIconPosition();
+			CalculatePath();
+		}
 		return stepCount++;
+	}
+	
+	private void CalculateAttackIconPosition()
+	{
+		GameObject target = GameStorage.getInstance().getNearbyTarget(gameObject);
+		Vector2 firstVec = new Vector2(target.transform.position.x-transform.position.x,target.transform.position.z-transform.position.z);
+		Vector2 movePoint;
+		Vector2 accuracy=Quaternion.Euler(0,0,-target.GetComponent<FriendlyShuttleBehaviour>().angle)*new Vector2(0,1);
+		Vector2 v1 = new Vector2(0,5);
+		float mySinPhi = (v1.x*firstVec.y - v1.y*firstVec.x);
+		float mangle = Vector2.Angle(v1,firstVec);
+		if(mySinPhi>=0)
+			mangle=(180-mangle)+180;
+		
+		float cos = (firstVec.x*v1.x+firstVec.y*v1.y)/(firstVec.magnitude*v1.magnitude);
+		
+		float between = GameStorage.getInstance().getAngleDst(angle,mangle);
+		float nnewAngle;
+		
+		if(Mathf.Abs(between)>=Abilities.RocketParameters.maxTurnAngle)
+		{
+			if(between>0)
+				nnewAngle=Mathf.Repeat(angle-Abilities.RocketParameters.maxTurnAngle,360);
+			else
+				nnewAngle=Mathf.Repeat(angle+Abilities.RocketParameters.maxTurnAngle,360);
+		}
+		else
+			nnewAngle=Mathf.Repeat(angle-between,360);
+		
+		movePoint=new Vector2(0,0);
+		
+		if(cos>=0)
+			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*Abilities.RocketParameters.maxRange;
+		else
+			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*Abilities.RocketParameters.minRange;
+		
+		movePoint=new Vector2(movePoint.x+accuracy.x+transform.position.x,movePoint.y+transform.position.z+accuracy.y);
+		
+		attackIcon.transform.position=new Vector3(movePoint.x,0,movePoint.y);
 	}
 	
 	private void CalculatePath()
@@ -232,15 +286,17 @@ public class ThorpedeBehaviour : MonoBehaviour {
 			point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())*0.02f;
 			point3 = point3+point2+pointz;
 			
-			
-			trackDots.Clear();
-			float x,y,tt;
-			float step = 0.005f;
-			for(tt=0f;tt<=1;tt+=step)
+			if(!enemy)
 			{
-				x = Mathf.Pow((1-tt),3)*point1.x+3*(1-tt)*(1-tt)*tt*point2.x+3*(1-tt)*tt*tt*point3.x+tt*tt*tt*point4.x;
-				y = Mathf.Pow((1-tt),3)*point1.y+3*(1-tt)*(1-tt)*tt*point2.y+3*(1-tt)*tt*tt*point3.y+tt*tt*tt*point4.y;
-				trackDots.Add(new Vector2(x,y));
+				trackDots.Clear();
+				float x,y,tt;
+				float step = 0.005f;
+				for(tt=0f;tt<=1;tt+=step)
+				{
+					x = Mathf.Pow((1-tt),3)*point1.x+3*(1-tt)*(1-tt)*tt*point2.x+3*(1-tt)*tt*tt*point3.x+tt*tt*tt*point4.x;
+					y = Mathf.Pow((1-tt),3)*point1.y+3*(1-tt)*(1-tt)*tt*point2.y+3*(1-tt)*tt*tt*point3.y+tt*tt*tt*point4.y;
+					trackDots.Add(new Vector2(x,y));
+				}
 			}
 		}
 	}
