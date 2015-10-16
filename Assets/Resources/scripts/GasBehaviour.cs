@@ -12,27 +12,22 @@ public class GasBehaviour : MonoBehaviour {
 		GameStorage.getInstance().registerGasUnit(this.gameObject);
 	}
 	
-	void Update () 
+	void OnCollisionEnter (Collision col) 
 	{
+		GameObject target = col.gameObject;
 		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
 		{
 			if(lastDamaged==0f)
 			{
 				if(enemy)
 				{
-					foreach(GameObject target in GameStorage.getInstance().getFriendlyShuttles())
-					{
-						if(Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(target.transform.position.x,target.transform.position.z))<=Abilities.GasParameters.gasRange)
-							target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.GasParameters.gasDamage,null);
-					}
+					if(target.GetComponent<FriendlyShuttleBehaviour>()!=null)
+						target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.GasParameters.gasDamage,null);
 				}
 				else
 				{
-					foreach(GameObject target in GameStorage.getInstance().getEnemyShuttles())
-					{
-						if(Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(target.transform.position.x,target.transform.position.z))<=Abilities.GasParameters.gasRange)
-							target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.GasParameters.gasDamage,null);
-					}
+					if(target.GetComponent<EnemyShuttleBehaviour>()!=null)
+						target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.GasParameters.gasDamage,null);
 				}
 				lastDamaged=Time.time;
 			}
@@ -42,19 +37,13 @@ public class GasBehaviour : MonoBehaviour {
 				{
 					if(enemy)
 					{
-						foreach(GameObject target in GameStorage.getInstance().getFriendlyShuttles())
-						{
-							if(Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(target.transform.position.x,target.transform.position.z))<=Abilities.GasParameters.gasRange)
-								target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.GasParameters.gasDamage,null);
-						}
+						if(target.GetComponent<FriendlyShuttleBehaviour>()!=null)
+							target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.GasParameters.gasDamage,null);
 					}
 					else
 					{
-						foreach(GameObject target in GameStorage.getInstance().getEnemyShuttles())
-						{
-							if(Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(target.transform.position.x,target.transform.position.z))<=Abilities.GasParameters.gasRange)
-								target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.GasParameters.gasDamage,null);
-						}
+						if(target.GetComponent<EnemyShuttleBehaviour>()!=null)
+							target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.GasParameters.gasDamage,null);
 					}
 					lastDamaged=Time.time;
 				}

@@ -295,7 +295,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		if(attackIconCaptured)
 			dragAttackIcon();
 		
-		transform.eulerAngles=new Vector3(0,angle-90,0);
+		transform.eulerAngles=new Vector3(0,angle,0);
 	}
 	
 	void OnGUI()
@@ -449,22 +449,9 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 							gun.ready=false;
 							// WARN
 							
-							int defect=-1,i;
-							float ch = UnityEngine.Random.Range(0.0f,100f);
-							float lower=0.0f,upper;
-							for(i=0;i<gunTemp.defectsChance.Length;i++)
-							{
-								upper=gunTemp.defectsChance[i]+lower;
-								if(ch>=lower && ch<=upper)
-								{
-									defect=i;
-									break;
-								}
-								else
-									lower=upper;
-							}
+							GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/bulletPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+							bullet.GetComponent<BulletBehaviour>().Launch(new Vector2(enemy.transform.position.x,enemy.transform.position.z),new Vector2(transform.position.x,transform.position.z),gun);
 							
-							enemy.GetComponent<EnemyShuttleBehaviour>().Attacked(gameObject,gunTemp.damage, Defects.getDefect(defect));
 						}
 					}
 				}
@@ -782,8 +769,12 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	private bool isMouseOver(GameObject o)
 	{
-		Vector3 pz = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		return (o.GetComponent<Renderer>().bounds.IntersectRay(new Ray(new Vector3(pz.x,o.transform.position.y,pz.z),new Vector3(pz.x,o.transform.position.y,pz.z))));
+    	Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    	RaycastHit hit;
+    	if (Physics.Raycast(ray, out hit)){
+    		return hit.collider.gameObject==o;
+    	}
+    	return false;
 	}
 	
 	private void CalculatePath()

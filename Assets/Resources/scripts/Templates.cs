@@ -61,6 +61,8 @@ public class Templates {
 		public string gunName;
 		public int damage;
 		public float reuse;
+		public float bulletSpeed;
+		public float bulletDispersion;
 		public float attackAngle,attackRange;
 		public float[] defectsChance = new float[Enum.GetNames(typeof(Defects.DefectType)).Length];
 	}
@@ -174,6 +176,10 @@ public class Templates {
 							p.attackAngle=float.Parse(m.Value);
 						else if(m.Name=="attackRange")
 							p.attackRange=float.Parse(m.Value);
+						else if(m.Name=="bulletSpeed")
+							p.bulletSpeed=float.Parse(m.Value);
+						else if(m.Name=="bulletDispersion")
+							p.bulletDispersion=float.Parse(m.Value);
 					}
 					
 					foreach(XmlNode m in x.ChildNodes)

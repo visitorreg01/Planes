@@ -154,23 +154,9 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 							gun.shotTime=Time.time;
 							gun.ready=false;
 							// WARN
-							
-							int defect=-1,i;
-							float ch = UnityEngine.Random.Range(0.0f,100f);
-							float lower=0.0f,upper;
-							for(i=0;i<gunTemp.defectsChance.Length;i++)
-							{
-								upper=gunTemp.defectsChance[i]+lower;
-								if(ch>=lower && ch<=upper)
-								{
-									defect=i;
-									break;
-								}
-								else
-									lower=upper;
-							}
-							
-							friendly.GetComponent<FriendlyShuttleBehaviour>().Attacked(gameObject,gunTemp.damage, Defects.getDefect(defect));
+							GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/bulletPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+							bullet.GetComponent<BulletBehaviour>().enemy=true;
+							bullet.GetComponent<BulletBehaviour>().Launch(new Vector2(friendly.transform.position.x,friendly.transform.position.z),new Vector2(transform.position.x,transform.position.z),gun);	
 						}
 					}
 				}
@@ -298,7 +284,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 		if(GameStorage.getInstance().isRunning)
 			Accelerate();
 		
-		transform.eulerAngles=new Vector3(0,angle-90,0);
+		transform.eulerAngles=new Vector3(0,angle,0);
 	}
 	
 	public void Die()
@@ -338,70 +324,77 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	private void calculateMovePosition()
 	{
 		GameObject target = GameStorage.getInstance().getNearbyTarget(gameObject);
-		Vector2 firstVec = new Vector2(target.transform.position.x-transform.position.x,target.transform.position.z-transform.position.z);
-		
-		Vector2 v1 = new Vector2(0,5);
-		float mySinPhi = (v1.x*firstVec.y - v1.y*firstVec.x);
-		float mangle = Vector2.Angle(v1,firstVec);
-		if(mySinPhi>=0)
-			mangle=(180-mangle)+180;
-		
-		float between = GameStorage.getInstance().getAngleDst(getAngle(),mangle);
-		float nnewAngle;
-		
-		if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnRight))
-			nnewAngle=Mathf.Repeat(getAngle()-UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
-		else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
-			nnewAngle=Mathf.Repeat(getAngle()+UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
-		else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn) || activeAbil==Abilities.AbilityType.halfRoundTurn || activeAbil==Abilities.AbilityType.turnAround)
-			nnewAngle=getAngle();
-		else
+		if(target!=null)
 		{
-			if(Mathf.Abs(between)>temp.maxTurnAngle)
-			{
-				if(between>0)
-					nnewAngle=Mathf.Repeat(getAngle()-temp.maxTurnAngle,360);
-				else
-					nnewAngle=Mathf.Repeat(getAngle()+temp.maxTurnAngle,360);
-			}
+			Vector2 firstVec = new Vector2(target.transform.position.x-transform.position.x,target.transform.position.z-transform.position.z);
+		
+			Vector2 v1 = new Vector2(0,5);
+			float mySinPhi = (v1.x*firstVec.y - v1.y*firstVec.x);
+			float mangle = Vector2.Angle(v1,firstVec);
+			if(mySinPhi>=0)
+				mangle=(180-mangle)+180;
+			
+			float between = GameStorage.getInstance().getAngleDst(getAngle(),mangle);
+			float nnewAngle;
+			
+			if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnRight))
+				nnewAngle=Mathf.Repeat(getAngle()-UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
+			else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
+				nnewAngle=Mathf.Repeat(getAngle()+UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
+			else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn) || activeAbil==Abilities.AbilityType.halfRoundTurn || activeAbil==Abilities.AbilityType.turnAround)
+				nnewAngle=getAngle();
 			else
-				nnewAngle=Mathf.Repeat(getAngle()-between,360);
+			{
+				if(Mathf.Abs(between)>temp.maxTurnAngle)
+				{
+					if(between>0)
+						nnewAngle=Mathf.Repeat(getAngle()-temp.maxTurnAngle,360);
+					else
+						nnewAngle=Mathf.Repeat(getAngle()+temp.maxTurnAngle,360);
+				}
+				else
+					nnewAngle=Mathf.Repeat(getAngle()-between,360);
+			}
+			
+			movePoint=new Vector2(0,0);
+			
+			if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
+				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*((Defects.EngineCrash)curDefect).newRangeCoeff;
+			else if(activeAbil==Abilities.AbilityType.doubleThrottle)
+				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange)*2;
+			else if(activeAbil==Abilities.AbilityType.halfRoundTurn)
+				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*0.7f;
+			else if(activeAbil==Abilities.AbilityType.turnAround)
+				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*((temp.minRange+temp.maxRange)/2.0f);
+			else
+				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange);
+			
+			movePoint=new Vector2(movePoint.x+transform.position.x,movePoint.y+transform.position.z);
+			
+			
+			if(viewGO!=null)
+				viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
+			
+			point1=new Vector2(transform.position.x,transform.position.z);
+			Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
+			Vector3 tempVec = GetComponent<Collider>().ClosestPointOnBounds(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
+			point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
+			point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
+			
+			point4=new Vector2(movePoint.x,movePoint.y);
+			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
+			point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
+			point3 = point3+point2+pointz;
 		}
-		
-		movePoint=new Vector2(0,0);
-		
-		if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
-			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*((Defects.EngineCrash)curDefect).newRangeCoeff;
-		else if(activeAbil==Abilities.AbilityType.doubleThrottle)
-			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange)*2;
-		else if(activeAbil==Abilities.AbilityType.halfRoundTurn)
-			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*0.7f;
-		else if(activeAbil==Abilities.AbilityType.turnAround)
-			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*((temp.minRange+temp.maxRange)/2.0f);
-		else
-			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange);
-		
-		movePoint=new Vector2(movePoint.x+transform.position.x,movePoint.y+transform.position.z);
-		
-		
-		if(viewGO!=null)
-			viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
-		
-		point1=new Vector2(transform.position.x,transform.position.z);
-		Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
-		Vector3 tempVec = GetComponent<Renderer>().bounds.ClosestPoint(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
-		point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
-		point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
-		
-		point4=new Vector2(movePoint.x,movePoint.y);
-		Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
-		point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
-		point3 = point3+point2+pointz;
 	}
 	
 	private bool isMouseOver(GameObject o)
 	{
-		Vector3 pz = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		return (o.GetComponent<Renderer>().bounds.IntersectRay(new Ray(new Vector3(pz.x,o.transform.position.y,pz.z),new Vector3(pz.x,o.transform.position.y,pz.z))));
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    	RaycastHit hit;
+    	if (Physics.Raycast(ray, out hit)){
+    		return hit.collider.gameObject==o;
+    	}
+    	return false;
 	}
 }

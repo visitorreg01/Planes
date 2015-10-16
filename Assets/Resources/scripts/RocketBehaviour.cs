@@ -139,6 +139,29 @@ public class RocketBehaviour : MonoBehaviour {
 		}
 	}
 	
+	void OnCollisionEnter(Collision col)
+	{
+		GameObject target = col.gameObject;
+		if(enemy)
+		{
+			if(target.GetComponent<FriendlyShuttleBehaviour>()!=null)
+			{
+				target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.RocketParameters.damage,null);
+				GameStorage.getInstance().removeRocketUnit(this.gameObject);
+				this.Die();
+			}
+		}
+		else
+		{
+			if(target.GetComponent<EnemyShuttleBehaviour>()!=null)
+			{
+				target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.RocketParameters.damage,null);
+				GameStorage.getInstance().removeRocketUnit(this.gameObject);
+				this.Die();
+			}
+		}
+	}
+	
 	private void Accelerate()
 	{
 		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
@@ -159,27 +182,6 @@ public class RocketBehaviour : MonoBehaviour {
 			angle=nAngle;
 			
 			transform.position=new Vector3(x,0,y);
-			
-			if(!enemy)
-			{
-				GameObject target = GameStorage.getInstance().getNearbyEnemy(this.gameObject);
-				if(GetComponent<Renderer>().bounds.Intersects(target.GetComponent<Renderer>().bounds))
-				{
-					target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.RocketParameters.damage,null);
-					GameStorage.getInstance().removeRocketUnit(this.gameObject);
-					this.Die();
-				}
-			}
-			else
-			{
-				GameObject target = GameStorage.getInstance().getNearbyTarget(this.gameObject);
-				if(GetComponent<Renderer>().bounds.Intersects(target.GetComponent<Renderer>().bounds))
-				{
-					target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.RocketParameters.damage,null);
-					GameStorage.getInstance().removeRocketUnit(this.gameObject);
-					this.Die();
-				}
-			}
 			
 			if(!enemy)
 				updateAttackIconPosition();

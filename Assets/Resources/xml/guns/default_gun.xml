@@ -5,7 +5,9 @@
 	damage="20"
 	reuse="1"
 	attackAngle="70.0"
-	attackRange="5.0">
+	bulletSpeed="2"
+	bulletDispersion="2"
+	attackRange="10.0">
 	<defectChance id="0" chance="7"/>
 	<defectChance id="1" chance="7"/>
 	<defectChance id="2" chance="6"/>
