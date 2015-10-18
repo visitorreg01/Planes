@@ -26,14 +26,14 @@ public class CameraBehaviour : MonoBehaviour {
 		if(Input.GetButtonUp("Fire2"))
 			released=false;
 		
-		if(Input.GetAxis("Mouse ScrollWheel") < 0)
+		if(Input.GetAxis("Mouse ScrollWheel") > 0)
 		{
 			if(cameraSize<=cameraSizeMin)
 				cameraSize=cameraSizeMin;
 			else
 				cameraSize-=cameraZoomSpeed;
 		}
-		if(Input.GetAxis("Mouse ScrollWheel") > 0)
+		if(Input.GetAxis("Mouse ScrollWheel") < 0)
 		{
 			if(cameraSize>=cameraSizeMax)
 				cameraSize=cameraSizeMax;
