@@ -5,12 +5,16 @@ public class CameraBehaviour : MonoBehaviour {
 
 	Vector3 startPoint;
 	bool released = false;
-	float scale = 15;
-	const float cameraSize=10;
+	float scale = 30;
+	float cameraSize=20;
+	const float cameraZoomSpeed=1;
+	const float cameraSizeMin=5;
+	const float cameraSizeMax=50;
+	
 	float x,y;
 	float cameraH=20;
 	float terrainH,terrainW;
-	const float speed=15;
+	const float speed=30;
 	void Start () {
 	}
 	
@@ -21,6 +25,23 @@ public class CameraBehaviour : MonoBehaviour {
 		
 		if(Input.GetButtonUp("Fire2"))
 			released=false;
+		
+		if(Input.GetAxis("Mouse ScrollWheel") < 0)
+		{
+			if(cameraSize<=cameraSizeMin)
+				cameraSize=cameraSizeMin;
+			else
+				cameraSize-=cameraZoomSpeed;
+		}
+		if(Input.GetAxis("Mouse ScrollWheel") > 0)
+		{
+			if(cameraSize>=cameraSizeMax)
+				cameraSize=cameraSizeMax;
+			else
+				cameraSize+=cameraZoomSpeed;
+		}
+		
+		Camera.main.orthographicSize=cameraSize;
 		
 		if(released)
 		{
