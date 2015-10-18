@@ -81,8 +81,12 @@ public class BulletBehaviour : MonoBehaviour {
 		gos=Templates.getInstance().getGunTemplate(gun.gunId);
 		startPoint=startPos;
 		targetPoint=new Vector2(targetPos.x+UnityEngine.Random.Range(-gos.bulletDispersion,gos.bulletDispersion),targetPos.y+UnityEngine.Random.Range(-gos.bulletDispersion,gos.bulletDispersion));
-		Debug.Log(targetPos);
-		Debug.Log(targetPoint);
+		targetPoint=new Vector2(targetPoint.x-startPoint.x,targetPoint.y-startPoint.y);
+		targetPoint/=targetPoint.magnitude;
+		targetPoint*=gos.attackRange;
+		targetPoint=new Vector2(targetPoint.x+startPoint.x,targetPoint.y+startPoint.y);
+		transform.eulerAngles=new Vector3(0,GameStorage.getInstance().getAngleRelative(startPoint,targetPoint),0);
+		
 		setuped=true;
 	}
 }

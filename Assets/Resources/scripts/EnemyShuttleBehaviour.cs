@@ -22,6 +22,10 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	bool rocketSpawned=false;
 	bool thorpedeSpawned=false;
 	
+		//DEBUG
+	private ArrayList shuttleGunsMeshes = new ArrayList();
+	private ArrayList shuttleGunsGos = new ArrayList();
+	
 	Vector2 point1,point2,point3,point4;
 	float t=0;
 	
@@ -154,9 +158,10 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 							gun.shotTime=Time.time;
 							gun.ready=false;
 							// WARN
-							GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/bulletPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+							Vector2 f = Quaternion.Euler(0,0,-angle)*gun.pos;
+							GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/bulletPrefab") as GameObject,new Vector3(transform.position.x+f.x,0,transform.position.z+f.y),Quaternion.Euler(0,angle,0));
 							bullet.GetComponent<BulletBehaviour>().enemy=true;
-							bullet.GetComponent<BulletBehaviour>().Launch(new Vector2(friendly.transform.position.x,friendly.transform.position.z),new Vector2(transform.position.x,transform.position.z),gun);	
+							bullet.GetComponent<BulletBehaviour>().Launch(new Vector2(friendly.transform.position.x,friendly.transform.position.z),new Vector2(transform.position.x+f.x,transform.position.z+f.y),gun);	
 						}
 					}
 				}
@@ -256,6 +261,14 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	void Start () {
 		GameStorage.getInstance().addEnemyShuttle(this.gameObject);
 		temp = Templates.getInstance().getPlaneTemplate(Template);
+		GameObject gD;
+		foreach(Templates.GunOnShuttle goss in temp.guns)
+		{
+			gD=(GameObject) Instantiate(Resources.Load("prefab/testGunMesh") as GameObject,new Vector3(transform.position.x+goss.pos.x,1,transform.position.z+goss.pos.y),Quaternion.Euler(0,goss.turnAngle,0));
+			gD.SetActive(false);
+			shuttleGunsMeshes.Add(gD);
+			shuttleGunsGos.Add(goss);
+		}
 		hp=temp.hp;
 		calculateMovePosition();
 	}
@@ -263,6 +276,15 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
+		for(int i = 0;i<shuttleGunsMeshes.Count;i++)
+		{
+			GameObject goss = (GameObject) shuttleGunsMeshes[i];
+			Vector2 f = Quaternion.Euler(0,0,-angle)*((Templates.GunOnShuttle)shuttleGunsGos[i]).pos;
+			goss.transform.position=new Vector3(f.x+transform.position.x,10,f.y+transform.position.z);
+			goss.transform.eulerAngles=new Vector3(0,angle+((Templates.GunOnShuttle)shuttleGunsGos[i]).turnAngle,0);
+			goss.SetActive(GameStorage.getInstance().isDebug);
+		}
+		
 		if(needToUpdatePosition)
 		{
 			transform.position=newPos;
@@ -294,6 +316,8 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	public void ByeBye()
 	{
+		foreach(GameObject g in shuttleGunsMeshes)
+			Destroy(g);
 		Destroy(this.gameObject);
 	}
 	

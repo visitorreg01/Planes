@@ -13,6 +13,7 @@ public class GameStorage {
 	}
 	
 	public bool isRunning=false;
+	public bool isDebug=false;
 	
 	private ArrayList friendlyGameObjectsList;
 	private ArrayList enemyGameObjectsList;
@@ -209,6 +210,18 @@ public class GameStorage {
 	{
 		Vector2 v1 = new Vector2(0,5);
 		Vector2 v2 = new Vector2(b.transform.position.x-a.transform.position.x,b.transform.position.z-a.transform.position.z);
+		float mySinPhi = (v1.x*v2.y - v1.y*v2.x);
+		float mangle = Vector2.Angle(v1,v2);
+		if(mySinPhi<=0)
+			return mangle;
+		else
+			return (180-mangle)+180;
+	}
+	
+	public float getAngleRelative(Vector2 a, Vector2 b)
+	{
+		Vector2 v1 = new Vector2(0,5);
+		Vector2 v2 = new Vector2(b.x-a.x,b.y-a.y);
 		float mySinPhi = (v1.x*v2.y - v1.y*v2.x);
 		float mangle = Vector2.Angle(v1,v2);
 		if(mySinPhi<=0)

@@ -26,6 +26,9 @@ public class GUIBehaviour : MonoBehaviour {
 			{
 				GameStorage.getInstance().StepStart();
 			}
+			
+			if(GUI.Button(new Rect(20,80,80,20),"Debug"))
+				GameStorage.getInstance().isDebug=!GameStorage.getInstance().isDebug;
 		}
 	}
 }

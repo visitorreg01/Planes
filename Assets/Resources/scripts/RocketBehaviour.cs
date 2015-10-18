@@ -236,40 +236,43 @@ public class RocketBehaviour : MonoBehaviour {
 	private void CalculateAttackIconPosition()
 	{
 		GameObject target = GameStorage.getInstance().getNearbyTarget(gameObject);
-		Vector2 firstVec = new Vector2(target.transform.position.x-transform.position.x,target.transform.position.z-transform.position.z);
-		Vector2 movePoint;
-		Vector2 accuracy=Quaternion.Euler(0,0,-target.GetComponent<FriendlyShuttleBehaviour>().angle)*new Vector2(0,1);
-		Vector2 v1 = new Vector2(0,5);
-		float mySinPhi = (v1.x*firstVec.y - v1.y*firstVec.x);
-		float mangle = Vector2.Angle(v1,firstVec);
-		if(mySinPhi>=0)
-			mangle=(180-mangle)+180;
-		
-		float cos = (firstVec.x*v1.x+firstVec.y*v1.y)/(firstVec.magnitude*v1.magnitude);
-		
-		float between = GameStorage.getInstance().getAngleDst(angle,mangle);
-		float nnewAngle;
-		
-		if(Mathf.Abs(between)>=Abilities.RocketParameters.maxTurnAngle)
+		if(target!=null)
 		{
-			if(between>0)
-				nnewAngle=Mathf.Repeat(angle-Abilities.RocketParameters.maxTurnAngle,360);
+			Vector2 firstVec = new Vector2(target.transform.position.x-transform.position.x,target.transform.position.z-transform.position.z);
+			Vector2 movePoint;
+			Vector2 accuracy=Quaternion.Euler(0,0,-target.GetComponent<FriendlyShuttleBehaviour>().angle)*new Vector2(0,1);
+			Vector2 v1 = new Vector2(0,5);
+			float mySinPhi = (v1.x*firstVec.y - v1.y*firstVec.x);
+			float mangle = Vector2.Angle(v1,firstVec);
+			if(mySinPhi>=0)
+				mangle=(180-mangle)+180;
+			
+			float cos = (firstVec.x*v1.x+firstVec.y*v1.y)/(firstVec.magnitude*v1.magnitude);
+			
+			float between = GameStorage.getInstance().getAngleDst(angle,mangle);
+			float nnewAngle;
+			
+			if(Mathf.Abs(between)>=Abilities.RocketParameters.maxTurnAngle)
+			{
+				if(between>0)
+					nnewAngle=Mathf.Repeat(angle-Abilities.RocketParameters.maxTurnAngle,360);
+				else
+					nnewAngle=Mathf.Repeat(angle+Abilities.RocketParameters.maxTurnAngle,360);
+			}
 			else
-				nnewAngle=Mathf.Repeat(angle+Abilities.RocketParameters.maxTurnAngle,360);
+				nnewAngle=Mathf.Repeat(angle-between,360);
+			
+			movePoint=new Vector2(0,0);
+			
+			if(cos>=0)
+				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*Abilities.RocketParameters.maxRange;
+			else
+				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*Abilities.RocketParameters.minRange;
+			
+			movePoint=new Vector2(movePoint.x+accuracy.x+transform.position.x,movePoint.y+transform.position.z+accuracy.y);
+			
+			attackIcon.transform.position=new Vector3(movePoint.x,0,movePoint.y);
 		}
-		else
-			nnewAngle=Mathf.Repeat(angle-between,360);
-		
-		movePoint=new Vector2(0,0);
-		
-		if(cos>=0)
-			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*Abilities.RocketParameters.maxRange;
-		else
-			movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*Abilities.RocketParameters.minRange;
-		
-		movePoint=new Vector2(movePoint.x+accuracy.x+transform.position.x,movePoint.y+transform.position.z+accuracy.y);
-		
-		attackIcon.transform.position=new Vector3(movePoint.x,0,movePoint.y);
 	}
 	
 	private void CalculatePath()
