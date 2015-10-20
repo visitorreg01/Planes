@@ -64,6 +64,7 @@ public class Templates {
 		public float bulletSpeed;
 		public float bulletDispersion;
 		public float attackAngle,attackRange;
+		public string bulletMesh;
 		public float[] defectsChance = new float[Enum.GetNames(typeof(Defects.DefectType)).Length];
 	}
 	
@@ -180,6 +181,8 @@ public class Templates {
 							p.bulletSpeed=float.Parse(m.Value);
 						else if(m.Name=="bulletDispersion")
 							p.bulletDispersion=float.Parse(m.Value);
+						else if(m.Name=="bulletMesh")
+							p.bulletMesh=m.Value;
 					}
 					
 					foreach(XmlNode m in x.ChildNodes)

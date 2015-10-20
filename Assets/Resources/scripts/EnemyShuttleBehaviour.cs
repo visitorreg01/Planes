@@ -159,7 +159,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 							gun.ready=false;
 							// WARN
 							Vector2 f = Quaternion.Euler(0,0,-angle)*gun.pos;
-							GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/bulletPrefab") as GameObject,new Vector3(transform.position.x+f.x,0,transform.position.z+f.y),Quaternion.Euler(0,angle,0));
+							GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/"+gunTemp.bulletMesh) as GameObject,new Vector3(transform.position.x+f.x,0,transform.position.z+f.y),Quaternion.Euler(0,angle,0));
 							bullet.GetComponent<BulletBehaviour>().enemy=true;
 							bullet.GetComponent<BulletBehaviour>().Launch(new Vector2(friendly.transform.position.x,friendly.transform.position.z),new Vector2(transform.position.x+f.x,transform.position.z+f.y),gun);	
 						}

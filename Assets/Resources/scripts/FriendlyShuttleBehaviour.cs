@@ -23,6 +23,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	private ArrayList shuttleGunsMeshes = new ArrayList();
 	private ArrayList shuttleGunsGos = new ArrayList();
 	
+	private ArrayList arcObjs = new ArrayList();
+	
 	//const
 	float shuttleH=5;
 	float attackIconH=6;
@@ -127,6 +129,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		GameObject gD;
 		foreach(Templates.GunOnShuttle goss in temp.guns)
 		{
+			gD=new GameObject();
+			LineRenderer line = gD.AddComponent<LineRenderer>();
+			line.SetWidth(0.05f, 0.05f);
+			line.material = Resources.Load("materials/lineMaterial") as Material;
+			arcObjs.Add(gD);
 			gD=(GameObject) Instantiate(Resources.Load("prefab/testGunMesh") as GameObject,new Vector3(transform.position.x+goss.pos.x,10,transform.position.z+goss.pos.y),Quaternion.Euler(0,goss.turnAngle,0));
 			gD.SetActive(false);
 			shuttleGunsMeshes.Add(gD);
@@ -279,6 +286,47 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			needToUpdateAttackIconPosition=false;
 		}
 		
+		if(selected)
+		{
+			int ii=0;
+			//Templates.GunOnShuttle gos = (Templates.GunOnShuttle) temp.guns[0];
+			foreach(Templates.GunOnShuttle gos in temp.guns)
+			{
+				LineRenderer line = ((GameObject) arcObjs[ii]).GetComponent<LineRenderer>();
+				Templates.GunTemplate gunTmp = Templates.getInstance().getGunTemplate(gos.gunId);
+				Vector2 startP = Quaternion.Euler(0,0,-angle)*gos.pos;
+				startP=new Vector2(transform.position.x+startP.x,transform.position.z+startP.y);
+				Vector2 lowerP = Quaternion.Euler(0,0,-(angle+gos.turnAngle-gunTmp.attackAngle))*new Vector2(0,gunTmp.attackRange);
+				lowerP=new Vector2(lowerP.x+transform.position.x,lowerP.y+transform.position.z);
+				Vector2 upperP = Quaternion.Euler(0,0,-(angle+gos.turnAngle+gunTmp.attackAngle))*new Vector2(0,gunTmp.attackRange);
+				upperP=new Vector2(upperP.x+transform.position.x,upperP.y+transform.position.z);
+				
+				int le = (int) (2*gunTmp.attackAngle/1f),i;
+				
+				line.SetVertexCount(3+le);
+				line.SetPosition(0,new Vector3(startP.x,0,startP.y));
+				//line.SetPosition(1,new Vector3(upperP.x,0,upperP.y));
+				for(i=0;i<le;i++)
+				{
+					Vector2 po = Quaternion.Euler(0,0,-(angle+gos.turnAngle+gunTmp.attackAngle-1*(i)))*new Vector2(0,gunTmp.attackRange);
+					po=new Vector2(po.x+transform.position.x,po.y+transform.position.z);
+					line.SetPosition(1+i,new Vector3(po.x,0,po.y));
+				}
+				line.SetPosition(1+le,new Vector3(lowerP.x,0,lowerP.y));
+				line.SetPosition(2+le,new Vector3(startP.x,0,startP.y));
+				ii++;
+			}
+		}
+		else
+		{
+			foreach(GameObject gg in arcObjs)
+			{
+				LineRenderer line = gg.GetComponent<LineRenderer>();
+				line.SetVertexCount(0);
+			}
+		}
+		
+		
 		if(isMouseOver(gameObject))
 			focused=true;
 		else
@@ -391,17 +439,20 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	public void checkShuttleClickState()
 	{
-		if((Input.GetMouseButtonDown(0) && isMouseOver(gameObject)) || (Input.GetMouseButtonDown(0) && isMouseOver(attackIcon)))
-			selected=true;
-		else if(Input.GetMouseButtonDown(0) && !isMouseOver(gameObject))
+		if(!GameStorage.getInstance().isRunning)
 		{
-			if(temp.abilities.Count>0)
+			if((Input.GetMouseButtonDown(0) && isMouseOver(gameObject)) || (Input.GetMouseButtonDown(0) && isMouseOver(attackIcon)))
+				selected=true;
+			else if(Input.GetMouseButtonDown(0) && !isMouseOver(gameObject))
 			{
-				if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>1.7f)
+				if(temp.abilities.Count>0)
+				{
+					if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>1.7f)
+						selected=false;
+				}
+				else
 					selected=false;
 			}
-			else
-				selected=false;
 		}
 	}
 	
@@ -471,7 +522,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 							gun.ready=false;
 							// WARN
 							Vector2 f = Quaternion.Euler(0,0,-angle)*gun.pos;
-							GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/bulletPrefab") as GameObject,new Vector3(transform.position.x+f.x,0,transform.position.z+f.y),Quaternion.Euler(0,angle,0));
+							GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/"+gunTemp.bulletMesh) as GameObject,new Vector3(transform.position.x+f.x,0,transform.position.z+f.y),Quaternion.Euler(0,angle,0));
 							bullet.GetComponent<BulletBehaviour>().Launch(new Vector2(enemy.transform.position.x,enemy.transform.position.z),new Vector2(transform.position.x+f.x,transform.position.z+f.y),gun);
 							
 						}

@@ -98,6 +98,17 @@ public class GameStorage {
 			thorpedeList.Remove(f);
 			f.GetComponent<ThorpedeBehaviour>().Die();
 		}
+		
+		if(getFriendlyShuttles().Length==0 && getEnemyShuttles().Length>0)
+			Debug.Log("LOSE!");
+		else if(getFriendlyShuttles().Length>0 && getEnemyShuttles().Length==0)
+		{
+			Debug.Log("WIN!");
+		}
+		else if(getFriendlyShuttles().Length==0 && getEnemyShuttles().Length==0)
+			Debug.Log("DRAW!");
+			
+		
 	}
 	
 	public void createFriendlyShuttle()
