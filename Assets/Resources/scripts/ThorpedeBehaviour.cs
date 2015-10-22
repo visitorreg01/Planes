@@ -147,7 +147,6 @@ public class ThorpedeBehaviour : MonoBehaviour {
 			if(target.GetComponent<FriendlyShuttleBehaviour>()!=null)
 			{
 				target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.ThorpedeParameters.damage,null);
-				GameStorage.getInstance().removeThorpedeUnit(this.gameObject);
 				this.Die();
 			}
 		}
@@ -156,7 +155,6 @@ public class ThorpedeBehaviour : MonoBehaviour {
 			if(target.GetComponent<EnemyShuttleBehaviour>()!=null)
 			{
 				target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.ThorpedeParameters.damage,null);
-				GameStorage.getInstance().removeThorpedeUnit(this.gameObject);
 				this.Die();
 			}
 		}
@@ -343,6 +341,7 @@ public class ThorpedeBehaviour : MonoBehaviour {
 	
 	public void Die()
 	{
+		GameStorage.getInstance().removeThorpedeUnit(this.gameObject);
 		Destroy(this.gameObject);
 	}
 }

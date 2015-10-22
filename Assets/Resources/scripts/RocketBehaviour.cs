@@ -147,7 +147,6 @@ public class RocketBehaviour : MonoBehaviour {
 			if(target.GetComponent<FriendlyShuttleBehaviour>()!=null)
 			{
 				target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.RocketParameters.damage,null);
-				GameStorage.getInstance().removeRocketUnit(this.gameObject);
 				this.Die();
 			}
 		}
@@ -156,7 +155,6 @@ public class RocketBehaviour : MonoBehaviour {
 			if(target.GetComponent<EnemyShuttleBehaviour>()!=null)
 			{
 				target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.RocketParameters.damage,null);
-				GameStorage.getInstance().removeRocketUnit(this.gameObject);
 				this.Die();
 			}
 		}
@@ -343,6 +341,7 @@ public class RocketBehaviour : MonoBehaviour {
 	
 	public void Die()
 	{
+		GameStorage.getInstance().removeRocketUnit(this.gameObject);
 		Destroy(this.gameObject);
 	}
 }

@@ -23,6 +23,7 @@ public class GameStorage {
 	private ArrayList rocketRemoveList;
 	private ArrayList thorpedeList;
 	private ArrayList thorpedeRemoveList;
+	private ArrayList asteroidsList;
 	
 	private GameObject friendlyUnitPrefab;
 	
@@ -38,6 +39,7 @@ public class GameStorage {
 		rocketRemoveList = new ArrayList();
 		thorpedeList = new ArrayList();
 		thorpedeRemoveList = new ArrayList();
+		asteroidsList = new ArrayList();
 	}
 	
 	public void StepStart()
@@ -174,6 +176,40 @@ public class GameStorage {
 			return -Mathf.Abs(a);
 		else
 			return Mathf.Abs(a);
+	}
+	
+	public void registerAsteroid(GameObject o)
+	{
+		asteroidsList.Add(o);
+	}
+	
+	public ArrayList getAllAsteroids()
+	{
+		return asteroidsList;
+	}
+	
+	public GameObject getNearestAsteroid(GameObject o)
+	{
+		Vector2 pos = new Vector2(o.transform.position.x,o.transform.position.z);
+		float d=-1;
+		GameObject ret = null;
+		foreach(GameObject obj in getAllAsteroids())
+		{
+			if(d<0)
+			{
+				ret=obj;
+				d=Vector2.Distance(pos,new Vector2(obj.transform.position.x,obj.transform.position.z));
+			}
+			else
+			{
+				if(Vector2.Distance(pos,new Vector2(obj.transform.position.x,obj.transform.position.z))<d)
+				{
+					d=Vector2.Distance(pos,new Vector2(obj.transform.position.x,obj.transform.position.z));
+					ret=obj;
+				}
+			}
+		}
+		return ret;
 	}
 	
 	//--------------------------------------------------------

@@ -22,6 +22,8 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	bool rocketSpawned=false;
 	bool thorpedeSpawned=false;
 	
+	int preferencedDirection=0; // 0 - bez raznicy, -1 left, -right
+	
 		//DEBUG
 	private ArrayList shuttleGunsMeshes = new ArrayList();
 	private ArrayList shuttleGunsGos = new ArrayList();
@@ -126,7 +128,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	void TryChoiceAbil()
 	{
-		if(UnityEngine.Random.Range(0,100)>=0)
+		if(UnityEngine.Random.Range(0,100)>=30)
 		{
 			prevAbil=activeAbil;
 			activeAbil=(Abilities.AbilityType) temp.abilities[UnityEngine.Random.Range(0,temp.abilities.Count)];
@@ -262,13 +264,18 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 		GameStorage.getInstance().addEnemyShuttle(this.gameObject);
 		temp = Templates.getInstance().getPlaneTemplate(Template);
 		GameObject gD;
+		int gunsl=0,gunsr=0;
 		foreach(Templates.GunOnShuttle goss in temp.guns)
 		{
+			if(goss.pos.x<0) gunsl++;
+			if(goss.pos.x>0) gunsr++;
 			gD=(GameObject) Instantiate(Resources.Load("prefab/testGunMesh") as GameObject,new Vector3(transform.position.x+goss.pos.x,1,transform.position.z+goss.pos.y),Quaternion.Euler(0,goss.turnAngle,0));
 			gD.SetActive(false);
 			shuttleGunsMeshes.Add(gD);
 			shuttleGunsGos.Add(goss);
 		}
+		if(gunsr>gunsl) preferencedDirection=1;
+		if(gunsl>gunsr) preferencedDirection=-1;
 		hp=temp.hp;
 		calculateMovePosition();
 	}
@@ -350,65 +357,219 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 		GameObject target = GameStorage.getInstance().getNearbyTarget(gameObject);
 		if(target!=null)
 		{
-			Vector2 firstVec = new Vector2(target.transform.position.x-transform.position.x,target.transform.position.z-transform.position.z);
-		
-			Vector2 v1 = new Vector2(0,5);
-			float mySinPhi = (v1.x*firstVec.y - v1.y*firstVec.x);
-			float mangle = Vector2.Angle(v1,firstVec);
-			if(mySinPhi>=0)
-				mangle=(180-mangle)+180;
-			
-			float between = GameStorage.getInstance().getAngleDst(getAngle(),mangle);
-			float nnewAngle;
-			
-			if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnRight))
-				nnewAngle=Mathf.Repeat(getAngle()-UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
-			else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
-				nnewAngle=Mathf.Repeat(getAngle()+UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
-			else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn) || activeAbil==Abilities.AbilityType.halfRoundTurn || activeAbil==Abilities.AbilityType.turnAround)
-				nnewAngle=getAngle();
-			else
-			{
-				if(Mathf.Abs(between)>temp.maxTurnAngle)
+			float p = UnityEngine.Random.Range(0,100);
+			GameObject ast = GameStorage.getInstance().getNearestAsteroid(gameObject);
+			if(p>33 && ast!=null)
+			{	
+				if(Vector2.Distance(new Vector2(ast.GetComponent<Collider>().ClosestPointOnBounds(transform.position).x,ast.GetComponent<Collider>().ClosestPointOnBounds(transform.position).z),new Vector2(transform.position.x,transform.position.z))<= temp.maxRange+1)
 				{
-					if(between>0)
-						nnewAngle=Mathf.Repeat(getAngle()-temp.maxTurnAngle,360);
+					Vector2 chVec;
+					Vector2 leftVec = Quaternion.Euler(0,0,-Mathf.Repeat(angle+temp.maxTurnAngle,360f))*new Vector2(0,UnityEngine.Random.Range(temp.minRange,temp.maxRange));
+					leftVec = new Vector2(transform.position.x+leftVec.x,transform.position.z+leftVec.y);
+					Vector2 rightVec = Quaternion.Euler(0,0,-Mathf.Repeat(angle-temp.maxTurnAngle,360f))*new Vector2(0,UnityEngine.Random.Range(temp.minRange,temp.maxRange));
+					rightVec = new Vector2(transform.position.x+rightVec.x,transform.position.z+rightVec.y);
+					Vector2 astPos = new Vector2(ast.transform.position.x,ast.transform.position.z);
+					float d1,d2;
+					d1=Vector2.Distance(leftVec,astPos);
+					d2=Vector2.Distance(rightVec,astPos);
+					
+					if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnRight))
+						chVec=leftVec;
+					else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
+						chVec=rightVec;
+					else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn))
+					{
+						chVec=Quaternion.Euler(0,0,-angle)*new Vector2(0,UnityEngine.Random.Range(temp.minRange,temp.maxRange));
+						chVec=new Vector2(chVec.x+transform.position.x,chVec.y+transform.position.z);
+					}
+					else if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
+					{
+						if(d1>=d2)
+						{
+							chVec=leftVec;
+							chVec=new Vector2(chVec.x-transform.position.x,chVec.y-transform.position.z);
+							chVec=chVec/chVec.magnitude*0.7f*temp.minRange;
+							chVec=new Vector2(chVec.x+transform.position.x,chVec.y+transform.position.z);
+						}
+						else
+						{
+							chVec=rightVec;
+							chVec=new Vector2(chVec.x-transform.position.x,chVec.y-transform.position.z);
+							chVec=chVec/chVec.magnitude*0.7f*temp.minRange;
+							chVec=new Vector2(chVec.x+transform.position.x,chVec.y+transform.position.z);
+						}
+					}
 					else
-						nnewAngle=Mathf.Repeat(getAngle()+temp.maxTurnAngle,360);
+					{
+						if(d1>=d2)
+							chVec=leftVec;
+						else
+							chVec=rightVec;
+					}
+					
+					movePoint=chVec;
+					
+					point1=new Vector2(transform.position.x,transform.position.z);
+					Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
+					Vector3 tempVec = GetComponent<Collider>().ClosestPointOnBounds(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
+					point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
+					point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
+					
+					point4=new Vector2(movePoint.x,movePoint.y);
+					Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
+					point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
+					point3 = point3+point2+pointz;
 				}
 				else
-					nnewAngle=Mathf.Repeat(getAngle()-between,360);
+				{
+					Vector2 firstVec = new Vector2(target.transform.position.x-transform.position.x,target.transform.position.z-transform.position.z);
+			
+					Vector2 v1 = new Vector2(0,5);
+					float mySinPhi = (v1.x*firstVec.y - v1.y*firstVec.x);
+					float mangle = Vector2.Angle(v1,firstVec);
+					if(mySinPhi>=0)
+						mangle=(180-mangle)+180;
+					
+					float between = GameStorage.getInstance().getAngleDst(getAngle(),mangle);
+					float nnewAngle;
+					
+					if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnRight))
+						nnewAngle=Mathf.Repeat(getAngle()-UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
+					else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
+						nnewAngle=Mathf.Repeat(getAngle()+UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
+					else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn) || activeAbil==Abilities.AbilityType.halfRoundTurn || activeAbil==Abilities.AbilityType.turnAround)
+						nnewAngle=getAngle();
+					else
+					{
+						if(Mathf.Abs(between)>temp.maxTurnAngle)
+						{
+							if(preferencedDirection==-1)
+							{
+								nnewAngle=Mathf.Repeat(getAngle()-temp.maxTurnAngle,360);
+							}
+							else if(preferencedDirection==1)
+							{
+								nnewAngle=Mathf.Repeat(getAngle()+temp.maxTurnAngle,360);
+							}
+							else
+							{
+								if(between>0)
+									nnewAngle=Mathf.Repeat(getAngle()-temp.maxTurnAngle,360);
+								else
+									nnewAngle=Mathf.Repeat(getAngle()+temp.maxTurnAngle,360);
+							}
+						}
+						else
+						{
+							nnewAngle=Mathf.Repeat(getAngle()-between,360);
+						}
+					}
+					
+					movePoint=new Vector2(0,0);
+					
+					if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
+						movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*((Defects.EngineCrash)curDefect).newRangeCoeff;
+					else if(activeAbil==Abilities.AbilityType.doubleThrottle)
+						movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange)*2;
+					else if(activeAbil==Abilities.AbilityType.halfRoundTurn)
+						movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*0.7f;
+					else if(activeAbil==Abilities.AbilityType.turnAround)
+						movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*((temp.minRange+temp.maxRange)/2.0f);
+					else
+						movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange);
+					
+					movePoint=new Vector2(movePoint.x+transform.position.x,movePoint.y+transform.position.z);
+					
+					
+					if(viewGO!=null)
+						viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
+					
+					point1=new Vector2(transform.position.x,transform.position.z);
+					Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
+					Vector3 tempVec = GetComponent<Collider>().ClosestPointOnBounds(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
+					point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
+					point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
+					
+					point4=new Vector2(movePoint.x,movePoint.y);
+					Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
+					point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
+					point3 = point3+point2+pointz;
+				}
 			}
-			
-			movePoint=new Vector2(0,0);
-			
-			if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
-				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*((Defects.EngineCrash)curDefect).newRangeCoeff;
-			else if(activeAbil==Abilities.AbilityType.doubleThrottle)
-				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange)*2;
-			else if(activeAbil==Abilities.AbilityType.halfRoundTurn)
-				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*0.7f;
-			else if(activeAbil==Abilities.AbilityType.turnAround)
-				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*((temp.minRange+temp.maxRange)/2.0f);
 			else
-				movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange);
-			
-			movePoint=new Vector2(movePoint.x+transform.position.x,movePoint.y+transform.position.z);
-			
-			
-			if(viewGO!=null)
-				viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
-			
-			point1=new Vector2(transform.position.x,transform.position.z);
-			Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
-			Vector3 tempVec = GetComponent<Collider>().ClosestPointOnBounds(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
-			point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
-			point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
-			
-			point4=new Vector2(movePoint.x,movePoint.y);
-			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
-			point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
-			point3 = point3+point2+pointz;
+			{
+				Vector2 firstVec = new Vector2(target.transform.position.x-transform.position.x,target.transform.position.z-transform.position.z);
+				Vector2 v1 = new Vector2(0,5);
+				float mySinPhi = (v1.x*firstVec.y - v1.y*firstVec.x);
+				float mangle = Vector2.Angle(v1,firstVec);
+				if(mySinPhi>=0)
+					mangle=(180-mangle)+180;
+				
+				float between = GameStorage.getInstance().getAngleDst(getAngle(),mangle);
+				float nnewAngle;
+				
+				if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnRight))
+					nnewAngle=Mathf.Repeat(getAngle()-UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
+				else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
+					nnewAngle=Mathf.Repeat(getAngle()+UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
+				else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn) || activeAbil==Abilities.AbilityType.halfRoundTurn || activeAbil==Abilities.AbilityType.turnAround)
+					nnewAngle=getAngle();
+				else
+				{
+					if(Mathf.Abs(between)>temp.maxTurnAngle)
+					{
+						if(preferencedDirection==-1)
+						{
+							nnewAngle=Mathf.Repeat(getAngle()-temp.maxTurnAngle,360);
+						}
+						else if(preferencedDirection==1)
+						{
+							nnewAngle=Mathf.Repeat(getAngle()+temp.maxTurnAngle,360);
+						}
+						else
+						{
+							if(between>0)
+								nnewAngle=Mathf.Repeat(getAngle()-temp.maxTurnAngle,360);
+							else
+								nnewAngle=Mathf.Repeat(getAngle()+temp.maxTurnAngle,360);
+						}
+					}
+					else
+					{
+						nnewAngle=Mathf.Repeat(getAngle()-between,360);
+					}
+				}
+				
+				movePoint=new Vector2(0,0);
+				
+				if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
+					movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*((Defects.EngineCrash)curDefect).newRangeCoeff;
+				else if(activeAbil==Abilities.AbilityType.doubleThrottle)
+					movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange)*2;
+				else if(activeAbil==Abilities.AbilityType.halfRoundTurn)
+					movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*temp.minRange*0.7f;
+				else if(activeAbil==Abilities.AbilityType.turnAround)
+					movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*((temp.minRange+temp.maxRange)/2.0f);
+				else
+					movePoint=Quaternion.Euler(0,0,-nnewAngle)*new Vector2(0,1)*UnityEngine.Random.Range(temp.minRange,temp.maxRange);
+				
+				movePoint=new Vector2(movePoint.x+transform.position.x,movePoint.y+transform.position.z);
+				
+				
+				if(viewGO!=null)
+					viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
+				
+				point1=new Vector2(transform.position.x,transform.position.z);
+				Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
+				Vector3 tempVec = GetComponent<Collider>().ClosestPointOnBounds(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
+				point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
+				point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
+				
+				point4=new Vector2(movePoint.x,movePoint.y);
+				Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
+				point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
+				point3 = point3+point2+pointz;
+			}
 		}
 	}
 	
