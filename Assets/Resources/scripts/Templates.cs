@@ -14,12 +14,36 @@ public class Templates {
 	
 	public enum PlaneTemplates : int
 	{
-		default_class=1
+		default_class=1,
+		AllyFighter=2,
+		AllyScout=3,
+		AllyAssault=4,
+		AllyGas=5,
+		AllyFrigate=6,
+		AllyCruiser=7,
+		AllyBattleship=8,
+		AllyDreadnaught=9,
+		AllyCorvette=10,
+		AllyBattlecruiser=11,
+		EnemyFighter=12,
+		EnemyScout=13,
+		EnemyAssault=14,
+		EnemyGas=15,
+		EnemyFrigate=16,
+		EnemyCruiser=17,
+		EnemyBattleship=18,
+		EnemyDreadnaught=19
+
 	};
 	
 	public enum GunTemplates : int
 	{
-		default_gun=1
+		default_gun=1,
+		small_gun=2,
+		medium_gun=3,
+		large_gun=4,
+		corvette_gnn=5,
+		battlecruiser_gun=6
 	};
 	
 	private ArrayList planeClasses;
