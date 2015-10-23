@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
 	id="11"
-	classname="default-class"
-	hp="250"
-	minRange="2.5"
-	maxRange="6.0"
-	maxTurnAngle="75"
+	classname="Aukeratu"
+	hp="800"
+	minRange="5"
+	maxRange="10"
+	maxTurnAngle="45"
 	description="This unit is a default class for planes">
-	<gun id="1" pos="1,-0.6" turnAngle="90.0"/>
-	<ability id="4"/>
-	<ability id="6"/>
-	<ability id="3"/>
+	<gun id="6" pos="1,-1" turnAngle="90.0"/>
+	<gun id="6" pos="1,1" turnAngle="90.0"/>
+	<gun id="6" pos="-1,-1" turnAngle="-90.0"/>
+	<gun id="6" pos="-1,1" turnAngle="-90.0"/>
+	<gun id="2" pos="1,1.6" turnAngle="0.0"/>
+	<gun id="2" pos="-1,1.6" turnAngle="0.0"/>
+	<gun id="2" pos="0,-2" turnAngle="180.0"/>
+	<ability id="0"/>
+	<ability id="5"/>
+	<ability id="7"/>
 </plane>

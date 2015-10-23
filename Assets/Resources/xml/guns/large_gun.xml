@@ -2,17 +2,17 @@
 <gun
 	id="4"
 	gunName="PAC large cannon"
-	damage="20"
-	reuse="1"
-	attackAngle="70.0"
+	damage="100"
+	reuse="1.5"
+	attackAngle="30.0"
 	bulletSpeed="2"
-	bulletDispersion="2"
-	attackRange="10.0"
+	bulletDispersion="3"
+	attackRange="21.0"
 	bulletMesh="bulletPrefab">
-	<defectChance id="0" chance="7"/>
-	<defectChance id="1" chance="7"/>
-	<defectChance id="2" chance="6"/>
-	<defectChance id="3" chance="5"/>
-	<defectChance id="4" chance="10"/>
-	<defectChance id="5" chance="5"/>
+	<defectChance id="0" chance="1.5"/>
+	<defectChance id="1" chance="1.5"/>
+	<defectChance id="2" chance="1.5"/>
+	<defectChance id="3" chance="1.5"/>
+	<defectChance id="4" chance="1.5"/>
+	<defectChance id="5" chance="1.5"/>
 </gun>
