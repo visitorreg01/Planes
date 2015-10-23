@@ -12,7 +12,8 @@ public static class Abilities
 		gas=3, // DONE pla, ai
 		homingMissle=4, // DONE pla, ai
 		shield=5, //DONE pla
-		homingThorpede=6 // DONE pla, ai
+		homingThorpede=6, // DONE pla, ai
+		mines=7
 	}
 	
 	public static class GasParameters
@@ -39,5 +40,12 @@ public static class Abilities
 		public const float maxTurnAngle=35f;
 		public const int damage=300;
 		public const float startRange=8.0f;
+	}
+	
+	public static class MinesParameters
+	{
+		public const float Range=0.5f;
+		public const int Damage=20;
+		public const float betweenDist=1f;
 	}
 }

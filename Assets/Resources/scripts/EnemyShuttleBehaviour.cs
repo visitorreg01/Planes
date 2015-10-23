@@ -7,7 +7,8 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	private Templates.PlaneTemplate temp;
 	
 	int shuttleH = 0;
-	
+	private ArrayList minesList=new ArrayList();
+	int minesSpawned=0;
 	public float angle=0;
 	int hp;
 	float lastFired=0f;
@@ -80,6 +81,18 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			if(prevAbil==Abilities.AbilityType.homingThorpede)
 			{
 				thorpedeSpawned=false;
+			}
+			
+			if(prevAbil==Abilities.AbilityType.mines)
+			{
+				minesSpawned=0;
+				routeDist=0f;
+				foreach(GameObject o in minesList)
+				{
+					o.GetComponent<MineBehaviour>().total=minesList.Count;
+					o.GetComponent<MineBehaviour>().ready=true;
+				}
+				minesList.Clear();
 			}
 			
 			if(prevAbil==Abilities.AbilityType.gas)
@@ -214,6 +227,17 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 						GameObject go = (GameObject) Instantiate(Resources.Load("prefab/gasPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
 						go.GetComponent<GasBehaviour>().enemy=true;
 						gasSpawned++;
+					}
+					routeDist+=pos.magnitude;
+				}
+				if(activeAbil==Abilities.AbilityType.mines)
+				{
+					if(routeDist>=minesSpawned*Abilities.MinesParameters.betweenDist)
+					{
+						GameObject mine = (GameObject) Instantiate(Resources.Load("prefab/minePrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						mine.GetComponent<MineBehaviour>().cur=minesSpawned;
+						minesList.Add(mine);
+						minesSpawned++;
 					}
 					routeDist+=pos.magnitude;
 				}

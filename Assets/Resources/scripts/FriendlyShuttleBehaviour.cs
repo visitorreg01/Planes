@@ -12,7 +12,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	private Templates.PlaneTemplate temp;
 	
 	
-	//RESET EVENT
+	private ArrayList minesList=new ArrayList();
 	
 	//abil positions
 	Vector3 firstAbilPos,secondAbilPos,thirdAbilPos,fourthAbilPos;
@@ -20,6 +20,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	int turnRotateDir=1;
 	float routeDist=0.0f;
 	int gasSpawned=0;
+	int minesSpawned=0;
 	private bool loaded=false;
 	bool rocketSpawned=false;
 	bool thorpedeSpawned=false;
@@ -191,6 +192,18 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			{
 				gasSpawned=0;
 				routeDist=0f;
+			}
+			
+			if(prevAbil==Abilities.AbilityType.mines)
+			{
+				minesSpawned=0;
+				routeDist=0f;
+				foreach(GameObject o in minesList)
+				{
+					o.GetComponent<MineBehaviour>().total=minesList.Count;
+					o.GetComponent<MineBehaviour>().ready=true;
+				}
+				minesList.Clear();
 			}
 			
 			if(prevAbil==Abilities.AbilityType.turnAround)
@@ -583,6 +596,17 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 					{
 						Instantiate(Resources.Load("prefab/gasPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
 						gasSpawned++;
+					}
+					routeDist+=pos.magnitude;
+				}
+				if(activeAbil==Abilities.AbilityType.mines)
+				{
+					if(routeDist>=minesSpawned*Abilities.MinesParameters.betweenDist)
+					{
+						GameObject mine = (GameObject) Instantiate(Resources.Load("prefab/minePrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						mine.GetComponent<MineBehaviour>().cur=minesSpawned;
+						minesList.Add(mine);
+						minesSpawned++;
 					}
 					routeDist+=pos.magnitude;
 				}
