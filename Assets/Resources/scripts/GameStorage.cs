@@ -25,6 +25,8 @@ public class GameStorage {
 	private ArrayList thorpedeRemoveList;
 	private ArrayList asteroidsList;
 	
+	public bool allReady = false;
+	
 	private GameObject friendlyUnitPrefab;
 	
 	private float time;

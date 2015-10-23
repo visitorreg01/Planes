@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Threading;
 
 public class FriendlyShuttleBehaviour : MonoBehaviour {
 
@@ -10,12 +11,16 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	public Templates.PlaneTemplates Template;
 	private Templates.PlaneTemplate temp;
 	
+	
+	//RESET EVENT
+	
 	//abil positions
 	Vector3 firstAbilPos,secondAbilPos,thirdAbilPos,fourthAbilPos;
 	// abil rotateDirection
 	int turnRotateDir=1;
 	float routeDist=0.0f;
 	int gasSpawned=0;
+	private bool loaded=false;
 	bool rocketSpawned=false;
 	bool thorpedeSpawned=false;
 	
@@ -106,6 +111,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		return angle;
 	}
 	
+	public void setReady()
+	{
+		loaded=true;
+	}
+	
 	private void updateAttackIconPosition()
 	{
 		float ds;
@@ -125,7 +135,6 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		lr.SetWidth(0.05f, 0.05f);
 		GameStorage.getInstance().addFriendlyShuttle(this.gameObject);
 		temp = Templates.getInstance().getPlaneTemplate(Template);
-		
 		GameObject gD;
 		foreach(Templates.GunOnShuttle goss in temp.guns)
 		{

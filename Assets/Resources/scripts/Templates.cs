@@ -42,7 +42,7 @@ public class Templates {
 		small_gun=2,
 		medium_gun=3,
 		large_gun=4,
-		corvette_gnn=5,
+		corvette_gun=5,
 		battlecruiser_gun=6
 	};
 	
@@ -57,6 +57,12 @@ public class Templates {
 		LoadPlaneClasses();
 		gunClasses=new ArrayList();
 		LoadGunClasses();
+		Loaded();
+	}
+	
+	void Loaded()
+	{
+		GameStorage.getInstance().allReady=true;
 	}
 	
 	public class GunOnShuttle
