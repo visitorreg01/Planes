@@ -402,10 +402,14 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		
 		if(temp.abilities.Count>0 && attackIconFocused && !attackIconCaptured && !abilityInReuse && !earnedDefect)
 		{
-			firstAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x-1f,0,attackIcon.transform.position.z));
-			secondAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x+1f,0,attackIcon.transform.position.z));
-			thirdAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z+1f));
-			fourthAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z-1f));
+			firstAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z));
+			firstAbilPos = new Vector3(firstAbilPos.x-20,firstAbilPos.y,0);
+			secondAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z));
+			secondAbilPos = new Vector3(secondAbilPos.x+20,secondAbilPos.y,0);
+			thirdAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z));
+			thirdAbilPos = new Vector3(thirdAbilPos.x,thirdAbilPos.y-20,0);
+			fourthAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z));
+			fourthAbilPos = new Vector3(fourthAbilPos.x,fourthAbilPos.y+20,0);
 			if(temp.abilities.Count>=1)
 			{
 				if(GUI.Button(new Rect(firstAbilPos.x-10,Screen.height-firstAbilPos.y-10,20,20),temp.abilities[0].ToString()))
