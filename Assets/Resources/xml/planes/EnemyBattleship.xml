@@ -3,7 +3,7 @@
 	id="18"
 	classname="Shrike"
 	hp="1250"
-	minRange="5"
+	minRange="3"
 	maxRange="8.0"
 	maxTurnAngle="35"
 	description="This unit is a default class for planes">

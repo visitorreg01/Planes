@@ -7,7 +7,7 @@
 	attackAngle="30.0"
 	bulletSpeed="2"
 	bulletDispersion="3"
-	attackRange="21.0"
+	attackRange="25.0"
 	bulletMesh="bulletPrefab">
 	<defectChance id="0" chance="1.5"/>
 	<defectChance id="1" chance="1.5"/>
