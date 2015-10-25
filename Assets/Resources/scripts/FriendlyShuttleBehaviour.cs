@@ -400,7 +400,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			GUI.Label(new Rect(vec.x+2,Screen.height-vec.y+40,100,180),temp.description);
 		}
 		
-		if(temp.abilities.Count>0 && attackIconFocused && !attackIconCaptured && !abilityInReuse && !earnedDefect)
+		if(temp.abilities.Count>0 && selected && !attackIconCaptured && !abilityInReuse && !earnedDefect)
 		{
 			firstAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z));
 			firstAbilPos = new Vector3(firstAbilPos.x-20,firstAbilPos.y,0);
@@ -577,8 +577,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			float x,y;
 			t+=1*Time.deltaTime/3;
 			
-			x = Mathf.Pow((1-t),3)*point1.x+3*(1-t)*(1-t)*t*point2.x+3*(1-t)*t*t*point3.x+t*t*t*point4.x;
-			y = Mathf.Pow((1-t),3)*point1.y+3*(1-t)*(1-t)*t*point2.y+3*(1-t)*t*t*point3.y+t*t*t*point4.y;
+			x=(1-t)*(1-t)*(1-t)*point1.x+3*(1-t)*(1-t)*t*point2.x+3*(1-t)*t*t*point3.x+t*t*t*point4.x;
+			y=(1-t)*(1-t)*(1-t)*point1.y+3*(1-t)*(1-t)*t*point2.y+3*(1-t)*t*t*point3.y+t*t*t*point4.y;
 			
 			if(activeAbil==Abilities.AbilityType.halfRoundTurn)
 				angle=Mathf.Repeat(angle+(180/3*Time.deltaTime*turnRotateDir),360);
@@ -894,25 +894,24 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		if(!GameStorage.getInstance().isRunning)
 		{
 			point1=new Vector2(transform.position.x,transform.position.z);
-			Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
-			Vector3 tempVec = GetComponent<Renderer>().bounds.ClosestPoint(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
-			point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
-			//point2*=dd;
+			point4=new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);
+			Vector2 tmpVec = new Vector2(point4.x-point1.x,point4.y-point1.y);
+			Vector2 perpVec = new Vector2(tmpVec.y,-tmpVec.x);
+			
+			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange)*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle);
 			point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
 			
-			point4=new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);
-			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
-			point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
-			point3 = point3+point2+pointz;
-			
+			point3=perpVec*getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle;
+			point3=new Vector2(point3.x+tmpVec.x/2.0f,point3.y+tmpVec.y/2.0f);
+			point3=new Vector2(point3.x+point1.x,point3.y+point1.y);
 			
 			trackDots.Clear();
 			float x,y,tt;
 			float step = 0.005f;
 			for(tt=0f;tt<=1;tt+=step)
 			{
-				x = Mathf.Pow((1-tt),3)*point1.x+3*(1-tt)*(1-tt)*tt*point2.x+3*(1-tt)*tt*tt*point3.x+tt*tt*tt*point4.x;
-				y = Mathf.Pow((1-tt),3)*point1.y+3*(1-tt)*(1-tt)*tt*point2.y+3*(1-tt)*tt*tt*point3.y+tt*tt*tt*point4.y;
+				x=(1-tt)*(1-tt)*(1-tt)*point1.x+3*(1-tt)*(1-tt)*tt*point2.x+3*(1-tt)*tt*tt*point3.x+tt*tt*tt*point4.x;
+				y=(1-tt)*(1-tt)*(1-tt)*point1.y+3*(1-tt)*(1-tt)*tt*point2.y+3*(1-tt)*tt*tt*point3.y+tt*tt*tt*point4.y;
 				trackDots.Add(new Vector2(x,y));
 			}
 		}

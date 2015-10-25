@@ -432,17 +432,6 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 					}
 					
 					movePoint=chVec;
-					
-					point1=new Vector2(transform.position.x,transform.position.z);
-					Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
-					Vector3 tempVec = GetComponent<Collider>().ClosestPointOnBounds(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
-					point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
-					point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
-					
-					point4=new Vector2(movePoint.x,movePoint.y);
-					Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
-					point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
-					point3 = point3+point2+pointz;
 				}
 				else
 				{
@@ -507,17 +496,6 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 					
 					if(viewGO!=null)
 						viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
-					
-					point1=new Vector2(transform.position.x,transform.position.z);
-					Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
-					Vector3 tempVec = GetComponent<Collider>().ClosestPointOnBounds(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
-					point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
-					point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
-					
-					point4=new Vector2(movePoint.x,movePoint.y);
-					Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
-					point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
-					point3 = point3+point2+pointz;
 				}
 			}
 			else
@@ -582,18 +560,18 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 				
 				if(viewGO!=null)
 					viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
-				
-				point1=new Vector2(transform.position.x,transform.position.z);
-				Vector2 vvec = Quaternion.Euler(0,0,-getAngle())*new Vector2(0,1);
-				Vector3 tempVec = GetComponent<Collider>().ClosestPointOnBounds(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
-				point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
-				point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
-				
-				point4=new Vector2(movePoint.x,movePoint.y);
-				Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
-				point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(getAngle(),getAttackIconAngle())*0.02f;
-				point3 = point3+point2+pointz;
 			}
+			point1=new Vector2(transform.position.x,transform.position.z);
+			point4=new Vector2(movePoint.x,movePoint.y);
+			Vector2 tmpVec = new Vector2(point4.x-point1.x,point4.y-point1.y);
+			Vector2 perpVec = new Vector2(tmpVec.y,-tmpVec.x);
+			
+			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange)*Mathf.Abs(GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle);
+			point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
+			
+			point3=perpVec*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle;
+			point3=new Vector2(point3.x+tmpVec.x/2.0f,point3.y+tmpVec.y/2.0f);
+			point3=new Vector2(point3.x+point1.x,point3.y+point1.y);
 		}
 	}
 	
