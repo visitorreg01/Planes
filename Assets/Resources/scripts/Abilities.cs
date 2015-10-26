@@ -26,8 +26,8 @@ public static class Abilities
 	
 	public static class RocketParameters
 	{
-		public const float minRange=8f;
-		public const float maxRange=15f;
+		public const float minRange=16f;
+		public const float maxRange=40f;
 		public const float maxTurnAngle=40f;
 		public const int damage=150;
 		public const float startRange=8.0f;
@@ -35,8 +35,8 @@ public static class Abilities
 	
 	public static class ThorpedeParameters
 	{
-		public const float minRange=6f;
-		public const float maxRange=10f;
+		public const float minRange=12f;
+		public const float maxRange=30f;
 		public const float maxTurnAngle=25f;
 		public const int damage=600;
 		public const float startRange=6.0f;
