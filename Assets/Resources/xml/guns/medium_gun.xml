@@ -2,12 +2,12 @@
 <gun
 	id="3"
 	gunName="PAC medium cannon"
-	damage="20"
-	reuse="0.5"
-	attackAngle="30.0"
+	damage="50"
+	reuse="0.7"
+	attackAngle="50.0"
 	bulletSpeed="2"
-	bulletDispersion="2.5"
-	attackRange="25.0"
+	bulletDispersion="2"
+	attackRange="21.0"
 	bulletMesh="bulletPrefab">
 	<defectChance id="0" chance="0.7"/>
 	<defectChance id="1" chance="0.7"/>

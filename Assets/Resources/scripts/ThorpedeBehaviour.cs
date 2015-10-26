@@ -279,28 +279,25 @@ public class ThorpedeBehaviour : MonoBehaviour {
 		{
 			point1=new Vector2(transform.position.x,transform.position.z);
 			Vector2 vvec = Quaternion.Euler(0,0,-angle)*new Vector2(0,1);
-			Vector3 tempVec = GetComponent<Renderer>().bounds.ClosestPoint(new Vector3(vvec.x+transform.position.x,0,vvec.y+transform.position.z));
-			point2=new Vector2(tempVec.x-transform.position.x,tempVec.z-transform.position.z);
-			//point2*=dd;
-			point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
-			
+			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,Abilities.ThorpedeParameters.minRange*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/Abilities.ThorpedeParameters.maxTurnAngle));
+			point2+=point1;
 			point4=new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);
 			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
-			point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())*0.02f;
+			point3 = new Vector2(pointz.y,-pointz.x)*getAngleDst(angle,getAttackIconAngle())/Abilities.ThorpedeParameters.maxTurnAngle;
 			point3 = point3+point2+pointz;
 			
+			trackDots.Clear();
+			float x,y,tt;
+			float step = 0.001f;
 			if(!enemy)
 			{
-				trackDots.Clear();
-				float x,y,tt;
-				float step = 0.005f;
 				for(tt=0f;tt<=1;tt+=step)
 				{
 					x = Mathf.Pow((1-tt),3)*point1.x+3*(1-tt)*(1-tt)*tt*point2.x+3*(1-tt)*tt*tt*point3.x+tt*tt*tt*point4.x;
 					y = Mathf.Pow((1-tt),3)*point1.y+3*(1-tt)*(1-tt)*tt*point2.y+3*(1-tt)*tt*tt*point3.y+tt*tt*tt*point4.y;
 					trackDots.Add(new Vector2(x,y));
-				}
-			}
+				}   
+			}                      
 		}
 	}
 	

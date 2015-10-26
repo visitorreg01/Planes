@@ -20,32 +20,32 @@ public static class Abilities
 	{
 		public const float gasRange=0.5f;
 		public const float gasReuse=0.5f;
-		public const int gasDamage=50;
-		public const float betweenDist=2f;
+		public const int gasDamage=20;
+		public const float betweenDist=1f;
 	}
 	
 	public static class RocketParameters
 	{
-		public const float minRange=16f;
-		public const float maxRange=40f;
-		public const float maxTurnAngle=40f;
+		public const float minRange=2f;
+		public const float maxRange=4f;
+		public const float maxTurnAngle=55f;
 		public const int damage=150;
 		public const float startRange=8.0f;
 	}
 	
 	public static class ThorpedeParameters
 	{
-		public const float minRange=12f;
-		public const float maxRange=30f;
-		public const float maxTurnAngle=25f;
-		public const int damage=600;
-		public const float startRange=6.0f;
+		public const float minRange=3f;
+		public const float maxRange=6f;
+		public const float maxTurnAngle=35f;
+		public const int damage=300;
+		public const float startRange=8.0f;
 	}
 	
 	public static class MinesParameters
 	{
 		public const float Range=0.5f;
-		public const int Damage=300;
-		public const float betweenDist=3f;
+		public const int Damage=20;
+		public const float betweenDist=1f;
 	}
 }

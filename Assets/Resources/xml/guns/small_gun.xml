@@ -4,7 +4,7 @@
 	gunName="PAC machinegun"
 	damage="3"
 	reuse="0.1"
-	attackAngle="50.0"
+	attackAngle="70.0"
 	bulletSpeed="2"
 	bulletDispersion="1"
 	attackRange="16.0"

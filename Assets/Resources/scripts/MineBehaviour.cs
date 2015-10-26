@@ -7,8 +7,9 @@ public class MineBehaviour : MonoBehaviour {
 	public int total;
 	public bool ready=false;
 	// Use this for initialization
+	float t;
 	void Start () {
-		
+		t=GameStorage.getInstance().getFixedTime();
 	}
 	
 	void Boom()
@@ -28,7 +29,7 @@ public class MineBehaviour : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(ready && GameStorage.getInstance().isRunning)
+		if(GameStorage.getInstance().getFixedTime()!=t && ready && GameStorage.getInstance().isRunning)
 		{
 			if(Time.time>=(GameStorage.getInstance().getFixedTime()+3.0f/total*cur))
 				Boom();

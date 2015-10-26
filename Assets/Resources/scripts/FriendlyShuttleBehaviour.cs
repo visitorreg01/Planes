@@ -11,6 +11,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	public Templates.PlaneTemplates Template;
 	private Templates.PlaneTemplate temp;
 	
+	private float clickDist=3f;
 	
 	private ArrayList minesList=new ArrayList();
 	
@@ -24,6 +25,10 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	private bool loaded=false;
 	bool rocketSpawned=false;
 	bool thorpedeSpawned=false;
+	bool over45=false;
+	
+	private float[] T = {0.0f,0.3f,1.0f};
+	private Vector2[] A = new Vector2[3];
 	
 	//DEBUG
 	private ArrayList shuttleGunsMeshes = new ArrayList();
@@ -53,7 +58,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	bool needToUpdateAttackIconPosition = false;
 	
 	//Path
-	Vector2 point1,point2,point3,point4;
+	Vector2 point1,point2,point3,point4,point5;
 	float d;
 	float t;
 	
@@ -268,7 +273,14 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void Update()
 	{
-		
+		if(!GameStorage.getInstance().isRunning)
+		{
+			if(Mathf.Abs(getAngleDst(angle,getAttackIconAngle()))>45)
+				over45=true;
+			else
+				over45=false;
+		}
+
 		for(int i = 0;i<shuttleGunsMeshes.Count;i++)
 		{
 			GameObject goss = (GameObject) shuttleGunsMeshes[i];
@@ -403,13 +415,13 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		if(temp.abilities.Count>0 && selected && !attackIconCaptured && !abilityInReuse && !earnedDefect)
 		{
 			firstAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z));
-			firstAbilPos = new Vector3(firstAbilPos.x-20,firstAbilPos.y,0);
+			firstAbilPos = new Vector3(firstAbilPos.x-40,firstAbilPos.y,0);
 			secondAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z));
-			secondAbilPos = new Vector3(secondAbilPos.x+20,secondAbilPos.y,0);
+			secondAbilPos = new Vector3(secondAbilPos.x+40,secondAbilPos.y,0);
 			thirdAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z));
-			thirdAbilPos = new Vector3(thirdAbilPos.x,thirdAbilPos.y-20,0);
+			thirdAbilPos = new Vector3(thirdAbilPos.x,thirdAbilPos.y-40,0);
 			fourthAbilPos = Camera.main.WorldToScreenPoint(new Vector3(attackIcon.transform.position.x,0,attackIcon.transform.position.z));
-			fourthAbilPos = new Vector3(fourthAbilPos.x,fourthAbilPos.y+20,0);
+			fourthAbilPos = new Vector3(fourthAbilPos.x,fourthAbilPos.y+40,0);
 			if(temp.abilities.Count>=1)
 			{
 				if(GUI.Button(new Rect(firstAbilPos.x-10,Screen.height-firstAbilPos.y-10,20,20),temp.abilities[0].ToString()))
@@ -473,7 +485,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			{
 				if(temp.abilities.Count>0)
 				{
-					if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>1.7f)
+					if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist)
 						selected=false;
 				}
 				else
@@ -869,6 +881,13 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	public void Die()
 	{
+		if(activeAbil!=Abilities.AbilityType.none && !abilityInReuse)
+		{
+			prevAbil=activeAbil;
+			abilityInReuse=true;
+			activeAbil=Abilities.AbilityType.none;
+			AbilitySwitched();
+		}
 		GameStorage.getInstance().removeFriendlyShuttle(this.gameObject);
 	}
 	
@@ -889,31 +908,33 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
     	return false;
 	}
 	
+	private Vector2 getRPoint(float z)
+	{
+		return A[0]+A[1]*(z-T[0])+A[2]*(z-T[0])*(z-T[1]);
+	}
+	
 	private void CalculatePath()
 	{
 		if(!GameStorage.getInstance().isRunning)
-		{
+		{         
 			point1=new Vector2(transform.position.x,transform.position.z);
+			Vector2 vvec = Quaternion.Euler(0,0,-angle)*new Vector2(0,1);
+			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle));
+			point2+=point1;
 			point4=new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);
-			Vector2 tmpVec = new Vector2(point4.x-point1.x,point4.y-point1.y);
-			Vector2 perpVec = new Vector2(tmpVec.y,-tmpVec.x);
-			
-			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange)*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle);
-			point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
-			
-			point3=perpVec*getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle;
-			point3=new Vector2(point3.x+tmpVec.x/2.0f,point3.y+tmpVec.y/2.0f);
-			point3=new Vector2(point3.x+point1.x,point3.y+point1.y);
+			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
+			point3 = new Vector2(pointz.y,-pointz.x)*getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle*Vector2.Distance(point1,point4)/temp.maxRange;
+			point3 = point3+point2+pointz;
 			
 			trackDots.Clear();
 			float x,y,tt;
-			float step = 0.005f;
+			float step = 0.001f;
 			for(tt=0f;tt<=1;tt+=step)
 			{
-				x=(1-tt)*(1-tt)*(1-tt)*point1.x+3*(1-tt)*(1-tt)*tt*point2.x+3*(1-tt)*tt*tt*point3.x+tt*tt*tt*point4.x;
-				y=(1-tt)*(1-tt)*(1-tt)*point1.y+3*(1-tt)*(1-tt)*tt*point2.y+3*(1-tt)*tt*tt*point3.y+tt*tt*tt*point4.y;
+				x = Mathf.Pow((1-tt),3)*point1.x+3*(1-tt)*(1-tt)*tt*point2.x+3*(1-tt)*tt*tt*point3.x+tt*tt*tt*point4.x;
+				y = Mathf.Pow((1-tt),3)*point1.y+3*(1-tt)*(1-tt)*tt*point2.y+3*(1-tt)*tt*tt*point3.y+tt*tt*tt*point4.y;
 				trackDots.Add(new Vector2(x,y));
-			}
+			}                                       
 		}
 	}
 	

@@ -342,6 +342,13 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	public void Die()
 	{
+		if(activeAbil!=Abilities.AbilityType.none && !abilityInReuse)
+		{
+			prevAbil=activeAbil;
+			abilityInReuse=true;
+			activeAbil=Abilities.AbilityType.none;
+			AbilitySwitched();
+		}
 		GameStorage.getInstance().removeEnemyShuttle(this.gameObject);
 	}
 	
@@ -562,16 +569,13 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 					viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
 			}
 			point1=new Vector2(transform.position.x,transform.position.z);
+			Vector2 vvec = Quaternion.Euler(0,0,-angle)*new Vector2(0,1);
+			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle));
+			point2+=point1;
 			point4=new Vector2(movePoint.x,movePoint.y);
-			Vector2 tmpVec = new Vector2(point4.x-point1.x,point4.y-point1.y);
-			Vector2 perpVec = new Vector2(tmpVec.y,-tmpVec.x);
-			
-			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange)*Mathf.Abs(GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle);
-			point2=new Vector2(transform.position.x+point2.x,transform.position.z+point2.y);
-			
-			point3=perpVec*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle;
-			point3=new Vector2(point3.x+tmpVec.x/2.0f,point3.y+tmpVec.y/2.0f);
-			point3=new Vector2(point3.x+point1.x,point3.y+point1.y);
+			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
+			point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle;
+			point3 = point3+point2+pointz;
 		}
 	}
 	
