@@ -65,6 +65,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	public void StepStart()
 	{
+		calculateMovePosition();
 		if(earnedDefect)
 			defectInUse=true;
 	}
@@ -136,17 +137,19 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 		
 		if(!abilityInReuse && !earnedDefect)
 			TryChoiceAbil();
-		calculateMovePosition();
 	}
 	
 	void TryChoiceAbil()
 	{
-		if(UnityEngine.Random.Range(0,100)>=30)
+		if(temp.abilities.Count>0)
 		{
-			prevAbil=activeAbil;
-			activeAbil=(Abilities.AbilityType) temp.abilities[UnityEngine.Random.Range(0,temp.abilities.Count)];
-			AbilitySwitched();
-			Debug.Log("USED: "+activeAbil);
+			if(UnityEngine.Random.Range(0,100)>=30)
+			{
+				prevAbil=activeAbil;
+				activeAbil=(Abilities.AbilityType) temp.abilities[UnityEngine.Random.Range(0,temp.abilities.Count)];
+				AbilitySwitched();
+				Debug.Log("USED: "+activeAbil);
+			}
 		}
 	}
 	
@@ -203,8 +206,8 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			float x,y;
 			t+=1*Time.deltaTime/3;
 			
-			x = Mathf.Pow(1-t,2)*point1.x+2*(1-t)*t*point2.x+t*t*point3.x;
-			y = Mathf.Pow(1-t,2)*point1.y+2*(1-t)*t*point2.y+t*t*point3.y;
+			x=(1-t)*(1-t)*(1-t)*point1.x+3*(1-t)*(1-t)*t*point2.x+3*(1-t)*t*t*point3.x+t*t*t*point4.x;
+			y=(1-t)*(1-t)*(1-t)*point1.y+3*(1-t)*(1-t)*t*point2.y+3*(1-t)*t*t*point3.y+t*t*t*point4.y;
 			Vector2 pos = new Vector2(x-transform.position.x,y-transform.position.z);
 			
 			if(activeAbil==Abilities.AbilityType.halfRoundTurn)
