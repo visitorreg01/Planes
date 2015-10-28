@@ -16,5 +16,5 @@
 	<gun id="2" pos="0,-2" turnAngle="180.0"/>
 	<ability id="0"/>
 	<ability id="5"/>
-	<ability id="7"/>
+	<ability id="6"/>
 </plane>

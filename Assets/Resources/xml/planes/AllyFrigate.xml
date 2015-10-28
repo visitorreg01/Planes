@@ -9,6 +9,6 @@
 	description="This unit is a default class for planes">
 	<gun id="1" pos="1,-0.6" turnAngle="90.0"/>
 	<ability id="4"/>
-	<ability id="6"/>
-	<ability id="3"/>
+	<ability id="2"/>
+	<ability id="7"/>
 </plane>
