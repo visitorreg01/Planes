@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <gun
 	id="3"
-	gunName="PAC medium cannon"
+	gunName="PAC medium cannon."
 	damage="20"
 	reuse="0.5"
 	attackAngle="30.0"
