@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <gun
 	id="5"
 	gunName="Corvette special cannon"
@@ -6,7 +6,7 @@
 	reuse="0.4"
 	attackAngle="40.0"
 	bulletSpeed="2"
-	bulletDispersion="1ю5"
+	bulletDispersion="1.5"
 	attackRange="23.0"
 	bulletMesh="bulletPrefab">
 	<defectChance id="0" chance="1"/>
