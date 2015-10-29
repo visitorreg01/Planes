@@ -7,11 +7,18 @@ ModelImporter:
   fileIDToRecycleName:
     100000: //RootNode
     100002: Texture_Support
+    100004: Fighter_Test:cube
+    100006: Fighter_Test:Texture_Support
     400000: //RootNode
     400002: Texture_Support
+    400004: Fighter_Test:cube
+    400006: Fighter_Test:Texture_Support
     2300000: //RootNode
+    2300002: Fighter_Test:cube
     3300000: //RootNode
+    3300002: Fighter_Test:cube
     4300000: cube
+    4300002: Fighter_Test:cube
     9500000: //RootNode
   materials:
     importMaterials: 1
