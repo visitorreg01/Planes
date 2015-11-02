@@ -4,7 +4,7 @@
 	classname="default-class"
 	hp="800"
 	minRange="5"
-	maxRange="8"
+	maxRange="12"
 	maxTurnAngle="30"
 	description="This unit is a default class for planes">
 	<gun id="1" pos="1,-0.6" turnAngle="90.0"/>
