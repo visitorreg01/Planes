@@ -80,6 +80,8 @@ public class Templates {
 		public string classname;
 		public int hp;
 		public float minRange,maxRange,maxTurnAngle;
+		public float upperSmooth=1f;
+		public float lowerSmooth=1f;
 		public string description;
 		public ArrayList guns = new ArrayList();
 		public ArrayList abilities = new ArrayList();
@@ -98,6 +100,11 @@ public class Templates {
 		public float[] defectsChance = new float[Enum.GetNames(typeof(Defects.DefectType)).Length];
 	}
 	
+	private void loadAbilityIconsSkins()
+	{
+		
+	}
+	
 	public PlaneTemplate getPlaneTemplate(PlaneTemplates id)
 	{
 		foreach(PlaneTemplate p in planeClasses)
@@ -110,6 +117,8 @@ public class Templates {
 				t.hp=p.hp;
 				t.id=p.id;
 				t.maxRange=p.maxRange;
+				t.lowerSmooth=p.lowerSmooth;
+				t.upperSmooth=p.upperSmooth;
 				t.maxTurnAngle=p.maxTurnAngle;
 				t.minRange=p.minRange;
 				foreach(GunOnShuttle f in p.guns)
@@ -151,6 +160,8 @@ public class Templates {
 				t.hp=p.hp;
 				t.id=p.id;
 				t.maxRange=p.maxRange;
+				t.lowerSmooth=p.lowerSmooth;
+				t.upperSmooth=p.upperSmooth;
 				t.maxTurnAngle=p.maxTurnAngle;
 				t.minRange=p.minRange;
 				foreach(GunOnShuttle f in p.guns)
@@ -258,6 +269,10 @@ public class Templates {
 							p.id=int.Parse(m.Value);
 						else if(m.Name=="hp")
 							p.hp=int.Parse(m.Value);
+						else if(m.Name=="upperSmooth")
+							p.upperSmooth=float.Parse(m.Value);
+						else if(m.Name=="lowerSmooth")
+							p.lowerSmooth=float.Parse(m.Value);
 						else if(m.Name=="classname")
 							p.classname=m.Value;
 						else if(m.Name=="minRange")

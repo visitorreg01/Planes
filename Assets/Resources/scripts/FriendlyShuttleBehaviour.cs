@@ -925,11 +925,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		{         
 			point1=new Vector2(transform.position.x,transform.position.z);
 			Vector2 vvec = Quaternion.Euler(0,0,-angle)*new Vector2(0,1);
-			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange)/1.3f;
+			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange)*temp.lowerSmooth;
 			point2+=point1;
 			point4=new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);
 			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
-			point3 = new Vector2(pointz.y,-pointz.x)*getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle*Vector2.Distance(point1,point4)/temp.maxRange/2;
+			point3 = new Vector2(pointz.y,-pointz.x)*getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle*Vector2.Distance(point1,point4)/temp.maxRange*temp.upperSmooth;
 			point3 = point3+point2+pointz;
 			
 			trackDots.Clear();
