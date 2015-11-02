@@ -14,6 +14,7 @@
 	<gun id="4" pos="0,3" turnAngle="0.0"/>
 	<gun id="2" pos="0,0" turnAngle="0.0"/>
 	<gun id="2" pos="0,-3" turnAngle="180.0"/>
+	
 	<ability id="5"/>
 	<ability id="6"/>
 
