@@ -4,7 +4,7 @@
 	classname="default-class"
 	hp="600"
 	minRange="3"
-	maxRange="9"
+	maxRange="13.5"
 	maxTurnAngle="40"
 	description="This unit is a default class for planes">
 	

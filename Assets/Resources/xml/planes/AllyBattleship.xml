@@ -4,7 +4,7 @@
 	classname="Modoc"
 	hp="1000"
 	minRange="2"
-	maxRange="8"
+	maxRange="12"
 	maxTurnAngle="35"
 	description="This unit is a default class for planes">
 	<gun id="4" pos="2,-1" turnAngle="90.0"/>

@@ -4,7 +4,7 @@
 	classname="The Chosen One"
 	hp="500"
 	minRange="5"
-	maxRange="14"
+	maxRange="21"
 	maxTurnAngle="55"
 	description="This unit is a default class for planes">
 	<gun id="5" pos="1,-0.6" turnAngle="0"/>

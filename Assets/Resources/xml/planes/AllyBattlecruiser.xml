@@ -4,7 +4,7 @@
 	classname="Aukeratu"
 	hp="800"
 	minRange="3"
-	maxRange="10"
+	maxRange="15"
 	maxTurnAngle="45"
 	description="This unit is a default class for planes">
 	<gun id="6" pos="1,-1" turnAngle="37.5"/>
