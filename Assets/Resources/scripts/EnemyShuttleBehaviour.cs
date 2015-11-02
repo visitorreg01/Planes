@@ -573,11 +573,11 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			}
 			point1=new Vector2(transform.position.x,transform.position.z);
 			Vector2 vvec = Quaternion.Euler(0,0,-angle)*new Vector2(0,1);
-			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle));
+			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange)*temp.lowerSmooth;
 			point2+=point1;
 			point4=new Vector2(movePoint.x,movePoint.y);
 			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
-			point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle;
+			point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle*Vector2.Distance(point1,point4)/temp.maxRange*temp.upperSmooth;
 			point3 = point3+point2+pointz;
 		}
 	}
