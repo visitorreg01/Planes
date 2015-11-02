@@ -2,12 +2,12 @@
 <gun
 	id="5"
 	gunName="Corvette special cannon"
-	damage="13"
-	reuse="0.4"
+	damage="10"
+	reuse="0.25"
 	attackAngle="40.0"
 	bulletSpeed="2"
 	bulletDispersion="1.5"
-	attackRange="23.0"
+	attackRange="28.75"
 	bulletMesh="bulletPrefab">
 	<defectChance id="0" chance="1"/>
 	<defectChance id="1" chance="1"/>

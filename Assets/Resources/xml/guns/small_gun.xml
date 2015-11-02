@@ -2,12 +2,12 @@
 <gun
 	id="2"
 	gunName="PAC machinegun"
-	damage="3"
+	damage="5"
 	reuse="0.1"
 	attackAngle="35.0"
 	bulletSpeed="2"
 	bulletDispersion="1"
-	attackRange="16.0"
+	attackRange="20.0"
 	bulletMesh="bulletPrefab">
 	<defectChance id="0" chance="0.1"/>
 	<defectChance id="1" chance="0.1"/>
