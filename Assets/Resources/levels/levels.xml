@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<levels>
+	<level num="1" levelName="This is level one" file="battleground"/>
+	<level num="2" levelName="This is level two" file="battleground2"/>
+</levels>

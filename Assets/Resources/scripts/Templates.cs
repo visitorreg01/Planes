@@ -48,8 +48,10 @@ public class Templates {
 	
 	private ArrayList planeClasses;
 	private ArrayList gunClasses;
+	private ArrayList levelList;
 	private string planeTempFolder="xml/planes";
 	private string gunTempFolder="xml/guns";
+	private string levelsFolder = "levels";
 	
 	public Templates()
 	{
@@ -57,8 +59,12 @@ public class Templates {
 		LoadPlaneClasses();
 		gunClasses=new ArrayList();
 		LoadGunClasses();
+		levelList=new ArrayList();
+		loadLevels();
 		Loaded();
 	}
+	
+	
 	
 	void Loaded()
 	{
@@ -87,6 +93,12 @@ public class Templates {
 		public ArrayList abilities = new ArrayList();
 	}
 	
+	public class LevelInfo
+	{
+		public int num;
+		public string levelName,file;
+	}
+	
 	public class GunTemplate
 	{
 		public int id;
@@ -98,11 +110,6 @@ public class Templates {
 		public float attackAngle,attackRange;
 		public string bulletMesh;
 		public float[] defectsChance = new float[Enum.GetNames(typeof(Defects.DefectType)).Length];
-	}
-	
-	private void loadAbilityIconsSkins()
-	{
-		
 	}
 	
 	public PlaneTemplate getPlaneTemplate(PlaneTemplates id)
@@ -146,6 +153,51 @@ public class Templates {
 				return p;
 		}
 		return null;
+	}
+	
+	public LevelInfo getLevel(int num)
+	{
+		foreach(LevelInfo l in levelList)
+		{
+			if(l.num==num)
+				return l;
+		}
+		return null;
+	}
+	
+	public ArrayList getAllLevels()
+	{
+		return levelList;
+	}
+	
+	private void loadLevels()
+	{
+		XmlDocument doc = new XmlDocument();
+		doc.LoadXml(((TextAsset) Resources.Load(levelsFolder+"/levels")).text);
+		foreach(XmlNode x in doc.ChildNodes)
+		{
+			if(x.Name=="levels")
+			{
+				foreach(XmlNode m in x.ChildNodes)
+				{
+					if(m.Name=="level")
+					{
+						LevelInfo li = new LevelInfo();
+						foreach(XmlNode l in m.Attributes)
+						{
+							if(l.Name=="num")
+								li.num=int.Parse(l.Value);
+							else if(l.Name=="levelName")
+								li.levelName=l.Value;
+							else if(l.Name=="file")
+								li.file=l.Value;
+						}
+						levelList.Add(li);
+					}
+				}
+			}
+		}
+		Debug.Log("Loaded "+levelList.Count+" levels.");
 	}
 	
 	public PlaneTemplate getPlaneTemplate(int id)
