@@ -278,7 +278,6 @@ public class ThorpedeBehaviour : MonoBehaviour {
 		if(!GameStorage.getInstance().isRunning)
 		{
 			point1=new Vector2(transform.position.x,transform.position.z);
-			Vector2 vvec = Quaternion.Euler(0,0,-angle)*new Vector2(0,1);
 			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,Abilities.ThorpedeParameters.minRange*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/Abilities.ThorpedeParameters.maxTurnAngle));
 			point2+=point1;
 			point4=new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);

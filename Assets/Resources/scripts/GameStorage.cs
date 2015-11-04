@@ -14,6 +14,7 @@ public class GameStorage {
 	
 	public bool isRunning=false;
 	public bool isDebug=false;
+	public float zoom=1.0f;
 	
 	private ArrayList friendlyGameObjectsList;
 	private ArrayList enemyGameObjectsList;

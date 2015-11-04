@@ -12,6 +12,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	private Templates.PlaneTemplate temp;
 	
 	private float clickDist=3f;
+	private float clickDistMin=2f;
+	private float clickDistAccuracy=0.05f;
 	
 	private ArrayList minesList=new ArrayList();
 	
@@ -22,13 +24,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	float routeDist=0.0f;
 	int gasSpawned=0;
 	int minesSpawned=0;
-	private bool loaded=false;
 	bool rocketSpawned=false;
 	bool thorpedeSpawned=false;
-	bool over45=false;
-	
-	private float[] T = {0.0f,0.3f,1.0f};
-	private Vector2[] A = new Vector2[3];
 	
 	//DEBUG
 	private ArrayList shuttleGunsMeshes = new ArrayList();
@@ -73,7 +70,6 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	bool focused = false;
 	bool selected = false;
 	bool attackIconCaptured = false;
-	bool attackIconFocused = false;
 	bool spawn=true;
 	
 	private Defects.Defect curDefect = null;
@@ -116,12 +112,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	{
 		return angle;
 	}
-	
-	public void setReady()
-	{
-		loaded=true;
-	}
-	
+
 	private void updateAttackIconPosition()
 	{
 		float ds;
@@ -273,13 +264,9 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void Update()
 	{
-		if(!GameStorage.getInstance().isRunning)
-		{
-			if(Mathf.Abs(getAngleDst(angle,getAttackIconAngle()))>45)
-				over45=true;
-			else
-				over45=false;
-		}
+		clickDist=0.15f*GameStorage.getInstance().zoom;
+		if(clickDist<clickDistMin)
+			clickDist=clickDistMin;
 
 		for(int i = 0;i<shuttleGunsMeshes.Count;i++)
 		{
@@ -414,16 +401,14 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		
 		if(temp.abilities.Count>0 && selected && !attackIconCaptured && !abilityInReuse && !earnedDefect)
 		{
-			
-			firstAbilPos = new Vector2(attackIcon.transform.position.x-clickDist,attackIcon.transform.position.z);
-			secondAbilPos = new Vector2(attackIcon.transform.position.x+clickDist,attackIcon.transform.position.z);
-			thirdAbilPos = new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z-clickDist);
-			fourthAbilPos = new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z+clickDist);
-			
-			firstAbilPos=new Vector2(Camera.main.WorldToScreenPoint(firstAbilPos).x,Camera.main.WorldToScreenPoint(firstAbilPos).z);
-			secondAbilPos=new Vector2(Camera.main.WorldToScreenPoint(secondAbilPos).x,Camera.main.WorldToScreenPoint(secondAbilPos).y);
-			thirdAbilPos=new Vector2(Camera.main.WorldToScreenPoint(thirdAbilPos).x,Camera.main.WorldToScreenPoint(thirdAbilPos).y);
-			fourthAbilPos=new Vector2(Camera.main.WorldToScreenPoint(fourthAbilPos).x,Camera.main.WorldToScreenPoint(fourthAbilPos).y);
+			Vector3 v1 = attackIcon.transform.position+new Vector3(clickDist,0,0);
+			Vector3 v2 = attackIcon.transform.position+new Vector3(-clickDist,0,0);
+			Vector3 v3 = attackIcon.transform.position+new Vector3(0,0,clickDist);
+			Vector3 v4 = attackIcon.transform.position+new Vector3(0,0,-clickDist);
+			firstAbilPos=new Vector2(Camera.main.WorldToScreenPoint(v1).x,Camera.main.WorldToScreenPoint(v1).y);
+			secondAbilPos=new Vector2(Camera.main.WorldToScreenPoint(v2).x,Camera.main.WorldToScreenPoint(v2).y);
+			thirdAbilPos=new Vector2(Camera.main.WorldToScreenPoint(v3).x,Camera.main.WorldToScreenPoint(v3).y);
+			fourthAbilPos=new Vector2(Camera.main.WorldToScreenPoint(v4).x,Camera.main.WorldToScreenPoint(v4).y);
 			
 			
 			
@@ -441,7 +426,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			}
 			if(temp.abilities.Count>=2)
 			{
-				if(GUI.Button(new Rect(secondAbilPos.x,Screen.height-secondAbilPos.y-10,20,20),temp.abilities[1].ToString()))
+				if(GUI.Button(new Rect(secondAbilPos.x-10,Screen.height-secondAbilPos.y-10,20,20),temp.abilities[1].ToString()))
 				{
 					Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[1];
 					prevAbil=activeAbil;
@@ -491,7 +476,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			{
 				if(temp.abilities.Count>0)
 				{
-					if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist)
+					if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist+clickDistAccuracy*GameStorage.getInstance().zoom)
 						selected=false;
 				}
 				else
@@ -809,30 +794,10 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	public void checkAttackIconClickState()
 	{
-		if(selected)
-		{
-			if(isMouseOver(attackIcon))
-				attackIconFocused=true;
-			else
-			{
-				if(temp.abilities.Count>0)
-				{
-					if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>1.7f)
-						attackIconFocused=false;
-				}
-				else
-					attackIconFocused=false;
-			}
-		}
-		
 		if(Input.GetMouseButtonDown(0) && isMouseOver(attackIcon))
-		{
 			attackIconCaptured=true;
-		}
 		if(Input.GetMouseButtonUp(0))
-		{
 			attackIconCaptured=false;
-		}
 	}
 	
 	public void StepStart()
@@ -914,17 +879,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
     	return false;
 	}
 	
-	private Vector2 getRPoint(float z)
-	{
-		return A[0]+A[1]*(z-T[0])+A[2]*(z-T[0])*(z-T[1]);
-	}
-	
 	private void CalculatePath()
 	{
 		if(!GameStorage.getInstance().isRunning)
 		{         
 			point1=new Vector2(transform.position.x,transform.position.z);
-			Vector2 vvec = Quaternion.Euler(0,0,-angle)*new Vector2(0,1);
 			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange)*temp.lowerSmooth;
 			point2+=point1;
 			point4=new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);

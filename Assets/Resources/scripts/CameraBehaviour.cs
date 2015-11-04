@@ -41,6 +41,8 @@ public class CameraBehaviour : MonoBehaviour {
 				cameraSize+=cameraZoomSpeed;
 		}
 		
+		GameStorage.getInstance().zoom=cameraSize;
+		
 		Camera.main.orthographicSize=cameraSize;
 		
 		if(released)

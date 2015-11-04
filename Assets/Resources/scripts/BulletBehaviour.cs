@@ -9,7 +9,7 @@ public class BulletBehaviour : MonoBehaviour {
 	float x,y;
 	bool setuped=false;
 	Templates.GunTemplate gos;
-	float t=0,step=0.01f;
+	float t=0;
 	
 	void Update () 
 	{

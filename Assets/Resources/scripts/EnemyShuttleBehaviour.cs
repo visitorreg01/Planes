@@ -572,7 +572,6 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 					viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
 			}
 			point1=new Vector2(transform.position.x,transform.position.z);
-			Vector2 vvec = Quaternion.Euler(0,0,-angle)*new Vector2(0,1);
 			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange)*temp.lowerSmooth;
 			point2+=point1;
 			point4=new Vector2(movePoint.x,movePoint.y);
