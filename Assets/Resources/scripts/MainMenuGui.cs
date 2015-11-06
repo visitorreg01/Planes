@@ -33,11 +33,6 @@ public class MainMenuGui : MonoBehaviour {
 			if(GUI.Button(new Rect(20,50,100,20),"Levels"))
 				showLevelsMenu=!showLevelsMenu;
 			
-			GUI.skin=skin;
-			if(GUI.Button(new Rect(100,100,40,40),""))
-				Debug.Log("Press");
-			GUI.skin=null;
-			
 			if(showLevelsMenu)
 			{
 				levels=Templates.getInstance().getAllLevels();

@@ -12,6 +12,9 @@ public class Templates {
 		return instance;
 	}
 	
+	private GUISkin[] abilitySkins = new GUISkin[9];
+	private GUISkin[] abilityDisabledSkins = new GUISkin[9];
+	
 	public enum PlaneTemplates : int
 	{
 		default_class=1,
@@ -61,10 +64,52 @@ public class Templates {
 		LoadGunClasses();
 		levelList=new ArrayList();
 		loadLevels();
+		loadAbilityIcons();
 		Loaded();
 	}
 	
+	private void loadAbilityIcons()
+	{
+		abilitySkins[0]=(GUISkin) Resources.Load("gui/skins/ability_common");
+		abilitySkins[1]=(GUISkin) Resources.Load("gui/skins/ability_180");
+		abilitySkins[2]=(GUISkin) Resources.Load("gui/skins/ability_360");
+		abilitySkins[3]=(GUISkin) Resources.Load("gui/skins/ability_dt");
+		abilitySkins[4]=(GUISkin) Resources.Load("gui/skins/ability_gas");
+		abilitySkins[5]=(GUISkin) Resources.Load("gui/skins/ability_rocket");
+		abilitySkins[6]=(GUISkin) Resources.Load("gui/skins/ability_shield");
+		abilitySkins[7]=(GUISkin) Resources.Load("gui/skins/ability_thorpede");
+		abilitySkins[8]=(GUISkin) Resources.Load("gui/skins/ability_mines");
+		
+		abilityDisabledSkins[0]=(GUISkin) Resources.Load("gui/skins/ability_common");
+		abilityDisabledSkins[1]=(GUISkin) Resources.Load("gui/skins/ability_180_grey");
+		abilityDisabledSkins[2]=(GUISkin) Resources.Load("gui/skins/ability_360_grey");
+		abilityDisabledSkins[3]=(GUISkin) Resources.Load("gui/skins/ability_dt_grey");
+		abilityDisabledSkins[4]=(GUISkin) Resources.Load("gui/skins/ability_gas_grey");
+		abilityDisabledSkins[5]=(GUISkin) Resources.Load("gui/skins/ability_rocket_grey");
+		abilityDisabledSkins[6]=(GUISkin) Resources.Load("gui/skins/ability_shield_grey");
+		abilityDisabledSkins[7]=(GUISkin) Resources.Load("gui/skins/ability_thorpede_grey");
+		abilityDisabledSkins[8]=(GUISkin) Resources.Load("gui/skins/ability_mines_grey");
+	}
 	
+	public GUISkin getAbilityIcon(int id)
+	{
+		return abilitySkins[id+1];
+	}
+	
+	public GUISkin getAbilityIcon(Abilities.AbilityType id)
+	{
+		return abilitySkins[((int)id)+1];
+	}
+	
+	public GUISkin getAbilityIconGrey(int id)
+	{
+		return abilityDisabledSkins[id+1];
+	}
+	
+	public GUISkin getAbilityIconGrey(Abilities.AbilityType id)
+	{
+		return abilityDisabledSkins[((int)id)+1];
+	}
 	
 	void Loaded()
 	{

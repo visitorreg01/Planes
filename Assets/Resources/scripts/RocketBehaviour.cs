@@ -8,6 +8,10 @@ public class RocketBehaviour : MonoBehaviour {
 	GameObject attackIcon;
 	bool attackIconCaptured=false;
 	
+	private float clickDist=3f;
+	private float clickDistMin=2f;
+	private float clickDistAccuracy=0.05f;
+	
 	ArrayList trackDots = new ArrayList();
 	Vector2 point1,point2,point3,point4;
 	public float angle=0;
@@ -43,6 +47,10 @@ public class RocketBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
+		clickDist=0.15f*GameStorage.getInstance().zoom;
+		if(clickDist<clickDistMin)
+			clickDist=clickDistMin;
+		
 		angle=Mathf.Repeat(angle,360);
 		if(spawned && GameStorage.getInstance().isRunning)
 			transform.position=new Vector3(transform.position.x+dx,0,transform.position.z+dy);
@@ -53,10 +61,6 @@ public class RocketBehaviour : MonoBehaviour {
 			{
 				checkShuttleClickState();
 				checkAttackIconClickState();
-				if(selected)
-					attackIcon.SetActive(true);
-				else
-					attackIcon.SetActive(false);
 				
 				if(attackIconCaptured)
 					dragAttackIcon();
@@ -70,6 +74,28 @@ public class RocketBehaviour : MonoBehaviour {
 			Accelerate();
 		
 		transform.eulerAngles=new Vector3(0,angle,0);
+	}
+	
+	public void checkAttackIconClickState()
+	{
+		if(Input.GetMouseButtonDown(0) && isMouseOver(attackIcon))
+			attackIconCaptured=true;
+		if(Input.GetMouseButtonUp(0))
+			attackIconCaptured=false;
+	}
+	
+	void OnGUI()
+	{
+		if(selected)
+		{
+			Vector3 v1 = attackIcon.transform.position;
+			Vector2 aPos = new Vector2(Camera.main.WorldToScreenPoint(v1).x,Camera.main.WorldToScreenPoint(v1).y);
+			
+			GUI.skin = Templates.getInstance().getAbilityIcon(Abilities.AbilityType.none);
+			if(GUI.RepeatButton(new Rect(aPos.x-20,Screen.height-aPos.y-20,40,40),""))
+				attackIconCaptured=true;
+			GUI.skin=null;
+		}
 	}
 	
 	private float getAngleDst(float fr, float to)
@@ -186,18 +212,14 @@ public class RocketBehaviour : MonoBehaviour {
 		}
 	}
 	
-	private void checkAttackIconClickState()
-	{	
-		if(Input.GetMouseButtonDown(0) && isMouseOver(attackIcon))
-			attackIconCaptured=true;
-		if(Input.GetMouseButtonUp(0))
-			attackIconCaptured=false;
-	}
-	
 	private bool isMouseOver(GameObject o)
 	{
-		Vector3 pz = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		return (o.GetComponent<Renderer>().bounds.IntersectRay(new Ray(new Vector3(pz.x,o.transform.position.y,pz.z),new Vector3(pz.x,o.transform.position.y,pz.z))));
+    	Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    	RaycastHit hit;
+    	if (Physics.Raycast(ray, out hit)){
+    		return hit.collider.gameObject==o;
+    	}
+    	return false;
 	}
 	
 	private void clearLine()
@@ -211,7 +233,10 @@ public class RocketBehaviour : MonoBehaviour {
 		if((Input.GetMouseButtonDown(0) && isMouseOver(gameObject)) || (Input.GetMouseButtonDown(0) && isMouseOver(attackIcon)))
 			selected=true;
 		else if(Input.GetMouseButtonDown(0) && !isMouseOver(gameObject))
-			selected=false;
+		{
+			if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist+clickDistAccuracy*GameStorage.getInstance().zoom)
+				selected=false;
+		}
 	}
 	
 	public int updateStepCounter()

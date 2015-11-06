@@ -13,7 +13,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	private float clickDist=3f;
 	private float clickDistMin=2f;
-	private float clickDistAccuracy=0.05f;
+	private float clickDistAccuracy=0.1f;
+	
 	
 	private ArrayList minesList=new ArrayList();
 	
@@ -163,17 +164,17 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void AbilitySwitched()
 	{
+		if((prevAbil==Abilities.AbilityType.halfRoundTurn || prevAbil==Abilities.AbilityType.turnAround) && (activeAbil!=Abilities.AbilityType.halfRoundTurn && activeAbil!=Abilities.AbilityType.turnAround))
+		{
+			maxTurnAngle=temp.maxTurnAngle;
+			attackIconDist=temp.maxRange;
+			attackIconDistMin=temp.minRange;
+			
+			updateAttackIconPosition();
+		}
+		
 		if(activeAbil==Abilities.AbilityType.none)
 		{
-			if(prevAbil==Abilities.AbilityType.halfRoundTurn)
-			{
-				maxTurnAngle=temp.maxTurnAngle;
-				attackIconDist=temp.maxRange;
-				attackIconDistMin=temp.minRange;
-				
-				updateAttackIconPosition();
-			}
-			
 			if(prevAbil==Abilities.AbilityType.homingMissle)
 			{
 				rocketSpawned=false;
@@ -202,14 +203,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				minesList.Clear();
 			}
 			
-			if(prevAbil==Abilities.AbilityType.turnAround)
-			{
-				maxTurnAngle=temp.maxTurnAngle;
-				attackIconDist=temp.maxRange;
-				attackIconDistMin=temp.minRange;
-				
-				updateAttackIconPosition();
-			}
+			
 			
 			if(prevAbil==Abilities.AbilityType.doubleThrottle)
 			{
@@ -358,21 +352,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		
 		CalculatePath();
 		DrawLine();
-		if(selected)
-		{
-			if(!GameStorage.getInstance().isRunning)
-			{
-				attackIcon.SetActive(true);
-			}
-			else
-			{
-				attackIcon.SetActive(false);
-			}
-		}
-		else
-		{
-			attackIcon.SetActive(false);
-		}
+		
 		
 		if(GameStorage.getInstance().isRunning)
 		{
@@ -391,6 +371,17 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
+		if(selected)
+		{
+			Vector3 v1 = attackIcon.transform.position;
+			Vector2 aPos = new Vector2(Camera.main.WorldToScreenPoint(v1).x,Camera.main.WorldToScreenPoint(v1).y);
+			
+			GUI.skin = Templates.getInstance().getAbilityIcon(activeAbil);
+			if(GUI.RepeatButton(new Rect(aPos.x-20,Screen.height-aPos.y-20,40,40),""))
+				attackIconCaptured=true;
+			GUI.skin=null;
+		}
+		
 		if(focused && !GameStorage.getInstance().isRunning)
 		{
 			Vector3 vec = Camera.main.WorldToScreenPoint(transform.position);
@@ -399,7 +390,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			GUI.Label(new Rect(vec.x+2,Screen.height-vec.y+40,100,180),temp.description);
 		}
 		
-		if(temp.abilities.Count>0 && selected && !attackIconCaptured && !abilityInReuse && !earnedDefect)
+		if(temp.abilities.Count>0 && selected && !attackIconCaptured)
 		{
 			Vector3 v1 = attackIcon.transform.position+new Vector3(clickDist,0,0);
 			Vector3 v2 = attackIcon.transform.position+new Vector3(-clickDist,0,0);
@@ -414,47 +405,90 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			
 			if(temp.abilities.Count>=1)
 			{
-				
-				if(GUI.Button(new Rect(firstAbilPos.x-10,Screen.height-firstAbilPos.y-10,20,20),temp.abilities[0].ToString()))
+				if(abilityInReuse || earnedDefect)
 				{
-					Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[0];
-					prevAbil=activeAbil;
-					temp.abilities[0]=(int)activeAbil;
-					activeAbil=selectedAbil;
-					AbilitySwitched();
+					GUI.skin=Templates.getInstance().getAbilityIconGrey((int)temp.abilities[0]);
+					GUI.Button(new Rect(firstAbilPos.x-20,Screen.height-firstAbilPos.y-20,40,40),"");
+					GUI.skin=null;
+				}
+				else
+				{
+					GUI.skin=Templates.getInstance().getAbilityIcon((int)temp.abilities[0]);
+					if(GUI.Button(new Rect(firstAbilPos.x-20,Screen.height-firstAbilPos.y-20,40,40),""))
+					{
+						Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[0];
+						prevAbil=activeAbil;
+						temp.abilities[0]=(int)activeAbil;
+						activeAbil=selectedAbil;
+						AbilitySwitched();
+					}
+					GUI.skin=null;
 				}
 			}
 			if(temp.abilities.Count>=2)
 			{
-				if(GUI.Button(new Rect(secondAbilPos.x-10,Screen.height-secondAbilPos.y-10,20,20),temp.abilities[1].ToString()))
+				if(abilityInReuse || earnedDefect)
 				{
-					Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[1];
-					prevAbil=activeAbil;
-					temp.abilities[1]=(int)activeAbil;
-					activeAbil=selectedAbil;
-					AbilitySwitched();
+					GUI.skin=Templates.getInstance().getAbilityIconGrey((int)temp.abilities[1]);
+					GUI.Button(new Rect(secondAbilPos.x-20,Screen.height-secondAbilPos.y-20,40,40),"");
+					GUI.skin=null;
+				}
+				else
+				{
+					GUI.skin=Templates.getInstance().getAbilityIcon((int)temp.abilities[1]);
+					if(GUI.Button(new Rect(secondAbilPos.x-20,Screen.height-secondAbilPos.y-20,40,40),""))
+					{
+						Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[1];
+						prevAbil=activeAbil;
+						temp.abilities[1]=(int)activeAbil;
+						activeAbil=selectedAbil;
+						AbilitySwitched();
+					}
+					GUI.skin=null;
 				}
 			}
 			if(temp.abilities.Count>=3)
 			{
-				if(GUI.Button(new Rect(thirdAbilPos.x-10,Screen.height-thirdAbilPos.y-10,20,20),temp.abilities[2].ToString()))
+				if(abilityInReuse || earnedDefect)
 				{
-					Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[2];
-					prevAbil=activeAbil;
-					temp.abilities[2]=(int)activeAbil;
-					activeAbil=selectedAbil;
-					AbilitySwitched();
+					GUI.skin=Templates.getInstance().getAbilityIconGrey((int)temp.abilities[2]);
+					GUI.Button(new Rect(thirdAbilPos.x-20,Screen.height-thirdAbilPos.y-20,40,40),"");
+					GUI.skin=null;
+				}
+				else
+				{
+					GUI.skin=Templates.getInstance().getAbilityIcon((int)temp.abilities[2]);
+					if(GUI.Button(new Rect(thirdAbilPos.x-20,Screen.height-thirdAbilPos.y-20,40,40),""))
+					{
+						Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[2];
+						prevAbil=activeAbil;
+						temp.abilities[2]=(int)activeAbil;
+						activeAbil=selectedAbil;
+						AbilitySwitched();
+					}
+					GUI.skin=null;
 				}
 			}
 			if(temp.abilities.Count>=4)
 			{
-				if(GUI.Button(new Rect(fourthAbilPos.x-10,Screen.height-fourthAbilPos.y-10,20,20),temp.abilities[3].ToString()))
+				if(abilityInReuse || earnedDefect)
 				{
-					Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[3];
-					prevAbil=activeAbil;
-					temp.abilities[3]=(int)activeAbil;
-					activeAbil=selectedAbil;
-					AbilitySwitched();
+					GUI.skin=Templates.getInstance().getAbilityIconGrey((int)temp.abilities[3]);
+					GUI.Button(new Rect(fourthAbilPos.x-20,Screen.height-fourthAbilPos.y-20,40,40),"");
+					GUI.skin=null;
+				}
+				else
+				{
+					GUI.skin=Templates.getInstance().getAbilityIcon((int)temp.abilities[3]);
+					if(GUI.Button(new Rect(fourthAbilPos.x-20,Screen.height-fourthAbilPos.y-20,40,40),""))
+					{
+						Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[3];
+						prevAbil=activeAbil;
+						temp.abilities[3]=(int)activeAbil;
+						activeAbil=selectedAbil;
+						AbilitySwitched();
+					}
+					GUI.skin=null;
 				}
 			}
 		}
@@ -474,12 +508,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				selected=true;
 			else if(Input.GetMouseButtonDown(0) && !isMouseOver(gameObject))
 			{
-				if(temp.abilities.Count>0)
-				{
-					if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist+clickDistAccuracy*GameStorage.getInstance().zoom)
-						selected=false;
-				}
-				else
+				if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist+clickDistAccuracy*GameStorage.getInstance().zoom)
 					selected=false;
 			}
 		}
@@ -809,10 +838,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	public void StepEnd()
 	{
 		if(activeAbil==Abilities.AbilityType.none && abilityInReuse)
-		{
 			abilityInReuse=false;
-			loadOriginAbilities();
-		}
+		loadOriginAbilities();
 		
 		if(activeAbil!=Abilities.AbilityType.none && !abilityInReuse)
 		{

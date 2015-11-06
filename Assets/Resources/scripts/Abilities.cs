@@ -6,7 +6,7 @@ public static class Abilities
 	public enum AbilityType : int
 	{
 		none=-1,
-		halfRoundTurn=0, // DONE pla, ai
+		halfRoundTurn=0, // DONE pla, ai, ico
 		turnAround=1, // DONE pla, ai
 		doubleThrottle=2, // DONE pla, ai
 		gas=3, // DONE pla, ai
