@@ -27,8 +27,8 @@ public static class Abilities
 	public static class RocketParameters
 	{
 		public const float minRange=8f;
-		public const float maxRange=15f;
-		public const float maxTurnAngle=40f;
+		public const float maxRange=20f;
+		public const float maxTurnAngle=60f;
 		public const int damage=150;
 		public const float startRange=8.0f;
 	}

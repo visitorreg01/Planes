@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <levels>
-	<level num="1" levelName="This is level one" file="battleground"/>
-	<level num="2" levelName="This is level two" file="battleground2"/>
-</levels>
+	<level num="1" levelName="This is level one" file="mission1"/>
+	<level num="2" levelName="This is level two" file="mission2"/>
+	<level num="3" levelName="This is level two" file="mission3"/>
+	<level num="4" levelName="This is level two" file="mission4"/>
+	<level num="5" levelName="This is level two" file="mission5"/>
+	<level num="6" levelName="This is level two" file="mission6"/>
+	<level num="7" levelName="This is level two" file="mission7"/>
+	<level num="8" levelName="This is level two" file="mission8"/>
+	<level num="9" levelName="This is level two" file="mission9"/>
+	<level num="10" levelName="This is level two" file="mission10"/>
+	<level num="11" levelName="This is level two" file="mission11"/>
+	<level num="12" levelName="This is level two" file="mission12"/>
+	<level num="13" levelName="This is level two" file="mission13"/>
+	<level num="14" levelName="This is level two" file="mission14"/>
+	<level num="15" levelName="This is level two" file="mission15"/>
+	<level num="16" levelName="This is level two" file="mission16"/>
+	<level num="17" levelName="This is level two" file="mission17"/>
+	<level num="18" levelName="This is level two" file="mission18"/>
+	<level num="19" levelName="This is level two" file="mission19"/>
+	<level num="20" levelName="This is level two" file="mission20"/>
+	<level num="21" levelName="This is level two" file="mission21"/>
+	<level num="22" levelName="This is level two" file="mission22"/>
+	<level num="23" levelName="This is level two" file="mission23"/>
+	<level num="24" levelName="This is level two" file="mission24"/>
+	<level num="25" levelName="This is level two" file="mission25"/>
+	<level num="26" levelName="This is level two" file="mission26"/>
+	<level num="27" levelName="This is level two" file="mission27"/>
+	<level num="28" levelName="This is level two" file="mission28"/>
+	<level num="29" levelName="This is level two" file="mission29"/>
+	<level num="30" levelName="This is level two" file="mission30"/>
+	</levels>
