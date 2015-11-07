@@ -5,15 +5,12 @@ public class MainMenuGui : MonoBehaviour {
 
 	int selectedLevel=0;
 	bool showLevelsMenu=false;
-	ArrayList levels;
-	
-	GUISkin skin; 
+	ArrayList levels; 
 	
 	// Use this for initialization
 	void Start () {
 		GameStorage.getInstance();
 		Templates.getInstance();
-		skin = (GUISkin) Resources.Load("gui/skins/ability_180");
 	}
 	
 	void OnGUI()

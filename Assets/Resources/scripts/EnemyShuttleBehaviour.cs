@@ -388,7 +388,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	private void calculateMovePosition()
 	{
-		GameObject target = GameStorage.getInstance().getNearbyTarget(gameObject);
+		GameObject target = GameStorage.getInstance().getNearbyFriendly(gameObject);
 		if(target!=null)
 		{
 			float p = UnityEngine.Random.Range(0,100);
@@ -572,11 +572,18 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 					viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
 			}
 			point1=new Vector2(transform.position.x,transform.position.z);
-			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange)*temp.lowerSmooth;
+			if(activeAbil==Abilities.AbilityType.doubleThrottle)
+				point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*2*Mathf.Abs(GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange/2)*temp.lowerSmooth;
+			else
+				point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange)*temp.lowerSmooth;
 			point2+=point1;
 			point4=new Vector2(movePoint.x,movePoint.y);
 			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
-			point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle*Vector2.Distance(point1,point4)/temp.maxRange*temp.upperSmooth;
+			if(activeAbil==Abilities.AbilityType.doubleThrottle)
+				point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle*Vector2.Distance(point1,point4)/temp.maxRange/2*temp.upperSmooth;
+			else
+				point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle*Vector2.Distance(point1,point4)/temp.maxRange*temp.upperSmooth;
+			
 			point3 = point3+point2+pointz;
 		}
 	}
