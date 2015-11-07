@@ -6,16 +6,17 @@ public class CameraBehaviour : MonoBehaviour {
 	Vector3 startPoint;
 	bool released = false;
 	float scale = 30;
-	float cameraSize=20;
-	const float cameraZoomSpeed=1;
-	const float cameraSizeMin=5;
-	const float cameraSizeMax=50;
+	public float cameraSize=20;
+	public float cameraZoomSpeed=1;
+	public float cameraSizeMin=5;
+	public float cameraSizeMax=50;
 	
 	float x,y;
 	float cameraH=20;
 	float terrainH,terrainW;
-	const float speed=30;
+	const float speed=45;
 	void Start () {
+		GameStorage.getInstance().cam=this;
 	}
 	
 	void Update()

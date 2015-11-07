@@ -12,9 +12,13 @@ public class GameStorage {
 		return instance;
 	}
 	
+	public GameObject currentSelectedFriendly=null;
+	
 	public bool isRunning=false;
 	public bool isDebug=false;
 	public float zoom=1.0f;
+	
+	public CameraBehaviour cam;
 	
 	private ArrayList friendlyGameObjectsList;
 	private ArrayList enemyGameObjectsList;
