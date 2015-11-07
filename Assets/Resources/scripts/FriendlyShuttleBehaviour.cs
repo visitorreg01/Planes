@@ -69,7 +69,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	//states
 	bool focused = false;
-	bool selected = false;
+	public bool selected = false;
 	bool attackIconCaptured = false;
 	bool spawn=true;
 	
@@ -505,11 +505,17 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		if(!GameStorage.getInstance().isRunning)
 		{
 			if((Input.GetMouseButtonDown(0) && isMouseOver(gameObject)) || (Input.GetMouseButtonDown(0) && isMouseOver(attackIcon)))
+			{
 				selected=true;
+				GameStorage.getInstance().currentSelectedFriendly=gameObject;
+			}
 			else if(Input.GetMouseButtonDown(0) && !isMouseOver(gameObject))
 			{
 				if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist+clickDistAccuracy*GameStorage.getInstance().zoom)
+				{
 					selected=false;
+					GameStorage.getInstance().currentSelectedFriendly=null;
+				}
 			}
 		}
 	}
