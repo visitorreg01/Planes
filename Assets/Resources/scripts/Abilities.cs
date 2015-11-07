@@ -39,11 +39,11 @@ public static class Abilities
 	public static class ThorpedeParameters
 	{
 		public const float minRange=6f;
-		public const float maxRange=10f;
+		public const float maxRange=15f;
 		public const float maxTurnAngle=25f;
 		public const int damage=600;
 		public const float startRange=8.0f;
-		public const float damageRange=3.0f;
+		public const float damageRange=4.0f;
 		public const float lowerSmooth = 0.7f;
 		public const float upperSmooth = 0.7f;
 	}
