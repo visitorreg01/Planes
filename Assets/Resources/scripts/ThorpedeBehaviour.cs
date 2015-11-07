@@ -47,6 +47,29 @@ public class ThorpedeBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
+		if(GameStorage.getInstance().isRunning)
+		{
+			GameObject target;
+			if(enemy)
+			{
+				target = GameStorage.getInstance().getNearbyFriendly(gameObject);
+				if(Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(target.transform.position.x,target.transform.position.z))<=Abilities.ThorpedeParameters.damageRange)
+				{
+					target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.ThorpedeParameters.damage,null);
+					this.Die();
+				}	
+			}
+			else
+			{
+				target = GameStorage.getInstance().getNearbyEnemy(gameObject);
+				if(Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(target.transform.position.x,target.transform.position.z))<=Abilities.ThorpedeParameters.damageRange)
+				{
+					target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.ThorpedeParameters.damage,null);
+					this.Die();
+				}	
+			}
+		}
+		
 		clickDist=0.15f*GameStorage.getInstance().zoom;
 		if(clickDist<clickDistMin)
 			clickDist=clickDistMin;
@@ -165,27 +188,6 @@ public class ThorpedeBehaviour : MonoBehaviour {
 		}
 	}
 	
-	void OnCollisionEnter(Collision col)
-	{
-		GameObject target = col.gameObject;
-		if(enemy)
-		{
-			if(target.GetComponent<FriendlyShuttleBehaviour>()!=null)
-			{
-				target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.ThorpedeParameters.damage,null);
-				this.Die();
-			}
-		}
-		else
-		{
-			if(target.GetComponent<EnemyShuttleBehaviour>()!=null)
-			{
-				target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.ThorpedeParameters.damage,null);
-				this.Die();
-			}
-		}
-	}
-	
 	private void Accelerate()
 	{
 		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
@@ -258,7 +260,7 @@ public class ThorpedeBehaviour : MonoBehaviour {
 	
 	private void CalculateAttackIconPosition()
 	{
-		GameObject target = GameStorage.getInstance().getNearbyTarget(gameObject);
+		GameObject target = GameStorage.getInstance().getNearbyFriendly(gameObject);
 		if(target!=null)
 		{
 			Vector2 firstVec = new Vector2(target.transform.position.x-transform.position.x,target.transform.position.z-transform.position.z);

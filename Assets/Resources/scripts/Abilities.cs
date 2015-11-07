@@ -31,6 +31,7 @@ public static class Abilities
 		public const float maxTurnAngle=60f;
 		public const int damage=150;
 		public const float startRange=8.0f;
+		public const float damageRange=3.0f;
 	}
 	
 	public static class ThorpedeParameters
@@ -40,6 +41,7 @@ public static class Abilities
 		public const float maxTurnAngle=25f;
 		public const int damage=600;
 		public const float startRange=8.0f;
+		public const float damageRange=3.0f;
 	}
 	
 	public static class MinesParameters

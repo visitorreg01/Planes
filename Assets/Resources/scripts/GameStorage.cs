@@ -390,7 +390,7 @@ public class GameStorage {
 	}
 	
 	
-	public GameObject getNearbyTarget(GameObject attacker)
+	public GameObject getNearbyFriendly(GameObject attacker)
 	{
 		GameObject ret=null;
 		float dst=-1;
