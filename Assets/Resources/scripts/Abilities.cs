@@ -32,6 +32,8 @@ public static class Abilities
 		public const int damage=150;
 		public const float startRange=8.0f;
 		public const float damageRange=3.0f;
+		public const float lowerSmooth = 0.7f;
+		public const float upperSmooth = 0.7f;
 	}
 	
 	public static class ThorpedeParameters
@@ -42,6 +44,8 @@ public static class Abilities
 		public const int damage=600;
 		public const float startRange=8.0f;
 		public const float damageRange=3.0f;
+		public const float lowerSmooth = 0.7f;
+		public const float upperSmooth = 0.7f;
 	}
 	
 	public static class MinesParameters

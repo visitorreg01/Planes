@@ -305,11 +305,12 @@ public class RocketBehaviour : MonoBehaviour {
 		if(!GameStorage.getInstance().isRunning)
 		{
 			point1=new Vector2(transform.position.x,transform.position.z);
-			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,Abilities.RocketParameters.minRange*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/Abilities.RocketParameters.maxTurnAngle));
+			point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,Abilities.RocketParameters.minRange*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/Abilities.RocketParameters.maxTurnAngle)*Vector2.Distance(point1,point4)/Abilities.RocketParameters.maxRange)*Abilities.RocketParameters.lowerSmooth;
 			point2+=point1;
 			point4=new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z);
 			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
-			point3 = new Vector2(pointz.y,-pointz.x)*getAngleDst(angle,getAttackIconAngle())/Abilities.RocketParameters.maxTurnAngle;
+			point3 = new Vector2(pointz.y,-pointz.x)*getAngleDst(angle,getAttackIconAngle())/Abilities.RocketParameters.maxTurnAngle*Vector2.Distance(point1,point4)/Abilities.RocketParameters.maxRange*Abilities.RocketParameters.upperSmooth;
+			
 			point3 = point3+point2+pointz;
 			
 			trackDots.Clear();
