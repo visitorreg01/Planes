@@ -44,7 +44,7 @@ public static class Abilities
 	
 	public static class MinesParameters
 	{
-		public const float Range=0.5f;
+		public const float Range=2.0f;
 		public const int Damage=300;
 		public const float betweenDist=3f;
 	}
