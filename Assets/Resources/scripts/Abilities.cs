@@ -31,7 +31,7 @@ public static class Abilities
 		public const float maxTurnAngle=60f;
 		public const int damage=150;
 		public const float startRange=8.0f;
-		public const float damageRange=3.0f;
+		public const float damageRange=4.0f;
 		public const float lowerSmooth = 0.7f;
 		public const float upperSmooth = 0.7f;
 	}
@@ -43,7 +43,7 @@ public static class Abilities
 		public const float maxTurnAngle=25f;
 		public const int damage=600;
 		public const float startRange=8.0f;
-		public const float damageRange=4.0f;
+		public const float damageRange=5.0f;
 		public const float lowerSmooth = 0.7f;
 		public const float upperSmooth = 0.7f;
 	}
