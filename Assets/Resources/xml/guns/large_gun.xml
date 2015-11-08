@@ -2,12 +2,12 @@
 <gun
 	id="4"
 	gunName="PAC large cannon"
-	damage="50"
-	reuse="1.5"
+	damage="100"
+	reuse="1.0"
 	attackAngle="20.0"
 	bulletSpeed="2"
-	bulletDispersion="5"
-	attackRange="43.75"
+	bulletDispersion="2.5"
+	attackRange="45"
 	bulletMesh="bulletPrefab">
 	<defectChance id="0" chance="1.5"/>
 	<defectChance id="1" chance="1.5"/>

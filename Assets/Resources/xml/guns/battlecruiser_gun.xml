@@ -2,11 +2,11 @@
 <gun
 	id="6"
 	gunName="Battlecruiser special cannon"
-	damage="40"
-	reuse="1"
+	damage="80"
+	reuse="0.75"
 	attackAngle="27.5"
 	bulletSpeed="2"
-	bulletDispersion="4"
+	bulletDispersion="2"
 	attackRange="40.0"
 	bulletMesh="bulletPrefab">
 	<defectChance id="0" chance="2"/>
