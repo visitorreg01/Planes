@@ -2,7 +2,7 @@
 <plane 
 	id="5"
 	classname="default-class"
-	hp="200"
+	hp="400"
 	minRange="4"
 	maxRange="16.5"
 	maxTurnAngle="47.5"
