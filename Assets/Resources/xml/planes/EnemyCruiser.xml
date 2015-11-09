@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
 	id="17"
-	classname="default-class"
+	classname="Stylette"
 	hp="800"
 	minRange="5"
 	maxRange="12"
 	maxTurnAngle="30"
+	lowerSmooth='0.5'
+	upperSmooth='0.5'
 	description="This unit is a default class for planes">
 	<gun id="4" pos="2,1" turnAngle="90.0"/>
 	<gun id="4" pos="-2,1" turnAngle="-90.0"/>

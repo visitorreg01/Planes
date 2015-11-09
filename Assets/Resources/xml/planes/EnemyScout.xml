@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
 	id="13"
-	classname="default-class"
+	classname="Firefly"
 	hp="50"
 	minRange="9"
 	maxRange="22.5"

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
 	id="15"
-	classname="default-class"
+	classname="Fearless"
 	hp="420"
 	minRange="6"
-	maxRange="19.5"
+	maxRange="23"
 	maxTurnAngle="45"
+	lowerSmooth='0.4'
+	upperSmooth='0.4'
 	description="This unit is a default class for planes">
 	<gun id="2" pos="0,-1" turnAngle="180.0"/>
 	<ability id="3"/>

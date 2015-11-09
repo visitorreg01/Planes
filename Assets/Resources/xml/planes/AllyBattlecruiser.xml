@@ -6,6 +6,8 @@
 	minRange="3"
 	maxRange="15"
 	maxTurnAngle="45"
+	lowerSmooth='0.8'
+	upperSmooth='0.8'
 	description="This unit is a default class for planes">
 	<gun id="6" pos="1,-1" turnAngle="25.0"/>
 	<gun id="6" pos="1,0" turnAngle="90.0"/>

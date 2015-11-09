@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
 	id="12"
-	classname="default-class"
+	classname="Scimitar"
 	hp="125"
 	minRange="6"
 	maxRange="18"
