@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
 	id="9"
-	classname="default-class"
+	classname="The New Future"
 	hp="2000"
 	minRange="4"
 	maxRange="10.5"

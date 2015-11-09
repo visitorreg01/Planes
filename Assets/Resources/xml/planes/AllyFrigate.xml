@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
 	id="6"
-	classname="default-class"
+	classname="Manifest"
 	hp="400"
 	minRange="4"
 	maxRange="15"

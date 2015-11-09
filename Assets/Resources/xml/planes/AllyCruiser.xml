@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
 	id="7"
-	classname="default-class"
+	classname="Scivelation"
 	hp="600"
 	minRange="3"
 	maxRange="13.5"
