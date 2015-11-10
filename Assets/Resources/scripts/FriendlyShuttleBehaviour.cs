@@ -125,6 +125,23 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
 	}
 	
+	public void setMaxAttackIcon()
+	{
+		float ds;
+		if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
+			ds=temp.minRange*((Defects.EngineCrash)curDefect).newRangeCoeff;
+		else if(activeAbil==Abilities.AbilityType.doubleThrottle)
+			ds=temp.maxRange*2;
+		else if(activeAbil==Abilities.AbilityType.turnAround)
+			ds=(temp.minRange+temp.maxRange)/2;
+		else if(activeAbil==Abilities.AbilityType.halfRoundTurn)
+			ds=0.7f*temp.minRange;
+		else
+			ds = temp.maxRange;
+		Vector2 vec =Quaternion.Euler(0,0,-angle)*(new Vector2(0,1)*ds);
+		attackIcon.transform.position=new Vector3(vec.x+transform.position.x,0,vec.y+transform.position.z);
+	}
+	
 	void Start()
 	{
 		attackIcon = Instantiate(Resources.Load("prefab/attackIcon") as GameObject);
@@ -245,7 +262,6 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			
 			if(activeAbil==Abilities.AbilityType.turnAround)
 			{
-				maxTurnAngle=0;
 				attackIconDist=(temp.minRange+temp.maxRange)/2;
 				attackIconDistMin=attackIconDist;
 				turnRotateDir=UnityEngine.Random.Range(0,2);
@@ -369,16 +385,21 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		transform.eulerAngles=new Vector3(0,angle,0);
 	}
 	
+	
+	
 	void OnGUI()
 	{
-		if(selected)
+		if(!GameStorage.getInstance().isRunning)
 		{
-			Vector3 v1 = attackIcon.transform.position;
-			Vector2 aPos = new Vector2(Camera.main.WorldToScreenPoint(v1).x,Camera.main.WorldToScreenPoint(v1).y);
+			Vector3 v11 = attackIcon.transform.position;
+			Vector2 aPos = new Vector2(Camera.main.WorldToScreenPoint(v11).x,Camera.main.WorldToScreenPoint(v11).y);
 			
 			GUI.skin = Templates.getInstance().getAbilityIcon(activeAbil);
 			if(GUI.RepeatButton(new Rect(aPos.x-20,Screen.height-aPos.y-20,40,40),""))
+			{
 				attackIconCaptured=true;
+				selected=true;
+			}
 			GUI.skin=null;
 		}
 		
@@ -566,7 +587,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	{
 		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
 		{
-			if(!(defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns)) && activeAbil!=Abilities.AbilityType.gas && activeAbil!=Abilities.AbilityType.homingMissle && activeAbil!=Abilities.AbilityType.homingThorpede)
+			if(!((defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns)) && (Abilities.getLockGun(activeAbil))))
 			{
 				Templates.GunTemplate gunTemp;
 				GameObject enemy;

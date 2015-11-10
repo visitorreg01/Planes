@@ -143,12 +143,20 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	{
 		if(temp.abilities.Count>0)
 		{
-			if(UnityEngine.Random.Range(0,100)>=30)
+			if(UnityEngine.Random.Range(0,100)<=Abilities.aiUseAbilityChance)
 			{
 				prevAbil=activeAbil;
 				activeAbil=(Abilities.AbilityType) temp.abilities[UnityEngine.Random.Range(0,temp.abilities.Count)];
-				AbilitySwitched();
-				Debug.Log("USED: "+activeAbil);
+				if(activeAbil==Abilities.AbilityType.halfRoundTurn || activeAbil==Abilities.AbilityType.turnAround)
+				{
+					GameObject ff = GameStorage.getInstance().getNearbyFriendly(gameObject);
+					if(Vector2.Distance(new Vector2(ff.transform.position.x,ff.transform.position.z),new Vector2(transform.position.x,transform.position.z))>Abilities.aiUse180360abilitiesRange)
+						activeAbil=prevAbil;
+					else
+						AbilitySwitched();
+				}
+				else
+					AbilitySwitched();
 			}
 		}
 	}

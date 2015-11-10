@@ -9,6 +9,7 @@ public class GUIBehaviour : MonoBehaviour {
 	
 	private int camScaleSpeed=5;
 	
+	
 	void Start()
 	{
 		buttonZoomInSkin=(GUISkin) Resources.Load("gui/skins/button_zoomIn");
@@ -27,17 +28,17 @@ public class GUIBehaviour : MonoBehaviour {
 		if(GameStorage.getInstance().isRunning)
 		{
 			GUI.skin=buttonPlayGrey;
-			GUI.Button(new Rect(20,20,32,32),"");
+			GUI.Button(new Rect(Screen.width-32-20,20,32,32),"");
 		}
 		else
 		{
 			GUI.skin=buttonPlay;
-			if(GUI.Button(new Rect(20,20,32,32),""))
+			if(GUI.Button(new Rect(Screen.width-32-20,20,32,32),""))
 				GameStorage.getInstance().StepStart();
 		}
 		
 		GUI.skin=buttonZoomInSkin;
-		if(GUI.Button(new Rect(62,20,32,32),""))
+		if(GUI.Button(new Rect(Screen.width-32-62,Screen.height-32-20,32,32),""))
 		{
 			if(GameStorage.getInstance().cam.cameraSize-camScaleSpeed*GameStorage.getInstance().cam.cameraZoomSpeed>=GameStorage.getInstance().cam.cameraSizeMin)
 			{
@@ -47,7 +48,7 @@ public class GUIBehaviour : MonoBehaviour {
 		}
 		
 		GUI.skin=buttonZoomOutSkin;
-		if(GUI.Button(new Rect(104,20,32,32),""))
+		if(GUI.Button(new Rect(Screen.width-32-20,Screen.height-32-20,32,32),""))
 		{
 			if(GameStorage.getInstance().cam.cameraSize+camScaleSpeed*GameStorage.getInstance().cam.cameraZoomSpeed<=GameStorage.getInstance().cam.cameraSizeMax)
 			{
@@ -57,42 +58,16 @@ public class GUIBehaviour : MonoBehaviour {
 		}
 		
 		GUI.skin=buttonPrev;
-		if(GUI.Button(new Rect(146,20,32,32),""))
-		{
-			GameObject obj;
-			if(GameStorage.getInstance().currentSelectedFriendly==null)
-			{
-				foreach(GameObject o in GameStorage.getInstance().getFriendlyShuttles())
-					o.GetComponent<FriendlyShuttleBehaviour>().selected=false;
-				obj=GameStorage.getInstance().getFriendlyShuttles()[GameStorage.getInstance().getFriendlyShuttles().Length-1];
-				GameStorage.getInstance().currentSelectedFriendly=obj;
-				GameStorage.getInstance().cam.transform.position=new Vector3(obj.transform.position.x,GameStorage.getInstance().cam.transform.position.y,obj.transform.position.z);
-			}
-			else
-			{
-				int i=0;
-				int nextSelected=0;
-				foreach(GameObject o in GameStorage.getInstance().getFriendlyShuttles())
-				{
-					if(o==GameStorage.getInstance().currentSelectedFriendly)
-						nextSelected=(i-1)%GameStorage.getInstance().getFriendlyShuttles().Length;
-					o.GetComponent<FriendlyShuttleBehaviour>().selected=false;
-					i++;
-				}
-				obj=GameStorage.getInstance().getFriendlyShuttles()[nextSelected];
-				GameStorage.getInstance().currentSelectedFriendly=obj;
-				GameStorage.getInstance().cam.transform.position=new Vector3(obj.transform.position.x,GameStorage.getInstance().cam.transform.position.y,obj.transform.position.z);
-			}
-			
-			foreach(GameObject o in GameStorage.getInstance().getFriendlyShuttles())
-			{
-				
-			}
-		}
+		if(GUI.Button(new Rect(20,Screen.height-20-32,32,32),""))
+			GameStorage.getInstance().prevShipFocus();
 		
 		GUI.skin=buttonNext;
-		GUI.Button(new Rect(188,20,32,32),"");
+		if(GUI.Button(new Rect(20+32+10,Screen.height-20-32,32,32),""))
+			GameStorage.getInstance().nextShipFocus();
 		GUI.skin=null;
+		
+		if(GUI.Button(new Rect(20,20,32,32),"max"))
+			GameStorage.getInstance().setAllShipsMaxTraec();
 		
 		if(GUI.Button(new Rect(230,20,80,20),"Debug"))
 				GameStorage.getInstance().isDebug=!GameStorage.getInstance().isDebug;

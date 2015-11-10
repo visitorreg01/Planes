@@ -20,6 +20,7 @@ public class GameStorage {
 	
 	public CameraBehaviour cam;
 	
+	private int currentFocusShip=0;
 	private ArrayList friendlyGameObjectsList;
 	private ArrayList enemyGameObjectsList;
 	private ArrayList gasList;
@@ -49,6 +50,12 @@ public class GameStorage {
 		asteroidsList = new ArrayList();
 	}
 	
+	public void setAllShipsMaxTraec()
+	{
+		foreach(GameObject gg in friendlyGameObjectsList)
+			gg.GetComponent<FriendlyShuttleBehaviour>().setMaxAttackIcon();
+	}
+	
 	public void StepStart()
 	{
 		fixTime();
@@ -61,6 +68,7 @@ public class GameStorage {
 		{
 			f.GetComponent<EnemyShuttleBehaviour>().StepStart();
 		}
+		currentFocusShip=0;
 	}
 	
 	public void StepStop()
@@ -73,7 +81,7 @@ public class GameStorage {
 		gasRemoveList.Clear();
 		foreach(GameObject f in GameStorage.getInstance().getGasUnits())
 		{
-			if(f.GetComponent<GasBehaviour>().updateStepCounter()==3)
+			if(f.GetComponent<GasBehaviour>().updateStepCounter()==Abilities.GasParameters.lifeTimeRounds)
 				gasRemoveList.Add(f);
 		}
 		
@@ -85,7 +93,7 @@ public class GameStorage {
 		rocketRemoveList.Clear();
 		foreach(GameObject f in GameStorage.getInstance().getRocketUnits())
 		{
-			if(f.GetComponent<RocketBehaviour>().updateStepCounter()==5)
+			if(f.GetComponent<RocketBehaviour>().updateStepCounter()==Abilities.RocketParameters.lifeTimeRounds)
 				rocketRemoveList.Add(f);
 		}
 		
@@ -98,7 +106,7 @@ public class GameStorage {
 		thorpedeRemoveList.Clear();
 		foreach(GameObject f in GameStorage.getInstance().getThorpedeUnits())
 		{
-			if(f.GetComponent<ThorpedeBehaviour>().updateStepCounter()==5)
+			if(f.GetComponent<ThorpedeBehaviour>().updateStepCounter()==Abilities.ThorpedeParameters.lifeTimeRounds)
 				thorpedeRemoveList.Add(f);
 		}
 		
@@ -118,6 +126,28 @@ public class GameStorage {
 			Debug.Log("DRAW!");
 			
 		
+	}
+	
+	public void nextShipFocus()
+	{
+		currentFocusShip++;
+		currentFocusShip%=friendlyGameObjectsList.Count;
+		focusShip(currentFocusShip);
+	}
+	
+	public void prevShipFocus()
+	{
+		currentFocusShip--;
+		if(currentFocusShip<0) currentFocusShip+=friendlyGameObjectsList.Count;
+		currentFocusShip%=friendlyGameObjectsList.Count;
+		focusShip(currentFocusShip);
+	}
+	
+	private void focusShip(int index)
+	{
+		GameObject gg = (GameObject) friendlyGameObjectsList[index];
+		cam.transform.position=new Vector3(gg.transform.position.x,cam.transform.position.y,gg.transform.position.z);
+		gg.GetComponent<FriendlyShuttleBehaviour>().selected=true;
 	}
 	
 	public void createFriendlyShuttle()

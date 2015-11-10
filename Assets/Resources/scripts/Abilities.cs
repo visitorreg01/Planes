@@ -16,12 +16,41 @@ public static class Abilities
 		mines=7
 	}
 	
+	public static int aiUseAbilityChance=100;
+	public static float aiUse180360abilitiesRange=20f;
+	
+	public static bool getLockGun(AbilityType abil)
+	{
+		switch(abil)
+		{
+			case AbilityType.doubleThrottle:
+				return false;
+			case AbilityType.gas:
+				return false;
+			case AbilityType.halfRoundTurn:
+				return false;
+			case AbilityType.homingMissle:
+				return false;
+			case AbilityType.homingThorpede:
+				return false;
+			case AbilityType.mines:
+				return false;
+			case AbilityType.shield:
+				return false;
+			case AbilityType.turnAround:
+				return false;
+			default:
+				return true;
+		}
+	}
+	
 	public static class GasParameters
 	{
 		public const float gasRange=0.5f;
 		public const float gasReuse=0.5f;
 		public const int gasDamage=50;
 		public const float betweenDist=2f;
+		public const int lifeTimeRounds=3;
 	}
 	
 	public static class RocketParameters
@@ -34,6 +63,7 @@ public static class Abilities
 		public const float damageRange=4.0f;
 		public const float lowerSmooth = 1f;
 		public const float upperSmooth = 1f;
+		public const int lifeTimeRounds=6;
 	}
 	
 	public static class ThorpedeParameters
@@ -46,6 +76,7 @@ public static class Abilities
 		public const float damageRange=5.0f;
 		public const float lowerSmooth = 1f;
 		public const float upperSmooth = 1f;
+		public const int lifeTimeRounds=6;
 	}
 	
 	public static class MinesParameters
