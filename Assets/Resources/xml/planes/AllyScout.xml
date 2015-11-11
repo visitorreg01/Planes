@@ -6,7 +6,7 @@
 	minRange="6"
 	maxRange="24"
 	maxTurnAngle="75"
-	description="TDevil's Dozen Corporation's Scout is extremely fast, maneuverable and fragile ship.">
+	description="Devil's Dozen Corporation's Scout is extremely fast, maneuverable and fragile ship.">
 	<gun id="2" pos="0,0" turnAngle="0.0"/>
 	<ability id="1"/>
 	<ability id="2"/>

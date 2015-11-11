@@ -6,7 +6,7 @@
 	minRange="9"
 	maxRange="22.5"
 	maxTurnAngle="80"
-	description="This unit is a default class for planes">
+	description="Delanel Theocracy's Scout is slower but more maneuverable than Scout of the Corporation.">
 	<gun id="2" pos="0,0" turnAngle="0.0"/>
 	<ability id="1"/>
 	<ability id="2"/>

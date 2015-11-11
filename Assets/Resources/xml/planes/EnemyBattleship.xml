@@ -8,7 +8,7 @@
 	maxTurnAngle="35"
 	lowerSmooth='0.7'
 	upperSmooth='0.7'
-	description="This unit is a default class for planes">
+	description="Delanel Theocracy's Battleship carries more armor but less weaponry than Corp's analogue.">
 	<gun id="4" pos="2,-1" turnAngle="90.0"/>
 	<gun id="4" pos="2,1" turnAngle="90.0"/>
 	<gun id="4" pos="-2,-1" turnAngle="-90.0"/>
