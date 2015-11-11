@@ -84,5 +84,7 @@ public static class Abilities
 		public const float Range=5.0f;
 		public const int Damage=300;
 		public const float betweenDist=3f;
+		public const float boomSpeed=2;
+		public const int lifeTimeRounds=3;
 	}
 }

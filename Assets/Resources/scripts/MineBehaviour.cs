@@ -6,10 +6,18 @@ public class MineBehaviour : MonoBehaviour {
 	public int cur;
 	public int total;
 	public bool ready=false;
+	private bool readyToBoom = false;
+	private int roundLife=0;
 	// Use this for initialization
-	float t;
 	void Start () {
-		t=GameStorage.getInstance().getFixedTime();
+		GameStorage.getInstance().registerMine(this.gameObject);
+	}
+	
+	public void StepEnd()
+	{
+		roundLife++;
+		if(roundLife==Abilities.MinesParameters.lifeTimeRounds)
+			readyToBoom=true;
 	}
 	
 	void Boom()
@@ -24,14 +32,15 @@ public class MineBehaviour : MonoBehaviour {
 			if(Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(o.transform.position.x,o.transform.position.z))<=Abilities.MinesParameters.Range)
 				o.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.MinesParameters.Damage,null);
 		}
+		GameStorage.getInstance().removeMine(this.gameObject);
 		Destroy(this.gameObject);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(GameStorage.getInstance().getFixedTime()!=t && ready && GameStorage.getInstance().isRunning)
+		if(ready && GameStorage.getInstance().isRunning && readyToBoom)
 		{
-			if(Time.time>=(GameStorage.getInstance().getFixedTime()+3.0f/total*cur))
+			if(Time.time>=((GameStorage.getInstance().getFixedTime())+3.0f/total*cur))
 				Boom();
 		}
 	}

@@ -29,6 +29,7 @@ public class GameStorage {
 	private ArrayList thorpedeList;
 	private ArrayList thorpedeRemoveList;
 	private ArrayList asteroidsList;
+	private ArrayList minesList;
 	
 	public bool allReady = false;
 	
@@ -45,6 +46,7 @@ public class GameStorage {
 		thorpedeList = new ArrayList();
 		thorpedeRemoveList = new ArrayList();
 		asteroidsList = new ArrayList();
+		minesList = new ArrayList();
 	}
 	
 	public void setAllShipsMaxTraec()
@@ -113,6 +115,9 @@ public class GameStorage {
 			f.GetComponent<ThorpedeBehaviour>().Die();
 		}
 		
+		foreach(GameObject f in minesList)
+			f.GetComponent<MineBehaviour>().StepEnd();
+		
 		if(getFriendlyShuttles().Length==0 && getEnemyShuttles().Length>0)
 			Debug.Log("LOSE!");
 		else if(getFriendlyShuttles().Length>0 && getEnemyShuttles().Length==0)
@@ -123,6 +128,21 @@ public class GameStorage {
 			Debug.Log("DRAW!");
 			
 		
+	}
+	
+	public void registerMine(GameObject o)
+	{
+		minesList.Add(o);
+	}
+	
+	public void removeMine(GameObject o)
+	{
+		minesList.Remove(o);
+	}
+	
+	public ArrayList getMines()
+	{
+		return minesList;
 	}
 	
 	public void nextShipFocus()
