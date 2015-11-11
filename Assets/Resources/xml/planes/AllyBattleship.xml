@@ -8,7 +8,7 @@
 	maxTurnAngle="35"
 	lowerSmooth='0.7'
 	upperSmooth='0.7'
-	description="This unit is a default class for planes">
+	description="Devil's Dozen Corporation's Battleship is a backbone of its fleet carrying massive broadside firepower.">
 	<gun id="4" pos="2,-1" turnAngle="90.0"/>
 	<gun id="4" pos="2,1" turnAngle="90.0"/>
 	<gun id="4" pos="-2,-1" turnAngle="-90.0"/>

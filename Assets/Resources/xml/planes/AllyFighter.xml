@@ -6,7 +6,7 @@
 	minRange="4"
 	maxRange="18"
 	maxTurnAngle="55"
-	description="This unit is a default class for planes">
+	description="Devil's Dozen Corporation's Fighter is a reliable vessel without any special characteristics.">
 	<gun id="2" pos="0,1" turnAngle="0.0"/>
 	<ability id="0"/>
 </plane>

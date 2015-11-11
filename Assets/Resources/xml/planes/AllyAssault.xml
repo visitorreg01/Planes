@@ -8,7 +8,7 @@
 	maxTurnAngle="40"
 	lowerSmooth='0.5'
 	upperSmooth='0.5'
-	description="This unit is a default class for planes">
+	description="Devil's Dozen Corporation's Assault bot is the heaviest of little ships mounting two machine guns and carrying torpedoes.">
 	<gun id="2" pos="0.5,0" turnAngle="0.0"/>
 	<gun id="2" pos="-0.5,0" turnAngle="0.0"/>
 	<ability id="5"/>

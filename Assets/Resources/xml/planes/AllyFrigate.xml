@@ -8,7 +8,7 @@
 	maxTurnAngle="50"
 	lowerSmooth='0.4'
 	upperSmooth='0.4'
-	description="This unit is a default class for planes">
+	description="Devil's Dozen Corporation's Frigate provides wide tactical capabilities to any commanding officer.">
 	<gun id="2" pos="1,-0.6" turnAngle="90.0"/>
 	<gun id="2" pos="-1,-0.6" turnAngle="-90.0"/>
 	<gun id="3" pos="0,1" turnAngle="0.0"/>

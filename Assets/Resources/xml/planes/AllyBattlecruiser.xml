@@ -8,7 +8,7 @@
 	maxTurnAngle="45"
 	lowerSmooth='0.8'
 	upperSmooth='0.8'
-	description="This unit is a default class for planes">
+	description="Devil's Dozen Corporation's Battlecruiser is a special ship made by Doortay Shipyards. It's a powerful all-round vessel. ">
 	<gun id="6" pos="1,-1" turnAngle="25.0"/>
 	<gun id="6" pos="1,0" turnAngle="90.0"/>
 	<gun id="6" pos="-1,-1" turnAngle="-25.0"/>

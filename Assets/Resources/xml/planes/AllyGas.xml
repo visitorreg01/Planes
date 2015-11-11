@@ -8,7 +8,7 @@
 	maxTurnAngle="47.5"
 	lowerSmooth='0.4'
 	upperSmooth='0.4'
-	description="This unit is a default class for planes">
+	description="Devil's Dozen Corporation's Gas Hauler is capable of spawning clouds of high toxicity gas and has a rear turret.">
 	<gun id="2" pos="0,-1" turnAngle="180.0"/>
 	<ability id="3"/>
 	<ability id="5"/>

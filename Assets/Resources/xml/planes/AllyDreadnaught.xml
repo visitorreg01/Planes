@@ -8,7 +8,7 @@
 	maxTurnAngle="25"
 	lowerSmooth='0.25'
 	upperSmooth='0.25'
-	description="This unit is a default class for planes">	
+	description="Devil's Dozen Corporation's Dreadnaught is the heaviest ship of the Corp featuring terryfing broadside firepower.">	
 	<gun id="4" pos="2,-1" turnAngle="90.0"/>
 	<gun id="4" pos="2,1" turnAngle="90.0"/>
 	<gun id="4" pos="-2,-1" turnAngle="-90.0"/>

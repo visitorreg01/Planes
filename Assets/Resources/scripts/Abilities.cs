@@ -26,17 +26,17 @@ public static class Abilities
 			case AbilityType.doubleThrottle:
 				return false;
 			case AbilityType.gas:
-				return false;
+				return true;
 			case AbilityType.halfRoundTurn:
 				return false;
 			case AbilityType.homingMissle:
-				return false;
+				return true;
 			case AbilityType.homingThorpede:
-				return false;
+				return true;
 			case AbilityType.mines:
 				return false;
 			case AbilityType.shield:
-				return false;
+				return true;
 			case AbilityType.turnAround:
 				return false;
 			default:
@@ -46,11 +46,11 @@ public static class Abilities
 	
 	public static class GasParameters
 	{
-		public const float gasRange=0.5f;
+		public const float gasRange=4f;
 		public const float gasReuse=0.5f;
 		public const int gasDamage=50;
 		public const float betweenDist=2f;
-		public const int lifeTimeRounds=3;
+		public const int lifeTimeRounds=5;
 	}
 	
 	public static class RocketParameters
@@ -81,7 +81,7 @@ public static class Abilities
 	
 	public static class MinesParameters
 	{
-		public const float Range=2.0f;
+		public const float Range=5.0f;
 		public const int Damage=300;
 		public const float betweenDist=3f;
 	}
