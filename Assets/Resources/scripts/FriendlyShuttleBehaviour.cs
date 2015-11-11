@@ -15,6 +15,9 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	private float clickDistMin=2f;
 	private float clickDistAccuracy=0.1f;
 	
+	private Material lineMat;
+	private ArrayList arcPoints=new ArrayList();
+	
 	
 	private ArrayList minesList=new ArrayList();
 	
@@ -144,6 +147,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void Start()
 	{
+		lineMat=Resources.Load("materials/lineMaterial") as Material;
 		attackIcon = Instantiate(Resources.Load("prefab/attackIcon") as GameObject);
 		attackIcon.SetActive(false);
 		LineRenderer lr = gameObject.AddComponent<LineRenderer>();
@@ -274,6 +278,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void Update()
 	{
+		
 		clickDist=0.15f*GameStorage.getInstance().zoom;
 		if(clickDist<clickDistMin)
 			clickDist=clickDistMin;
@@ -304,23 +309,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		}
 		angle=Mathf.Repeat(angle,360);
 		
-		if(spawn)
-		{
-			updateAttackIconPosition();
-			spawn=false;
-		}
-		
-
-		if(needToUpdateAttackIconPosition)
-		{
-			updateAttackIconPosition();
-			needToUpdateAttackIconPosition=false;
-		}
-		
-		if(selected)
+		/*if(selected)
 		{
 			int ii=0;
 			//Templates.GunOnShuttle gos = (Templates.GunOnShuttle) temp.guns[0];
+			arcPoints.Clear();
 			foreach(Templates.GunOnShuttle gos in temp.guns)
 			{
 				LineRenderer line = ((GameObject) arcObjs[ii]).GetComponent<LineRenderer>();
@@ -332,29 +325,57 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				Vector2 upperP = Quaternion.Euler(0,0,-(angle+gos.turnAngle+gunTmp.attackAngle))*new Vector2(0,gunTmp.attackRange);
 				upperP=new Vector2(upperP.x+transform.position.x,upperP.y+transform.position.z);
 				
-				int le = (int) (2*gunTmp.attackAngle/1f),i;
+				int i;
+				Vector2 v;
+				for(i=0;i<100;i++)
+				{
+					v = lowerP-startP;
+					v*=(i/100);
+					v+=startP;
+					arcPoints.Add(v);
+				}
 				
-				line.SetVertexCount(3+le);
-				line.SetPosition(0,new Vector3(startP.x,0,startP.y));
-				//line.SetPosition(1,new Vector3(upperP.x,0,upperP.y));
+				int le = (int) (2*gunTmp.attackAngle/1f);
 				for(i=0;i<le;i++)
 				{
-					Vector2 po = Quaternion.Euler(0,0,-(angle+gos.turnAngle+gunTmp.attackAngle-1*(i)))*new Vector2(0,gunTmp.attackRange);
-					po=new Vector2(po.x+transform.position.x,po.y+transform.position.z);
-					line.SetPosition(1+i,new Vector3(po.x,0,po.y));
+					v = Quaternion.Euler(0,0,-(angle+gos.turnAngle-gunTmp.attackAngle-1*(i)))*new Vector2(0,gunTmp.attackRange);
+					v=new Vector2(v.x+transform.position.x,v.y+transform.position.z);
+					arcPoints.Add(v);
 				}
-				line.SetPosition(1+le,new Vector3(lowerP.x,0,lowerP.y));
-				line.SetPosition(2+le,new Vector3(startP.x,0,startP.y));
+				for(i=0;i<100;i++)
+				{
+					v = upperP-startP;
+					v*=1-(i/100);
+					v+=startP;
+					arcPoints.Add(v);
+				}
+				
+				line.SetVertexCount(arcPoints.Count);
+				for(i=0;i<arcPoints.Count;i++)
+					line.SetPosition(i,new Vector3(((Vector2)arcPoints[i]).x,0,((Vector2)arcPoints[i]).y));
 				ii++;
 			}
 		}
 		else
-		{
+		{*/
 			foreach(GameObject gg in arcObjs)
 			{
 				LineRenderer line = gg.GetComponent<LineRenderer>();
 				line.SetVertexCount(0);
 			}
+		//}
+		
+		if(spawn)
+		{
+			updateAttackIconPosition();
+			spawn=false;
+		}
+		
+
+		if(needToUpdateAttackIconPosition)
+		{
+			updateAttackIconPosition();
+			needToUpdateAttackIconPosition=false;
 		}
 		
 		
@@ -385,10 +406,102 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		transform.eulerAngles=new Vector3(0,angle,0);
 	}
 	
-	
+	public static class Drawing
+{
+    //****************************************************************************************************
+    //  static function DrawLine(rect : Rect) : void
+    //  static function DrawLine(rect : Rect, color : Color) : void
+    //  static function DrawLine(rect : Rect, width : float) : void
+    //  static function DrawLine(rect : Rect, color : Color, width : float) : void
+    //  static function DrawLine(Vector2 pointA, Vector2 pointB) : void
+    //  static function DrawLine(Vector2 pointA, Vector2 pointB, color : Color) : void
+    //  static function DrawLine(Vector2 pointA, Vector2 pointB, width : float) : void
+    //  static function DrawLine(Vector2 pointA, Vector2 pointB, color : Color, width : float) : void
+    //  
+    //  Draws a GUI line on the screen.
+    //  
+    //  DrawLine makes up for the severe lack of 2D line rendering in the Unity runtime GUI system.
+    //  This function works by drawing a 1x1 texture filled with a color, which is then scaled
+    //   and rotated by altering the GUI matrix.  The matrix is restored afterwards.
+    //****************************************************************************************************
+ 
+    public static Texture2D lineTex;
+ 
+    public static void DrawLine(Rect rect) { DrawLine(rect, GUI.contentColor, 1.0f); }
+    public static void DrawLine(Rect rect, Color color) { DrawLine(rect, color, 1.0f); }
+    public static void DrawLine(Rect rect, float width) { DrawLine(rect, GUI.contentColor, width); }
+    public static void DrawLine(Rect rect, Color color, float width) { DrawLine(new Vector2(rect.x, rect.y), new Vector2(rect.x + rect.width, rect.y + rect.height), color, width); }
+    public static void DrawLine(Vector2 pointA, Vector2 pointB) { DrawLine(pointA, pointB, GUI.contentColor, 1.0f); }
+    public static void DrawLine(Vector2 pointA, Vector2 pointB, Color color) { DrawLine(pointA, pointB, color, 1.0f); }
+    public static void DrawLine(Vector2 pointA, Vector2 pointB, float width) { DrawLine(pointA, pointB, GUI.contentColor, width); }
+    public static void DrawLine(Vector2 pointA, Vector2 pointB, Color color, float width)
+    {
+        // Save the current GUI matrix, since we're going to make changes to it.
+        Matrix4x4 matrix = GUI.matrix;
+ 
+        // Generate a single pixel texture if it doesn't exist
+        if (!lineTex) { lineTex = new Texture2D(1, 1); }
+ 
+        // Store current GUI color, so we can switch it back later,
+        // and set the GUI color to the color parameter
+        Color savedColor = GUI.color;
+        GUI.color = color;
+ 
+        // Determine the angle of the line.
+        float angle = Vector3.Angle(pointB - pointA, Vector2.right);
+ 
+        // Vector3.Angle always returns a positive number.
+        // If pointB is above pointA, then angle needs to be negative.
+        if (pointA.y > pointB.y) { angle = -angle; }
+ 
+        // Use ScaleAroundPivot to adjust the size of the line.
+        // We could do this when we draw the texture, but by scaling it here we can use
+        //  non-integer values for the width and length (such as sub 1 pixel widths).
+        // Note that the pivot point is at +.5 from pointA.y, this is so that the width of the line
+        //  is centered on the origin at pointA.
+        GUIUtility.ScaleAroundPivot(new Vector2((pointB - pointA).magnitude, width), new Vector2(pointA.x, pointA.y + 0.5f));
+ 
+        // Set the rotation for the line.
+        //  The angle was calculated with pointA as the origin.
+        GUIUtility.RotateAroundPivot(angle, pointA);
+ 
+        // Finally, draw the actual line.
+        // We're really only drawing a 1x1 texture from pointA.
+        // The matrix operations done with ScaleAroundPivot and RotateAroundPivot will make this
+        //  render with the proper width, length, and angle.
+        GUI.DrawTexture(new Rect(pointA.x, pointA.y, 1, 1), lineTex);
+ 
+        // We're done.  Restore the GUI matrix and GUI color to whatever they were before.
+        GUI.matrix = matrix;
+        GUI.color = savedColor;
+    }
+}
+
 	
 	void OnGUI()
 	{
+		/*
+		int ii=0;
+		Vector3 tVec,tVec2;
+		foreach(Templates.GunOnShuttle gos in temp.guns)
+		{
+			Templates.GunTemplate gunTmp = Templates.getInstance().getGunTemplate(gos.gunId);
+			Vector2 startP = Quaternion.Euler(0,0,-angle)*gos.pos;
+			startP=new Vector2(transform.position.x+startP.x,transform.position.z+startP.y);
+			Vector2 lowerP = Quaternion.Euler(0,0,-(angle+gos.turnAngle-gunTmp.attackAngle))*new Vector2(0,gunTmp.attackRange);
+			lowerP=new Vector2(lowerP.x+transform.position.x,lowerP.y+transform.position.z);
+			Vector2 upperP = Quaternion.Euler(0,0,-(angle+gos.turnAngle+gunTmp.attackAngle))*new Vector2(0,gunTmp.attackRange);
+			upperP=new Vector2(upperP.x+transform.position.x,upperP.y+transform.position.z);
+			
+			tVec=new Vector3(startP.x,0,startP.y);
+			tVec2=new Vector3(lowerP.x,0,lowerP.y);
+			tVec2=Camera.main.WorldToScreenPoint(tVec2);
+			
+			Drawing.DrawLine(new Rect(Camera.main.WorldToScreenPoint(tVec).x,Screen.height-Camera.main.WorldToScreenPoint(tVec).y,50,50));
+			
+			ii++;
+		}*/
+		
 		if(!GameStorage.getInstance().isRunning)
 		{
 			Vector3 v11 = attackIcon.transform.position;
@@ -587,29 +700,32 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	{
 		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
 		{
-			if(!((defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns)) && (Abilities.getLockGun(activeAbil))))
+			if(!((defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns))))
 			{
-				Templates.GunTemplate gunTemp;
-				GameObject enemy;
-				foreach(Templates.GunOnShuttle gun in temp.guns)
+				if(!Abilities.getLockGun(activeAbil))
 				{
-					gunTemp=Templates.getInstance().getGunTemplate(gun.gunId);
-					if(!gun.ready)
-						if(gun.shotTime+gunTemp.reuse<Time.time)
-							gun.ready=true;
-					
-					enemy=GameStorage.getInstance().getEnemyInFireZone(gameObject,gun);
-					if(enemy!=null)
+					Templates.GunTemplate gunTemp;
+					GameObject enemy;
+					foreach(Templates.GunOnShuttle gun in temp.guns)
 					{
-						if(gun.ready)
+						gunTemp=Templates.getInstance().getGunTemplate(gun.gunId);
+						if(!gun.ready)
+							if(gun.shotTime+gunTemp.reuse<Time.time)
+								gun.ready=true;
+						
+						enemy=GameStorage.getInstance().getEnemyInFireZone(gameObject,gun);
+						if(enemy!=null)
 						{
-							gun.shotTime=Time.time;
-							gun.ready=false;
-							// WARN
-							Vector2 f = Quaternion.Euler(0,0,-angle)*gun.pos;
-							GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/"+gunTemp.bulletMesh) as GameObject,new Vector3(transform.position.x+f.x,0,transform.position.z+f.y),Quaternion.Euler(0,angle,0));
-							bullet.GetComponent<BulletBehaviour>().Launch(new Vector2(enemy.transform.position.x,enemy.transform.position.z),new Vector2(transform.position.x+f.x,transform.position.z+f.y),gun);
-							
+							if(gun.ready)
+							{
+								gun.shotTime=Time.time;
+								gun.ready=false;
+								// WARN
+								Vector2 f = Quaternion.Euler(0,0,-angle)*gun.pos;
+								GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/"+gunTemp.bulletMesh) as GameObject,new Vector3(transform.position.x+f.x,0,transform.position.z+f.y),Quaternion.Euler(0,angle,0));
+								bullet.GetComponent<BulletBehaviour>().Launch(new Vector2(enemy.transform.position.x,enemy.transform.position.z),new Vector2(transform.position.x+f.x,transform.position.z+f.y),gun);
+								
+							}
 						}
 					}
 				}

@@ -26,7 +26,6 @@ public class ThorpedeBehaviour : MonoBehaviour {
 	void Start () {
 		GameStorage.getInstance().registerThorpedeUnit(this.gameObject);
 		attackIcon = Instantiate(Resources.Load("prefab/attackIcon") as GameObject);
-		attackIcon.SetActive(false);
 		startpoint1=new Vector2(transform.position.x,transform.position.z);
 		angle=transform.eulerAngles.y;
 		startpoint2=Quaternion.Euler(0,0,angle)*new Vector2(0,1)*Abilities.ThorpedeParameters.startRange;
@@ -53,20 +52,26 @@ public class ThorpedeBehaviour : MonoBehaviour {
 			if(enemy)
 			{
 				target = GameStorage.getInstance().getNearbyFriendly(gameObject);
-				if(Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(target.transform.position.x,target.transform.position.z))<=Abilities.ThorpedeParameters.damageRange)
+				if(target!=null)
 				{
-					target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.ThorpedeParameters.damage,null);
-					this.Die();
-				}	
+					if(Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(target.transform.position.x,target.transform.position.z))<=Abilities.ThorpedeParameters.damageRange)
+					{
+						target.GetComponent<FriendlyShuttleBehaviour>().Attacked(null,Abilities.ThorpedeParameters.damage,null);
+						this.Die();
+					}	
+				}
 			}
 			else
 			{
 				target = GameStorage.getInstance().getNearbyEnemy(gameObject);
-				if(Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(target.transform.position.x,target.transform.position.z))<=Abilities.ThorpedeParameters.damageRange)
+				if(target!=null)
 				{
-					target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.ThorpedeParameters.damage,null);
-					this.Die();
-				}	
+					if(Vector2.Distance(new Vector2(transform.position.x,transform.position.z),new Vector2(target.transform.position.x,target.transform.position.z))<=Abilities.ThorpedeParameters.damageRange)
+					{
+						target.GetComponent<EnemyShuttleBehaviour>().Attacked(null,Abilities.ThorpedeParameters.damage,null);
+						this.Die();
+					}	
+				}
 			}
 		}
 		
@@ -109,14 +114,17 @@ public class ThorpedeBehaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
-		if(selected)
+		if(!GameStorage.getInstance().isRunning)
 		{
-			Vector3 v1 = attackIcon.transform.position;
-			Vector2 aPos = new Vector2(Camera.main.WorldToScreenPoint(v1).x,Camera.main.WorldToScreenPoint(v1).y);
+			Vector3 v11 = attackIcon.transform.position;
+			Vector2 aPos = new Vector2(Camera.main.WorldToScreenPoint(v11).x,Camera.main.WorldToScreenPoint(v11).y);
 			
 			GUI.skin = Templates.getInstance().getAbilityIcon(Abilities.AbilityType.none);
 			if(GUI.RepeatButton(new Rect(aPos.x-20,Screen.height-aPos.y-20,40,40),""))
+			{
 				attackIconCaptured=true;
+				selected=true;
+			}
 			GUI.skin=null;
 		}
 	}

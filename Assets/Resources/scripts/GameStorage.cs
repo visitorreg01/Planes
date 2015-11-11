@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.IO;
 
 public class GameStorage {
 
@@ -32,8 +31,6 @@ public class GameStorage {
 	private ArrayList asteroidsList;
 	
 	public bool allReady = false;
-	
-	private GameObject friendlyUnitPrefab;
 	
 	private float time;
 	
@@ -147,7 +144,8 @@ public class GameStorage {
 	{
 		GameObject gg = (GameObject) friendlyGameObjectsList[index];
 		cam.transform.position=new Vector3(gg.transform.position.x,cam.transform.position.y,gg.transform.position.z);
-		gg.GetComponent<FriendlyShuttleBehaviour>().selected=true;
+		if(!isRunning)
+			gg.GetComponent<FriendlyShuttleBehaviour>().selected=true;
 	}
 	
 	public void createFriendlyShuttle()

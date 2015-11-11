@@ -46,7 +46,7 @@ public static class Abilities
 	
 	public static class GasParameters
 	{
-		public const float gasRange=4f;
+		public const float gasRange=4.0f;
 		public const float gasReuse=0.5f;
 		public const int gasDamage=50;
 		public const float betweenDist=2f;
