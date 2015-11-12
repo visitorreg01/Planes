@@ -154,17 +154,58 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		lr.SetWidth(0.05f, 0.05f);
 		GameStorage.getInstance().addFriendlyShuttle(this.gameObject);
 		temp = Templates.getInstance().getPlaneTemplate(Template);
-		GameObject gD;
+		GameObject go;
+		MeshRenderer mr;
+		Mesh m;
 		foreach(Templates.GunOnShuttle goss in temp.guns)
 		{
-			gD=new GameObject();
-			LineRenderer line = gD.AddComponent<LineRenderer>();
-			line.SetWidth(0.05f, 0.05f);
-			line.material = Resources.Load("materials/lineMaterial") as Material;
-			arcObjs.Add(gD);
-			gD=(GameObject) Instantiate(Resources.Load("prefab/testGunMesh") as GameObject,new Vector3(transform.position.x+goss.pos.x,10,transform.position.z+goss.pos.y),Quaternion.Euler(0,goss.turnAngle,0));
-			gD.SetActive(false);
-			shuttleGunsMeshes.Add(gD);
+			go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			Templates.GunTemplate gt = Templates.getInstance().getGunTemplate(goss.gunId);
+			
+			Destroy(go.GetComponent<Collider>());
+			mr = go.GetComponent<MeshRenderer>();
+			mr.material=Resources.Load("materials/lineMaterial") as Material;
+	      	m = go.GetComponent<MeshFilter>().mesh;
+	      	m.Clear();
+	        Vector3[] vertices = new Vector3[101];
+	        vertices[0]=new Vector3(0,1,0);
+	        float ds=gt.attackRange;
+	        
+	        Vector2 va;
+	        int i=1;
+	        for(float ang = -gt.attackAngle; ang<=gt.attackAngle; ang+=(2*gt.attackAngle)/100.0f)
+	        {
+	        	va=Quaternion.Euler(0,0,ang)*new Vector2(0,ds);
+	        	vertices[i]=new Vector3(va.x,0,va.y);
+	        	i++;
+	        	if(i==101) break;
+	        }
+	        
+	        int[] triangles = new int[vertices.Length*3];
+	        int bb=0;
+	        for(i=0;i<99;i++)
+	        {
+	        	triangles[bb*3]=0;
+	        	triangles[bb*3+1]=i+1;
+	        	triangles[bb*3+2]=i+2;
+	        	bb++;
+	        }
+	   
+	        Vector2[] uvs = new Vector2[vertices.Length];
+			for (i = 0; i < uvs.Length; i++) {
+				uvs[i] = new Vector2(vertices[i].x, vertices[i].z);
+			}
+       
+	        m.vertices=vertices;
+	        m.triangles=triangles;
+	        m.uv=uvs;
+	       	m.RecalculateBounds();
+	        m.RecalculateNormals();
+	        arcObjs.Add(go);
+	        
+	        go=(GameObject) Instantiate(Resources.Load("prefab/testGunMesh") as GameObject,new Vector3(transform.position.x+goss.pos.x,1,transform.position.z+goss.pos.y),Quaternion.Euler(0,goss.turnAngle,0));
+			go.SetActive(false);
+			shuttleGunsMeshes.Add(go);
 			shuttleGunsGos.Add(goss);
 		}
 		
@@ -278,7 +319,24 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void Update()
 	{
-		
+		if(selected)
+		{
+			int i=0;
+			foreach(GameObject go in arcObjs)
+			{
+				Templates.GunOnShuttle goss = (Templates.GunOnShuttle)temp.guns[i];
+				go.SetActive(true);
+				Vector2 gosPos = Quaternion.Euler(0,0,-angle)*new Vector2(goss.pos.x,goss.pos.y);
+				go.transform.position=new Vector3(transform.position.x+gosPos.x,0,transform.position.z+gosPos.y);
+				go.transform.localRotation=Quaternion.Euler(0,angle+goss.turnAngle,0);
+				i++;
+			}
+		}
+		else
+		{
+			foreach(GameObject go in arcObjs)
+				go.SetActive(false);
+		}
 		clickDist=0.15f*GameStorage.getInstance().zoom;
 		if(clickDist<clickDistMin)
 			clickDist=clickDistMin;
@@ -309,61 +367,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		}
 		angle=Mathf.Repeat(angle,360);
 		
-		/*if(selected)
-		{
-			int ii=0;
-			//Templates.GunOnShuttle gos = (Templates.GunOnShuttle) temp.guns[0];
-			arcPoints.Clear();
-			foreach(Templates.GunOnShuttle gos in temp.guns)
-			{
-				LineRenderer line = ((GameObject) arcObjs[ii]).GetComponent<LineRenderer>();
-				Templates.GunTemplate gunTmp = Templates.getInstance().getGunTemplate(gos.gunId);
-				Vector2 startP = Quaternion.Euler(0,0,-angle)*gos.pos;
-				startP=new Vector2(transform.position.x+startP.x,transform.position.z+startP.y);
-				Vector2 lowerP = Quaternion.Euler(0,0,-(angle+gos.turnAngle-gunTmp.attackAngle))*new Vector2(0,gunTmp.attackRange);
-				lowerP=new Vector2(lowerP.x+transform.position.x,lowerP.y+transform.position.z);
-				Vector2 upperP = Quaternion.Euler(0,0,-(angle+gos.turnAngle+gunTmp.attackAngle))*new Vector2(0,gunTmp.attackRange);
-				upperP=new Vector2(upperP.x+transform.position.x,upperP.y+transform.position.z);
-				
-				int i;
-				Vector2 v;
-				for(i=0;i<100;i++)
-				{
-					v = lowerP-startP;
-					v*=(i/100);
-					v+=startP;
-					arcPoints.Add(v);
-				}
-				
-				int le = (int) (2*gunTmp.attackAngle/1f);
-				for(i=0;i<le;i++)
-				{
-					v = Quaternion.Euler(0,0,-(angle+gos.turnAngle-gunTmp.attackAngle-1*(i)))*new Vector2(0,gunTmp.attackRange);
-					v=new Vector2(v.x+transform.position.x,v.y+transform.position.z);
-					arcPoints.Add(v);
-				}
-				for(i=0;i<100;i++)
-				{
-					v = upperP-startP;
-					v*=1-(i/100);
-					v+=startP;
-					arcPoints.Add(v);
-				}
-				
-				line.SetVertexCount(arcPoints.Count);
-				for(i=0;i<arcPoints.Count;i++)
-					line.SetPosition(i,new Vector3(((Vector2)arcPoints[i]).x,0,((Vector2)arcPoints[i]).y));
-				ii++;
-			}
-		}
-		else
-		{*/
-			foreach(GameObject gg in arcObjs)
-			{
-				LineRenderer line = gg.GetComponent<LineRenderer>();
-				line.SetVertexCount(0);
-			}
-		//}
+		
 		
 		if(spawn)
 		{
@@ -406,101 +410,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		transform.eulerAngles=new Vector3(0,angle,0);
 	}
 	
-	public static class Drawing
-{
-    //****************************************************************************************************
-    //  static function DrawLine(rect : Rect) : void
-    //  static function DrawLine(rect : Rect, color : Color) : void
-    //  static function DrawLine(rect : Rect, width : float) : void
-    //  static function DrawLine(rect : Rect, color : Color, width : float) : void
-    //  static function DrawLine(Vector2 pointA, Vector2 pointB) : void
-    //  static function DrawLine(Vector2 pointA, Vector2 pointB, color : Color) : void
-    //  static function DrawLine(Vector2 pointA, Vector2 pointB, width : float) : void
-    //  static function DrawLine(Vector2 pointA, Vector2 pointB, color : Color, width : float) : void
-    //  
-    //  Draws a GUI line on the screen.
-    //  
-    //  DrawLine makes up for the severe lack of 2D line rendering in the Unity runtime GUI system.
-    //  This function works by drawing a 1x1 texture filled with a color, which is then scaled
-    //   and rotated by altering the GUI matrix.  The matrix is restored afterwards.
-    //****************************************************************************************************
- 
-    public static Texture2D lineTex;
- 
-    public static void DrawLine(Rect rect) { DrawLine(rect, GUI.contentColor, 1.0f); }
-    public static void DrawLine(Rect rect, Color color) { DrawLine(rect, color, 1.0f); }
-    public static void DrawLine(Rect rect, float width) { DrawLine(rect, GUI.contentColor, width); }
-    public static void DrawLine(Rect rect, Color color, float width) { DrawLine(new Vector2(rect.x, rect.y), new Vector2(rect.x + rect.width, rect.y + rect.height), color, width); }
-    public static void DrawLine(Vector2 pointA, Vector2 pointB) { DrawLine(pointA, pointB, GUI.contentColor, 1.0f); }
-    public static void DrawLine(Vector2 pointA, Vector2 pointB, Color color) { DrawLine(pointA, pointB, color, 1.0f); }
-    public static void DrawLine(Vector2 pointA, Vector2 pointB, float width) { DrawLine(pointA, pointB, GUI.contentColor, width); }
-    public static void DrawLine(Vector2 pointA, Vector2 pointB, Color color, float width)
-    {
-        // Save the current GUI matrix, since we're going to make changes to it.
-        Matrix4x4 matrix = GUI.matrix;
- 
-        // Generate a single pixel texture if it doesn't exist
-        if (!lineTex) { lineTex = new Texture2D(1, 1); }
- 
-        // Store current GUI color, so we can switch it back later,
-        // and set the GUI color to the color parameter
-        Color savedColor = GUI.color;
-        GUI.color = color;
- 
-        // Determine the angle of the line.
-        float angle = Vector3.Angle(pointB - pointA, Vector2.right);
- 
-        // Vector3.Angle always returns a positive number.
-        // If pointB is above pointA, then angle needs to be negative.
-        if (pointA.y > pointB.y) { angle = -angle; }
- 
-        // Use ScaleAroundPivot to adjust the size of the line.
-        // We could do this when we draw the texture, but by scaling it here we can use
-        //  non-integer values for the width and length (such as sub 1 pixel widths).
-        // Note that the pivot point is at +.5 from pointA.y, this is so that the width of the line
-        //  is centered on the origin at pointA.
-        GUIUtility.ScaleAroundPivot(new Vector2((pointB - pointA).magnitude, width), new Vector2(pointA.x, pointA.y + 0.5f));
- 
-        // Set the rotation for the line.
-        //  The angle was calculated with pointA as the origin.
-        GUIUtility.RotateAroundPivot(angle, pointA);
- 
-        // Finally, draw the actual line.
-        // We're really only drawing a 1x1 texture from pointA.
-        // The matrix operations done with ScaleAroundPivot and RotateAroundPivot will make this
-        //  render with the proper width, length, and angle.
-        GUI.DrawTexture(new Rect(pointA.x, pointA.y, 1, 1), lineTex);
- 
-        // We're done.  Restore the GUI matrix and GUI color to whatever they were before.
-        GUI.matrix = matrix;
-        GUI.color = savedColor;
-    }
-}
-
+	
 	
 	void OnGUI()
 	{
-		/*
-		int ii=0;
-		Vector3 tVec,tVec2;
-		foreach(Templates.GunOnShuttle gos in temp.guns)
-		{
-			Templates.GunTemplate gunTmp = Templates.getInstance().getGunTemplate(gos.gunId);
-			Vector2 startP = Quaternion.Euler(0,0,-angle)*gos.pos;
-			startP=new Vector2(transform.position.x+startP.x,transform.position.z+startP.y);
-			Vector2 lowerP = Quaternion.Euler(0,0,-(angle+gos.turnAngle-gunTmp.attackAngle))*new Vector2(0,gunTmp.attackRange);
-			lowerP=new Vector2(lowerP.x+transform.position.x,lowerP.y+transform.position.z);
-			Vector2 upperP = Quaternion.Euler(0,0,-(angle+gos.turnAngle+gunTmp.attackAngle))*new Vector2(0,gunTmp.attackRange);
-			upperP=new Vector2(upperP.x+transform.position.x,upperP.y+transform.position.z);
-			
-			tVec=new Vector3(startP.x,0,startP.y);
-			tVec2=new Vector3(lowerP.x,0,lowerP.y);
-			tVec2=Camera.main.WorldToScreenPoint(tVec2);
-			
-			Drawing.DrawLine(new Rect(Camera.main.WorldToScreenPoint(tVec).x,Screen.height-Camera.main.WorldToScreenPoint(tVec).y,50,50));
-			
-			ii++;
-		}*/
+		
 		
 		if(!GameStorage.getInstance().isRunning)
 		{

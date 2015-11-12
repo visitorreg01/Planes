@@ -40,7 +40,7 @@ public static class Abilities
 			case AbilityType.turnAround:
 				return false;
 			default:
-				return true;
+				return false;
 		}
 	}
 	

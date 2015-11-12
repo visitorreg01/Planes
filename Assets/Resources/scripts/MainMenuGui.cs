@@ -11,6 +11,16 @@ public class MainMenuGui : MonoBehaviour {
 	void Start () {
 		GameStorage.getInstance();
 		Templates.getInstance();
+		
+		//TEST
+		Test();
+		
+		
+	}
+	
+	void Test()
+	{
+        
 	}
 	
 	void OnGUI()
