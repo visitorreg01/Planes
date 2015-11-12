@@ -19,8 +19,8 @@ public class GUIBehaviour : MonoBehaviour {
 		buttonPlayGrey=(GUISkin) Resources.Load("gui/skins/button_play_grey");
 		buttonNext=(GUISkin) Resources.Load("gui/skins/button_next");
 		buttonPrev=(GUISkin) Resources.Load("gui/skins/button_prev");
-		buttonCharge=(GUISkin) Resources.Load("gui/skins/button_charge");
-		buttonChargeGrey=(GUISkin) Resources.Load("gui/skins/button_charge_grey");
+		buttonCharge=(GUISkin) Resources.Load("gui/skins/button_cha");
+		buttonChargeGrey=(GUISkin) Resources.Load("gui/skins/button_cha_grey");
 	}
 	
 	void OnGUI()

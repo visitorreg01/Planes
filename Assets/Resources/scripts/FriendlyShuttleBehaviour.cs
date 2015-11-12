@@ -147,7 +147,6 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void Start()
 	{
-		lineMat=Resources.Load("materials/lineMaterial") as Material;
 		attackIcon = Instantiate(Resources.Load("prefab/attackIcon") as GameObject);
 		attackIcon.SetActive(false);
 		LineRenderer lr = gameObject.AddComponent<LineRenderer>();
@@ -164,7 +163,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			
 			Destroy(go.GetComponent<Collider>());
 			mr = go.GetComponent<MeshRenderer>();
-			mr.material=Resources.Load("materials/lineMaterial") as Material;
+			mr.material=Resources.Load("materials/arc") as Material;
 	      	m = go.GetComponent<MeshFilter>().mesh;
 	      	m.Clear();
 	        Vector3[] vertices = new Vector3[101];
