@@ -63,7 +63,7 @@ public static class Abilities
 		public const float damageRange=4.0f;
 		public const float lowerSmooth = 1f;
 		public const float upperSmooth = 1f;
-		public const int lifeTimeRounds=6;
+		public const int lifeTimeRounds=5;
 	}
 	
 	public static class ThorpedeParameters
