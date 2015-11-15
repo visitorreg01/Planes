@@ -25,6 +25,31 @@ public class GUIBehaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
+		GUI.enabled=!GameStorage.getInstance().overlap;
+		
+		if(GameStorage.getInstance().isRunning)
+			GUI.enabled=false;
+		else
+		{
+			bool res=false;
+			foreach(GameObject g in GameStorage.getInstance().getFriendlyShuttles())
+			{
+				if(g.GetComponent<FriendlyShuttleBehaviour>().haveRockets() || g.GetComponent<FriendlyShuttleBehaviour>().haveThorpeds())
+					res=true;
+			}
+			
+			if(!res)
+				GUI.enabled=false;
+		}
+		
+		if(GameStorage.getInstance().overlap)
+			GUI.enabled=false;
+		
+		if(GUI.Button(new Rect(5,5,32,32),"Q"))
+			GameStorage.getInstance().setThorpedesAndRocketsAbils();
+		
+		GUI.enabled=!GameStorage.getInstance().overlap;
+		
 		if(GameStorage.getInstance().isRunning)
 		{
 			GUI.skin=buttonPlayGrey;

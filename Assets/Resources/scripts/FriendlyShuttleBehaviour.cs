@@ -11,14 +11,13 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	public Templates.PlaneTemplates Template;
 	private Templates.PlaneTemplate temp;
 	
+	
+	
 	private float clickDist=3f;
 	private float clickDistMin=2f;
 	private float clickDistAccuracy=0.1f;
 	
 	private Material lineMat;
-	private ArrayList arcPoints=new ArrayList();
-	
-	
 	private ArrayList minesList=new ArrayList();
 	
 	//abil positions
@@ -43,7 +42,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	float attackIconDistMin=2f;
 	float attackIconDist=6f;
 	float maxTurnAngle = 55;
-	int hp = 300;
+	public int hp = 300;
 	float lastFired=0f;
 	bool abilityInReuse=false;
 	Abilities.AbilityType origin0,origin1,origin2,origin3;
@@ -89,6 +88,89 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		needToUpdatePosition=true;
 	}
 	
+	public void setActiveThorpedeAbil()
+	{
+		if(!abilityInReuse)
+		{
+			if(activeAbil!=Abilities.AbilityType.homingThorpede)
+			{
+				int i=0,ch=-1;
+				foreach(Abilities.AbilityType ab in temp.abilities)
+				{
+					if(ab==Abilities.AbilityType.homingThorpede)
+					{
+						ch=i;
+						break;
+					}
+					i++;
+				}
+				if(ch>=0)
+				{
+					Abilities.AbilityType selectedAbil = Abilities.AbilityType.homingThorpede;
+					prevAbil=activeAbil;
+					temp.abilities[ch]=(int)activeAbil;
+					activeAbil=selectedAbil;
+					AbilitySwitched();
+				}
+			}
+		}
+	}
+	
+	public void setActiveRocketAbil()
+	{
+		if(!abilityInReuse)
+		{
+			if(activeAbil!=Abilities.AbilityType.homingMissle)
+			{
+				int i=0,ch=-1;
+				foreach(Abilities.AbilityType ab in temp.abilities)
+				{
+					if(ab==Abilities.AbilityType.homingMissle)
+					{
+						ch=i;
+						break;
+					}
+					i++;
+				}
+				if(ch>=0)
+				{
+					Abilities.AbilityType selectedAbil = Abilities.AbilityType.homingMissle;
+					prevAbil=activeAbil;
+					temp.abilities[ch]=(int)activeAbil;
+					activeAbil=selectedAbil;
+					AbilitySwitched();
+				}
+			}
+		}
+	}
+	
+	public bool haveRockets()
+	{
+		if(abilityInReuse)
+			return false;
+		bool result=false;
+		foreach(Abilities.AbilityType ab in temp.abilities)
+		{
+			if(ab==Abilities.AbilityType.homingMissle)
+				result=true;
+		}
+		return result;
+	}
+	
+	public bool haveThorpeds()
+	{
+		if(abilityInReuse)
+			return false;
+		
+		bool result=false;
+		foreach(Abilities.AbilityType ab in temp.abilities)
+		{
+			if(ab==Abilities.AbilityType.homingThorpede)
+				result=true;
+		}
+		return result;
+	}
+	
 	public void updateAttackPosition()
 	{
 		needToUpdateAttackIconPosition=true;
@@ -123,7 +205,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		if(earnedDefect && curDefect.GetType() == typeof(Defects.EngineCrash))
 			ds=temp.minRange*((Defects.EngineCrash)curDefect).newRangeCoeff;
 		else
-			ds = (attackIconDist-attackIconDistMin)/2+attackIconDistMin;
+			ds = attackIconDist;
 		Vector2 vec =Quaternion.Euler(0,0,-angle)*(new Vector2(0,1)*ds);
 		attackIcon.transform.position=new Vector3(vec.x+transform.position.x,attackIconH,vec.y+transform.position.z);
 	}
@@ -153,6 +235,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		lr.SetWidth(0.05f, 0.05f);
 		GameStorage.getInstance().addFriendlyShuttle(this.gameObject);
 		temp = Templates.getInstance().getPlaneTemplate(Template);
+		GameStorage.getInstance().totalHp+=temp.hp;
 		GameObject go;
 		MeshRenderer mr;
 		Mesh m;
@@ -413,7 +496,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
-		
+		GUI.enabled=!GameStorage.getInstance().overlap;
 		
 		if(!GameStorage.getInstance().isRunning)
 		{
@@ -549,19 +632,22 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	public void checkShuttleClickState()
 	{
-		if(!GameStorage.getInstance().isRunning)
+		if(!GameStorage.getInstance().overlap)
 		{
-			if((Input.GetMouseButtonDown(0) && isMouseOver(gameObject)) || (Input.GetMouseButtonDown(0) && isMouseOver(attackIcon)))
+			if(!GameStorage.getInstance().isRunning)
 			{
-				selected=true;
-				GameStorage.getInstance().currentSelectedFriendly=gameObject;
-			}
-			else if(Input.GetMouseButtonDown(0) && !isMouseOver(gameObject))
-			{
-				if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist+clickDistAccuracy*GameStorage.getInstance().zoom)
+				if((Input.GetMouseButtonDown(0) && isMouseOver(gameObject)) || (Input.GetMouseButtonDown(0) && isMouseOver(attackIcon)))
 				{
-					selected=false;
-					GameStorage.getInstance().currentSelectedFriendly=null;
+					selected=true;
+					GameStorage.getInstance().currentSelectedFriendly=gameObject;
+				}
+				else if(Input.GetMouseButtonDown(0) && !isMouseOver(gameObject))
+				{
+					if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist+clickDistAccuracy*GameStorage.getInstance().zoom)
+					{
+						selected=false;
+						GameStorage.getInstance().currentSelectedFriendly=null;
+					}
 				}
 			}
 		}

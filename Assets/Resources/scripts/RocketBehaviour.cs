@@ -76,6 +76,15 @@ public class RocketBehaviour : MonoBehaviour {
 			}
 		}
 		
+		if(!GameStorage.getInstance().isRunning)
+		{
+			if(enemy)
+			{
+				CalculateAttackIconPosition();
+				CalculatePath();
+			}
+		}
+		
 		clickDist=0.15f*GameStorage.getInstance().zoom;
 		if(clickDist<clickDistMin)
 			clickDist=clickDistMin;
@@ -115,20 +124,23 @@ public class RocketBehaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
-		if(!enemy)
+		if(!GameStorage.getInstance().overlap)
 		{
-			if(!GameStorage.getInstance().isRunning)
+			if(!enemy)
 			{
-				Vector3 v11 = attackIcon.transform.position;
-				Vector2 aPos = new Vector2(Camera.main.WorldToScreenPoint(v11).x,Camera.main.WorldToScreenPoint(v11).y);
-				
-				GUI.skin = Templates.getInstance().getAbilityIcon(Abilities.AbilityType.none);
-				if(GUI.RepeatButton(new Rect(aPos.x-20,Screen.height-aPos.y-20,40,40),""))
+				if(!GameStorage.getInstance().isRunning)
 				{
-					attackIconCaptured=true;
-					selected=true;
+					Vector3 v11 = attackIcon.transform.position;
+					Vector2 aPos = new Vector2(Camera.main.WorldToScreenPoint(v11).x,Camera.main.WorldToScreenPoint(v11).y);
+					
+					GUI.skin = Templates.getInstance().getAbilityIcon(Abilities.AbilityType.homingMissle);
+					if(GUI.RepeatButton(new Rect(aPos.x-20,Screen.height-aPos.y-20,40,40),""))
+					{
+						attackIconCaptured=true;
+						selected=true;
+					}
+					GUI.skin=null;
 				}
-				GUI.skin=null;
 			}
 		}
 	}
@@ -261,12 +273,7 @@ public class RocketBehaviour : MonoBehaviour {
 			spawned=false;
 			updateAttackIconPosition();
 		}
-		
-		if(enemy)
-		{
-			CalculateAttackIconPosition();
-			CalculatePath();
-		}
+	
 		return stepCount++;
 	}
 	

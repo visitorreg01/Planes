@@ -11,6 +11,8 @@ public class AsteroidBehaviour : MonoBehaviour {
 	void OnCollisionEnter(Collision col)
 	{
 		GameObject target = col.gameObject;
+		if(target.GetComponent<BulletBehaviour>()!=null)
+			Destroy(target);
 		if(target.GetComponent<FriendlyShuttleBehaviour>()!=null)
 			target.GetComponent<FriendlyShuttleBehaviour>().Die();
 		if(target.GetComponent<EnemyShuttleBehaviour>()!=null)

@@ -12,13 +12,16 @@ public class GameStorage {
 	}
 	
 	public GameObject currentSelectedFriendly=null;
-	
+	public int defaultDepth = GUI.depth;
 	public bool isRunning=false;
 	public bool isDebug=false;
 	public float zoom=1.0f;
 	
 	public CameraBehaviour cam;
 	
+	public int totalHp=0;
+	public int curHp=0;
+	public int curLevel=0;
 	private int currentFocusShip=0;
 	private ArrayList friendlyGameObjectsList;
 	private ArrayList enemyGameObjectsList;
@@ -30,6 +33,8 @@ public class GameStorage {
 	private ArrayList thorpedeRemoveList;
 	private ArrayList asteroidsList;
 	private ArrayList minesList;
+	
+	public bool overlap=false;
 	
 	public bool allReady = false;
 	
@@ -53,6 +58,28 @@ public class GameStorage {
 	{
 		foreach(GameObject gg in friendlyGameObjectsList)
 			gg.GetComponent<FriendlyShuttleBehaviour>().setMaxAttackIcon();
+	}
+	
+	public void LoadLevel(Templates.LevelInfo lv)
+	{
+		totalHp=0;
+		curHp=0;
+		curLevel=lv.num;
+		Application.LoadLevel(lv.file);
+	}
+	
+	public void EndLevel()
+	{
+		friendlyGameObjectsList.Clear();
+		enemyGameObjectsList.Clear();
+		rocketList.Clear();
+		rocketRemoveList.Clear();
+		minesList.Clear();
+		thorpedeList.Clear();
+		thorpedeRemoveList.Clear();
+		gasList.Clear();
+		gasRemoveList.Clear();
+		asteroidsList.Clear();
 	}
 	
 	public void StepStart()
@@ -118,16 +145,45 @@ public class GameStorage {
 		foreach(GameObject f in minesList)
 			f.GetComponent<MineBehaviour>().StepEnd();
 		
+		
 		if(getFriendlyShuttles().Length==0 && getEnemyShuttles().Length>0)
-			Debug.Log("LOSE!");
+		{
+			EndLevel();
+			cam.GetComponent<CameraBehaviour>().nextLevelWindow(-1,curLevel+1);
+		}
 		else if(getFriendlyShuttles().Length>0 && getEnemyShuttles().Length==0)
 		{
-			Debug.Log("WIN!");
+			foreach(GameObject go in friendlyGameObjectsList)
+				curHp+=go.GetComponent<FriendlyShuttleBehaviour>().hp;
+			
+			float perc = ((float)curHp)/((float)totalHp)*100.0f;
+			int stars=1;
+			if(perc>=Templates.StarsSettings.oneStar && perc < Templates.StarsSettings.threeStar)
+				stars=2;
+			else if(perc>=Templates.StarsSettings.threeStar)
+				stars=3;
+			else
+				stars=1;
+			
+			EndLevel();
+			cam.GetComponent<CameraBehaviour>().nextLevelWindow(stars,curLevel+1);
 		}
 		else if(getFriendlyShuttles().Length==0 && getEnemyShuttles().Length==0)
-			Debug.Log("DRAW!");
+		{
+			EndLevel();
+			cam.GetComponent<CameraBehaviour>().nextLevelWindow(0,curLevel+1);
+		}
 			
 		
+	}
+	
+	public void setThorpedesAndRocketsAbils()
+	{
+		foreach(GameObject g in friendlyGameObjectsList)
+		{
+			g.GetComponent<FriendlyShuttleBehaviour>().setActiveRocketAbil();
+			g.GetComponent<FriendlyShuttleBehaviour>().setActiveThorpedeAbil();
+		}
 	}
 	
 	public void registerMine(GameObject o)

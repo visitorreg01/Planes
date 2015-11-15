@@ -23,6 +23,8 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	bool rocketSpawned=false;
 	bool thorpedeSpawned=false;
 	
+	private ArrayList trackDots = new ArrayList();
+	
 	int preferencedDirection=0; // 0 - bez raznicy, -1 left, -right
 	
 		//DEBUG
@@ -65,7 +67,6 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	public void StepStart()
 	{
-		calculateMovePosition();
 		if(earnedDefect)
 			defectInUse=true;
 	}
@@ -150,8 +151,13 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 				if(activeAbil==Abilities.AbilityType.halfRoundTurn || activeAbil==Abilities.AbilityType.turnAround)
 				{
 					GameObject ff = GameStorage.getInstance().getNearbyFriendly(gameObject);
-					if(Vector2.Distance(new Vector2(ff.transform.position.x,ff.transform.position.z),new Vector2(transform.position.x,transform.position.z))>Abilities.aiUse180360abilitiesRange)
-						activeAbil=prevAbil;
+					if(ff!=null)
+					{
+						if(Vector2.Distance(new Vector2(ff.transform.position.x,ff.transform.position.z),new Vector2(transform.position.x,transform.position.z))>Abilities.aiUse180360abilitiesRange)
+							activeAbil=prevAbil;
+						else
+							AbilitySwitched();
+					}
 					else
 						AbilitySwitched();
 				}
@@ -216,7 +222,6 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			
 			x=(1-t)*(1-t)*(1-t)*point1.x+3*(1-t)*(1-t)*t*point2.x+3*(1-t)*t*t*point3.x+t*t*t*point4.x;
 			y=(1-t)*(1-t)*(1-t)*point1.y+3*(1-t)*(1-t)*t*point2.y+3*(1-t)*t*t*point3.y+t*t*t*point4.y;
-			Vector2 pos = new Vector2(x-transform.position.x,y-transform.position.z);
 			
 			if(activeAbil==Abilities.AbilityType.halfRoundTurn)
 				angle=Mathf.Repeat(angle+(180/3*Time.deltaTime*turnRotateDir),360);
@@ -224,6 +229,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 				angle=Mathf.Repeat(angle+(360/3*Time.deltaTime*turnRotateDir),360);
 			else
 			{
+				Vector2 pos = new Vector2(x-transform.position.x,y-transform.position.z);
 				float nAngle;
 				Vector2 v1 = new Vector2(0,5);
 				float mySinPhi = (v1.x*pos.y - v1.y*pos.x);
@@ -235,8 +241,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 				{
 					if(routeDist>=gasSpawned*Abilities.GasParameters.betweenDist)
 					{
-						GameObject go = (GameObject) Instantiate(Resources.Load("prefab/gasPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
-						go.GetComponent<GasBehaviour>().enemy=true;
+						Instantiate(Resources.Load("prefab/gasPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
 						gasSpawned++;
 					}
 					routeDist+=pos.magnitude;
@@ -256,8 +261,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 				{
 					if(t>=1.0/3.0)
 					{
-						GameObject go = (GameObject) Instantiate(Resources.Load("prefab/rocketPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
-						go.GetComponent<RocketBehaviour>().enemy=true;
+						Instantiate(Resources.Load("prefab/rocketPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
 						rocketSpawned=true;
 					}
 				}
@@ -265,8 +269,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 				{
 					if(t>=1.0/3.0)
 					{
-						GameObject go = (GameObject) Instantiate(Resources.Load("prefab/thorpedePrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
-						go.GetComponent<ThorpedeBehaviour>().enemy=true;
+						Instantiate(Resources.Load("prefab/thorpedePrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
 						thorpedeSpawned=true;
 					}
 				}
@@ -298,6 +301,8 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	void Start () {
 		GameStorage.getInstance().addEnemyShuttle(this.gameObject);
 		temp = Templates.getInstance().getPlaneTemplate(Template);
+		LineRenderer lr = gameObject.AddComponent<LineRenderer>();
+		lr.SetWidth(0.05f, 0.05f);
 		GameObject gD;
 		int gunsl=0,gunsr=0;
 		foreach(Templates.GunOnShuttle goss in temp.guns)
@@ -318,6 +323,11 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
+		if(GameStorage.getInstance().isDebug)
+			DrawLine();
+		else
+			clearLine();
+		
 		for(int i = 0;i<shuttleGunsMeshes.Count;i++)
 		{
 			GameObject goss = (GameObject) shuttleGunsMeshes[i];
@@ -339,7 +349,8 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			needToUpdateAngle=false;
 		}
 		angle=Mathf.Repeat(angle,360);
-		
+		if(!GameStorage.getInstance().isRunning)
+			calculateMovePosition();
 		if(isMouseOver(gameObject))
 			focused=true;
 		else
@@ -399,9 +410,8 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 		GameObject target = GameStorage.getInstance().getNearbyFriendly(gameObject);
 		if(target!=null)
 		{
-			float p = UnityEngine.Random.Range(0,100);
 			GameObject ast = GameStorage.getInstance().getNearestAsteroid(gameObject);
-			if(p>33 && ast!=null)
+			if(ast!=null)
 			{	
 				if(Vector2.Distance(new Vector2(ast.GetComponent<Collider>().ClosestPointOnBounds(transform.position).x,ast.GetComponent<Collider>().ClosestPointOnBounds(transform.position).z),new Vector2(transform.position.x,transform.position.z))<= temp.maxRange+1)
 				{
@@ -419,6 +429,24 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 						chVec=leftVec;
 					else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
 						chVec=rightVec;
+					else if(activeAbil==Abilities.AbilityType.halfRoundTurn)
+					{
+						chVec=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*0.7f);
+						chVec+=new Vector2(transform.position.x,transform.position.z);
+					}
+					else if(activeAbil==Abilities.AbilityType.turnAround)
+					{
+						if(d1>=d2)
+						{
+							chVec=leftVec/=leftVec.magnitude*((temp.minRange+temp.maxRange)/2.0f);
+							chVec+=new Vector2(transform.position.x,transform.position.z);
+						}
+						else
+						{
+							chVec=rightVec/=rightVec.magnitude*((temp.minRange+temp.maxRange)/2.0f);
+							chVec+=new Vector2(transform.position.x,transform.position.z);
+						}
+					}
 					else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn))
 					{
 						chVec=Quaternion.Euler(0,0,-angle)*new Vector2(0,UnityEngine.Random.Range(temp.minRange,temp.maxRange));
@@ -468,7 +496,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 						nnewAngle=Mathf.Repeat(getAngle()-UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
 					else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
 						nnewAngle=Mathf.Repeat(getAngle()+UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
-					else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn) || activeAbil==Abilities.AbilityType.halfRoundTurn || activeAbil==Abilities.AbilityType.turnAround)
+					else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn) || activeAbil==Abilities.AbilityType.halfRoundTurn)
 						nnewAngle=getAngle();
 					else
 					{
@@ -532,7 +560,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 					nnewAngle=Mathf.Repeat(getAngle()-UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
 				else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurnLeft))
 					nnewAngle=Mathf.Repeat(getAngle()+UnityEngine.Random.Range(temp.maxTurnAngle/2,temp.maxTurnAngle),360);
-				else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn) || activeAbil==Abilities.AbilityType.halfRoundTurn || activeAbil==Abilities.AbilityType.turnAround)
+				else if(earnedDefect && curDefect.GetType() == typeof(Defects.DisableTurn) || activeAbil==Abilities.AbilityType.halfRoundTurn)
 					nnewAngle=getAngle();
 				else
 				{
@@ -579,21 +607,51 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 				if(viewGO!=null)
 					viewGO.transform.position=new Vector3(movePoint.x,0,movePoint.y);
 			}
+			
 			point1=new Vector2(transform.position.x,transform.position.z);
 			if(activeAbil==Abilities.AbilityType.doubleThrottle)
-				point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*2*Mathf.Abs(GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange/2)*temp.lowerSmooth;
+				point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*2*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange/2)*temp.lowerSmooth;
 			else
-				point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange)*temp.lowerSmooth;
+				point2=Quaternion.Euler(0,0,-angle)*new Vector2(0,temp.minRange*Mathf.Abs(getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle)*Vector2.Distance(point1,point4)/temp.maxRange)*temp.lowerSmooth;
 			point2+=point1;
 			point4=new Vector2(movePoint.x,movePoint.y);
 			Vector2 pointz = new Vector2(point4.x-point2.x,point4.y-point2.y)/2;
 			if(activeAbil==Abilities.AbilityType.doubleThrottle)
-				point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle*Vector2.Distance(point1,point4)/temp.maxRange/2*temp.upperSmooth;
+				point3 = new Vector2(pointz.y,-pointz.x)*getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle*Vector2.Distance(point1,point4)/temp.maxRange/2*temp.upperSmooth;
 			else
-				point3 = new Vector2(pointz.y,-pointz.x)*GameStorage.getInstance().getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle*Vector2.Distance(point1,point4)/temp.maxRange*temp.upperSmooth;
+				point3 = new Vector2(pointz.y,-pointz.x)*getAngleDst(angle,getAttackIconAngle())/temp.maxTurnAngle*Vector2.Distance(point1,point4)/temp.maxRange*temp.upperSmooth;
 			
 			point3 = point3+point2+pointz;
+			
+			if(GameStorage.getInstance().isDebug)
+			{
+				trackDots.Clear();
+				float x,y,tt;
+				float step = 0.001f;
+				for(tt=0f;tt<=1;tt+=step)
+				{
+					x = Mathf.Pow((1-tt),3)*point1.x+3*(1-tt)*(1-tt)*tt*point2.x+3*(1-tt)*tt*tt*point3.x+tt*tt*tt*point4.x;
+					y = Mathf.Pow((1-tt),3)*point1.y+3*(1-tt)*(1-tt)*tt*point2.y+3*(1-tt)*tt*tt*point3.y+tt*tt*tt*point4.y;
+					trackDots.Add(new Vector2(x,y));
+				}      
+			}   
 		}
+	}
+	
+	private float getAngleDst(float fr, float to)
+	{
+		Vector2 v1 = Quaternion.Euler(0,0,fr)*new Vector2(0,5);
+		Vector2 v2 = Quaternion.Euler(0,0,to)*new Vector2(0,5);
+		
+		float sin = (v1.x*v2.y - v1.y*v2.x);
+		float a = fr-to;
+		if(Mathf.Abs(a)>180)
+			a=360-Mathf.Abs(a);
+		
+		if(sin>0)
+			return -Mathf.Abs(a);
+		else
+			return Mathf.Abs(a);
 	}
 	
 	private bool isMouseOver(GameObject o)
@@ -604,5 +662,22 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
     		return hit.collider.gameObject==o;
     	}
     	return false;
+	}
+	
+	
+	//DEBUG
+	private void clearLine()
+	{
+		LineRenderer lr = gameObject.GetComponent<LineRenderer>();
+		lr.SetVertexCount(0);
+	}
+	
+	private void DrawLine()
+	{
+		LineRenderer lr = gameObject.GetComponent<LineRenderer>();
+		lr.SetVertexCount(trackDots.Count);
+		int i;
+		for(i=0;i<trackDots.Count;i++)
+			lr.SetPosition(i,new Vector3(((Vector2)trackDots[i]).x,5,((Vector2)trackDots[i]).y));
 	}
 }

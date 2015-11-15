@@ -15,6 +15,11 @@ public class Templates {
 	private GUISkin[] abilitySkins = new GUISkin[9];
 	private GUISkin[] abilityDisabledSkins = new GUISkin[9];
 	
+	public static class StarsSettings {
+		public static int oneStar=60;
+		public static int threeStar=80;
+	}
+	
 	public enum PlaneTemplates : int
 	{
 		default_class=1,
