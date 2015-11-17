@@ -21,7 +21,7 @@ public class ThorpedeBehaviour : MonoBehaviour {
 	
 	bool spawned=true;
 	
-	bool selected=false;
+	public bool selected=false;
 	
 	void Start () {
 		GameStorage.getInstance().registerThorpedeUnit(this.gameObject);
@@ -38,7 +38,7 @@ public class ThorpedeBehaviour : MonoBehaviour {
 	
 	private void updateAttackIconPosition()
 	{
-		float ds = (Abilities.ThorpedeParameters.maxRange-Abilities.ThorpedeParameters.minRange)/2+Abilities.ThorpedeParameters.minRange;
+		float ds = Abilities.ThorpedeParameters.maxRange;
 		Vector2 vec =Quaternion.Euler(0,0,-angle)*(new Vector2(0,1)*ds);
 		attackIcon.transform.position=new Vector3(vec.x+transform.position.x,0,vec.y+transform.position.z);
 	}

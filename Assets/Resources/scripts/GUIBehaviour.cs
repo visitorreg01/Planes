@@ -90,17 +90,6 @@ public class GUIBehaviour : MonoBehaviour {
 		if(GUI.Button(new Rect(20+32+10,Screen.height-20-32,32,32),""))
 			GameStorage.getInstance().nextShipFocus();
 		
-		if(GameStorage.getInstance().isRunning)
-		{
-			GUI.skin=buttonChargeGrey;
-			GUI.Button(new Rect(20+16+6,Screen.height-20-32-5-32,32,32),"");
-		}
-		else
-		{
-			GUI.skin=buttonCharge;
-			if(GUI.Button(new Rect(20+16+6,Screen.height-20-32-5-32,32,32),""))
-				GameStorage.getInstance().setAllShipsMaxTraec();
-		}
 		GUI.skin=null;
 		if(GUI.Button(new Rect(50,50,20,20),"D"))
 			GameStorage.getInstance().isDebug=!GameStorage.getInstance().isDebug;

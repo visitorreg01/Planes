@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <levels>
-	<level num="1" levelName="This is level one" file="mission1"/>
+	<level num="1" levelName="This is level one" file="mission1" rankReached="0"/>
 	<level num="2" levelName="This is level two" file="mission2"/>
 	<level num="3" levelName="This is level two" file="mission3"/>
 	<level num="4" levelName="This is level two" file="mission4"/>

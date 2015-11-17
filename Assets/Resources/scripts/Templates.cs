@@ -57,14 +57,18 @@ public class Templates {
 	private ArrayList planeClasses;
 	private ArrayList gunClasses;
 	private ArrayList levelList;
+	private ArrayList ranksList;
 	private string planeTempFolder="xml/planes";
 	private string gunTempFolder="xml/guns";
 	private string levelsFolder = "levels";
+	private string ranksFolder = "xml";
 	
 	public Templates()
 	{
 		planeClasses=new ArrayList();
 		LoadPlaneClasses();
+		ranksList=new ArrayList();
+		loadRanks();
 		gunClasses=new ArrayList();
 		LoadGunClasses();
 		levelList=new ArrayList();
@@ -121,6 +125,13 @@ public class Templates {
 		GameStorage.getInstance().allReady=true;
 	}
 	
+	public class Rank
+	{
+		public int id;
+		public string name;
+		// maybe ico
+	}
+	
 	public class GunOnShuttle
 	{
 		public int gunId;
@@ -147,6 +158,7 @@ public class Templates {
 	{
 		public int num;
 		public string levelName,file;
+		public int rankReached=-1;
 	}
 	
 	public class GunTemplate
@@ -205,6 +217,16 @@ public class Templates {
 		return null;
 	}
 	
+	public Rank getRank(int id)
+	{
+		foreach(Rank p in ranksList)
+		{
+			if(p.id==(int)id)
+				return p;
+		}
+		return null;
+	}
+	
 	public LevelInfo getLevel(int num)
 	{
 		foreach(LevelInfo l in levelList)
@@ -241,6 +263,8 @@ public class Templates {
 								li.levelName=l.Value;
 							else if(l.Name=="file")
 								li.file=l.Value;
+							else if(l.Name=="rankReached")
+								li.rankReached=int.Parse(l.Value);
 						}
 						levelList.Add(li);
 					}
@@ -248,6 +272,34 @@ public class Templates {
 			}
 		}
 		Debug.Log("Loaded "+levelList.Count+" levels.");
+	}
+	
+	private void loadRanks()
+	{
+		XmlDocument doc = new XmlDocument();
+		doc.LoadXml(((TextAsset) Resources.Load(ranksFolder+"/ranks")).text);
+		foreach(XmlNode x in doc.ChildNodes)
+		{
+			if(x.Name=="ranks")
+			{
+				foreach(XmlNode m in x.ChildNodes)
+				{
+					if(m.Name=="rank")
+					{
+						Rank li = new Rank();
+						foreach(XmlNode l in m.Attributes)
+						{
+							if(l.Name=="id")
+								li.id=int.Parse(l.Value);
+							else if(l.Name=="name")
+								li.name=l.Value;
+						}
+						ranksList.Add(li);
+					}
+				}
+			}
+		}
+		Debug.Log("Loaded "+ranksList.Count+" ranks.");
 	}
 	
 	public PlaneTemplate getPlaneTemplate(int id)

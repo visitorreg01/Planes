@@ -33,6 +33,7 @@ public class GameStorage {
 	private ArrayList thorpedeRemoveList;
 	private ArrayList asteroidsList;
 	private ArrayList minesList;
+	private ArrayList minesRemoveList;
 	
 	public bool overlap=false;
 	
@@ -52,6 +53,7 @@ public class GameStorage {
 		thorpedeRemoveList = new ArrayList();
 		asteroidsList = new ArrayList();
 		minesList = new ArrayList();
+		minesRemoveList = new ArrayList();
 	}
 	
 	public void setAllShipsMaxTraec()
@@ -111,6 +113,19 @@ public class GameStorage {
 				gasRemoveList.Add(f);
 		}
 		
+		minesRemoveList.Clear();
+		foreach(GameObject f in minesList)
+		{
+			if(f.GetComponent<MineBehaviour>().updateStepCounter()==Abilities.MinesParameters.lifeTimeRounds)
+				minesRemoveList.Add(f);
+		}
+		
+		foreach(GameObject f in minesRemoveList)
+		{
+			minesRemoveList.Remove(f);
+			f.GetComponent<MineBehaviour>().Die();
+		}
+		
 		foreach(GameObject f in gasRemoveList)
 		{
 			gasList.Remove(f);
@@ -141,9 +156,6 @@ public class GameStorage {
 			thorpedeList.Remove(f);
 			f.GetComponent<ThorpedeBehaviour>().Die();
 		}
-		
-		foreach(GameObject f in minesList)
-			f.GetComponent<MineBehaviour>().StepEnd();
 		
 		
 		if(getFriendlyShuttles().Length==0 && getEnemyShuttles().Length>0)

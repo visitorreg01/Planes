@@ -148,21 +148,22 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			{
 				prevAbil=activeAbil;
 				activeAbil=(Abilities.AbilityType) temp.abilities[UnityEngine.Random.Range(0,temp.abilities.Count)];
+				
 				if(activeAbil==Abilities.AbilityType.halfRoundTurn || activeAbil==Abilities.AbilityType.turnAround)
 				{
 					GameObject ff = GameStorage.getInstance().getNearbyFriendly(gameObject);
 					if(ff!=null)
 					{
 						if(Vector2.Distance(new Vector2(ff.transform.position.x,ff.transform.position.z),new Vector2(transform.position.x,transform.position.z))>Abilities.aiUse180360abilitiesRange)
+						{
 							activeAbil=prevAbil;
-						else
-							AbilitySwitched();
+							return;
+						}
 					}
-					else
-						AbilitySwitched();
 				}
-				else
-					AbilitySwitched();
+				
+				AbilitySwitched();
+				Debug.Log(activeAbil);
 			}
 		}
 	}
@@ -241,7 +242,8 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 				{
 					if(routeDist>=gasSpawned*Abilities.GasParameters.betweenDist)
 					{
-						Instantiate(Resources.Load("prefab/gasPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						GameObject go = (GameObject) Instantiate(Resources.Load("prefab/gasPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						go.GetComponent<GasBehaviour>().enemy=true;
 						gasSpawned++;
 					}
 					routeDist+=pos.magnitude;
@@ -252,24 +254,29 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 					{
 						GameObject mine = (GameObject) Instantiate(Resources.Load("prefab/minePrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
 						mine.GetComponent<MineBehaviour>().cur=minesSpawned;
+						mine.GetComponent<MineBehaviour>().enemy=true;
 						minesList.Add(mine);
 						minesSpawned++;
 					}
 					routeDist+=pos.magnitude;
 				}
+	
 				if(activeAbil==Abilities.AbilityType.homingMissle && !rocketSpawned)
 				{
 					if(t>=1.0/3.0)
 					{
-						Instantiate(Resources.Load("prefab/rocketPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						GameObject go = (GameObject) Instantiate(Resources.Load("prefab/rocketPrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						go.GetComponent<RocketBehaviour>().enemy=true;
 						rocketSpawned=true;
 					}
 				}
 				if(activeAbil==Abilities.AbilityType.homingThorpede && !thorpedeSpawned)
 				{
+					
 					if(t>=1.0/3.0)
 					{
-						Instantiate(Resources.Load("prefab/thorpedePrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						GameObject go = (GameObject) Instantiate(Resources.Load("prefab/thorpedePrefab") as GameObject,transform.position,Quaternion.Euler(0,angle,0));
+						go.GetComponent<ThorpedeBehaviour>().enemy=true;
 						thorpedeSpawned=true;
 					}
 				}
@@ -351,10 +358,6 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 		angle=Mathf.Repeat(angle,360);
 		if(!GameStorage.getInstance().isRunning)
 			calculateMovePosition();
-		if(isMouseOver(gameObject))
-			focused=true;
-		else
-			focused=false;
 		
 		if(GameStorage.getInstance().isRunning)
 			Accelerate();
@@ -653,17 +656,6 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 		else
 			return Mathf.Abs(a);
 	}
-	
-	private bool isMouseOver(GameObject o)
-	{
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-    	RaycastHit hit;
-    	if (Physics.Raycast(ray, out hit)){
-    		return hit.collider.gameObject==o;
-    	}
-    	return false;
-	}
-	
 	
 	//DEBUG
 	private void clearLine()

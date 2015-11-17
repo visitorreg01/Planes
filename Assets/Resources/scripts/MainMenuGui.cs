@@ -40,6 +40,14 @@ public class MainMenuGui : MonoBehaviour {
 					PlayerPrefs.SetInt("level"+j+"Stars",3);
 			}
 			
+			string current_rank="";
+			int currentRankId=PlayerPrefs.GetInt("currentRankId",-1);
+			if(currentRankId==-1)
+				current_rank="No ranked";
+			else
+				current_rank=Templates.getInstance().getRank(currentRankId).name;
+			GUI.Label(new Rect(Screen.width-5-200,10,200,30),"Current Rank: "+current_rank);
+			
 			if(GUI.Button(new Rect(110,5,100,20),"null"))
 			{
 				PlayerPrefs.DeleteAll();

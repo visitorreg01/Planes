@@ -21,7 +21,7 @@ public class RocketBehaviour : MonoBehaviour {
 	
 	bool spawned=true;
 	
-	bool selected=false;
+	public bool selected=false;
 	
 	void Start () {
 		GameStorage.getInstance().registerRocketUnit(this.gameObject);
@@ -39,7 +39,7 @@ public class RocketBehaviour : MonoBehaviour {
 	
 	private void updateAttackIconPosition()
 	{
-		float ds = (Abilities.RocketParameters.maxRange-Abilities.RocketParameters.minRange)/2+Abilities.RocketParameters.minRange;
+		float ds = Abilities.RocketParameters.maxRange;
 		Vector2 vec =Quaternion.Euler(0,0,-angle)*(new Vector2(0,1)*ds);
 		attackIcon.transform.position=new Vector3(vec.x+transform.position.x,0,vec.y+transform.position.z);
 	}
