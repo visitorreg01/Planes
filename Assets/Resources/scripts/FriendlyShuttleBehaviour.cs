@@ -630,6 +630,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		lr.SetVertexCount(0);
 	}
 	
+	public bool cancelMouseDrop()
+	{
+		return !(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist+clickDistAccuracy*GameStorage.getInstance().zoom);
+	}
+	
 	public void checkShuttleClickState()
 	{
 		if(!GameStorage.getInstance().overlap)

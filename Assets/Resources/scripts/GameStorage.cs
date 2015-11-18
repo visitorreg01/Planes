@@ -113,24 +113,12 @@ public class GameStorage {
 				gasRemoveList.Add(f);
 		}
 		
-		minesRemoveList.Clear();
-		foreach(GameObject f in minesList)
-		{
-			if(f.GetComponent<MineBehaviour>().updateStepCounter()==Abilities.MinesParameters.lifeTimeRounds)
-				minesRemoveList.Add(f);
-		}
-		
-		foreach(GameObject f in minesRemoveList)
-		{
-			minesRemoveList.Remove(f);
-			f.GetComponent<MineBehaviour>().Die();
-		}
-		
 		foreach(GameObject f in gasRemoveList)
 		{
 			gasList.Remove(f);
 			f.GetComponent<GasBehaviour>().Die();
 		}
+		
 		rocketRemoveList.Clear();
 		foreach(GameObject f in GameStorage.getInstance().getRocketUnits())
 		{
@@ -155,6 +143,19 @@ public class GameStorage {
 		{
 			thorpedeList.Remove(f);
 			f.GetComponent<ThorpedeBehaviour>().Die();
+		}
+		
+		minesRemoveList.Clear();
+		foreach(GameObject f in GameStorage.getInstance().getMinesList())
+		{
+			if(f.GetComponent<MineBehaviour>().updateStepCounter()==Abilities.MinesParameters.lifeTimeRounds)
+				minesRemoveList.Add(f);
+		}
+		
+		foreach(GameObject f in minesRemoveList)
+		{
+			minesList.Remove(f);
+			f.GetComponent<MineBehaviour>().Die();
 		}
 		
 		
@@ -507,6 +508,11 @@ public class GameStorage {
 	public ArrayList getThorpedeUnits()
 	{
 		return thorpedeList;
+	}
+	
+	public ArrayList getMinesList()
+	{
+		return minesList;
 	}
 	
 	

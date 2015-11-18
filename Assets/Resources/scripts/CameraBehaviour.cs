@@ -23,6 +23,7 @@ public class CameraBehaviour : MonoBehaviour {
 	private GameObject currentSelected=null;
 	
 	bool showNextLevelWindow = false;
+	bool showPause=false;
 	int stars=0,nextLevel=0;
 	
 	void Start () {
@@ -122,7 +123,17 @@ public class CameraBehaviour : MonoBehaviour {
 		{
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 	    	RaycastHit hit;
-	    	if(currentSelected!=null) dropSelection(currentSelected);
+	    	if(currentSelected!=null)
+	    	{
+	    		if(currentSelected.GetComponent<FriendlyShuttleBehaviour>()!=null)
+	    		{
+	    			if(currentSelected.GetComponent<FriendlyShuttleBehaviour>().cancelMouseDrop())
+	    				return;
+	    		}
+	    		else
+	    			dropSelection(currentSelected);
+	    	}
+	    	
 	    	if (Physics.Raycast(ray, out hit))
 	    	{
 	    		currentSelected=hit.collider.gameObject;
@@ -137,6 +148,7 @@ public class CameraBehaviour : MonoBehaviour {
 	{
 		if(showNextLevelWindow)
 		{
+			showPause=false;
 			GameStorage.getInstance().overlap=true;
 			GUI.depth=200;
 			
@@ -213,6 +225,46 @@ public class CameraBehaviour : MonoBehaviour {
 			GUI.depth=GameStorage.getInstance().defaultDepth;
 		}
 		
+		if(showPause)
+		{
+			GameStorage.getInstance().overlap=true;
+			GUI.depth=200;
+			GUI.Box(new Rect(0,0,Screen.width,Screen.height),"");
+			int boxW=Screen.width/100*20;
+			int boxH=Screen.height/100*40;
+			string boxLabel="Game Pause";
+			GUI.Box(new Rect(Screen.width/2-boxW/2,Screen.height/2-boxH/2,boxW,boxH),boxLabel);
+			int buttonH,buttonW;
+			buttonW=boxW/3-10;
+			buttonH=boxH/100*20;
+			
+			if(GUI.Button(new Rect(Screen.width/2-boxW/2+5,Screen.height/2+boxH/2-5-buttonH,buttonW,buttonH),"Main Menu"))
+			{
+				GameStorage.getInstance().overlap=false;
+				showPause=false;
+				GameStorage.getInstance().EndLevel();
+				Application.LoadLevel("mainGui");
+			}
+			
+			if(GUI.Button(new Rect(Screen.width/2-boxW/2+15+buttonW,Screen.height/2+boxH/2-5-buttonH,buttonW,buttonH),"Reply"))
+			{
+				GameStorage.getInstance().overlap=false;
+				showPause=false;
+				GameStorage.getInstance().EndLevel();
+				GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel(GameStorage.getInstance().curLevel));
+			}
+			
+			if(GUI.Button(new Rect(Screen.width/2-boxW/2+25+buttonW*2,Screen.height/2+boxH/2-5-buttonH,buttonW,buttonH),"Continue"))
+			{
+				GameStorage.getInstance().overlap=false;
+				showPause=false;
+			}
+		}
+	}
+	
+	public void gamePause()
+	{
+		showPause=true;
 	}
 	
 	public void nextLevelWindow(int stars, int nextLevel)

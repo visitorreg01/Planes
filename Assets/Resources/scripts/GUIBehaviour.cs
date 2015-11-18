@@ -50,6 +50,9 @@ public class GUIBehaviour : MonoBehaviour {
 		
 		GUI.enabled=!GameStorage.getInstance().overlap;
 		
+		if(GUI.Button(new Rect(Screen.width-20-32-10-32,20,32,32),"II"))
+			GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().gamePause();
+		
 		if(GameStorage.getInstance().isRunning)
 		{
 			GUI.skin=buttonPlayGrey;
