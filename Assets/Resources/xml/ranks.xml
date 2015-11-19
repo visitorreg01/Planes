@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ranks>
-	<rank id="0" name="Recruiter"/>
+	<rank id="0" name="Lieutenant Junior Grade"/>
+	<rank id="1" name="Lieutenant"/>
+	<rank id="2" name="Lieutenant Commander"/>
+	<rank id="3" name="Commander"/>
+	<rank id="4" name="Captain"/>
+	<rank id="5" name="Rear Admiral"/>
+	<rank id="6" name="Vice Admiral"/>
+	<rank id="7" name="Admiral"/>
+	<rank id="8" name="Grand Admiral"/>
 </ranks>
