@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<campaigns>
+	<campaign id="0" name="Campaign one">
+		<level id="1"/>
+		<level id="24"/>
+	</campaign>
+	<campaign id="1" name="Campaign two">
+		<level id="3"/>
+		<level id="4"/>
+		<level id="5"/>
+	</campaign>
+</campaigns>

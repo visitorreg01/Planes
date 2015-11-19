@@ -155,7 +155,7 @@ public class CameraBehaviour : MonoBehaviour {
 			GUI.Box(new Rect(0,0,Screen.width,Screen.height),"");
 			int boxW=Screen.width/100*20;
 			int boxH=Screen.height/100*40;
-			string boxLabel="End mission "+(nextLevel-1)+"\n";
+			string boxLabel="End mission "+(MainMenuGui.playedLevelIndex+1)+"\n";
 			
 			if(stars==-1)
 				boxLabel+="LOSE!";
@@ -170,7 +170,8 @@ public class CameraBehaviour : MonoBehaviour {
 			GUI.Box(new Rect(Screen.width/2-boxW/2,Screen.height/2-boxH/2,boxW,boxH),boxLabel);
 			int buttonH,buttonW;
 			buttonH=boxH/100*20;
-			if(stars==-1 || nextLevel==31) buttonW=boxW/2-10;
+			
+			if(stars==-1 || MainMenuGui.playedLevelIndex+1==MainMenuGui.selectedCampaign.levels.Count) buttonW=boxW/2-10;
 			else buttonW=boxW/3-10;
 			
 			if(stars==-1 || stars==0)
@@ -179,24 +180,25 @@ public class CameraBehaviour : MonoBehaviour {
 				{
 					GameStorage.getInstance().overlap=false;
 					showNextLevelWindow=false;
+					MainMenuGui.nextMenu=MainMenuGui.GuiCategories.LevelsMenu;
 					Application.LoadLevel("mainGui");
 				}
 				if(GUI.Button(new Rect(Screen.width/2-boxW/2+15+buttonW,Screen.height/2+boxH/2-buttonH-5,buttonW,buttonH),"Reply"))
 				{
 					GameStorage.getInstance().overlap=false;
 					showNextLevelWindow=false;
-					GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel(nextLevel-1));
+					GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]));
 				}
 			}
 			else
 			{
-				int maxStars = PlayerPrefs.GetInt("level"+(nextLevel-2)+"Stars",0);
+				int maxStars = PlayerPrefs.GetInt("level"+((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex])+"Stars",0);
 				if(maxStars==0)
-					PlayerPrefs.SetInt("level"+(nextLevel-2)+"Stars",stars);
+					PlayerPrefs.SetInt("level"+((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex])+"Stars",stars);
 				else
 				{
 					if(maxStars<stars)
-						PlayerPrefs.SetInt("level"+(nextLevel-2)+"Stars",stars);
+						PlayerPrefs.SetInt("level"+((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex])+"Stars",stars);
 				}
 				PlayerPrefs.Save();
 				
@@ -204,21 +206,22 @@ public class CameraBehaviour : MonoBehaviour {
 				{
 					GameStorage.getInstance().overlap=false;
 					showNextLevelWindow=false;
+					MainMenuGui.nextMenu=MainMenuGui.GuiCategories.LevelsMenu;
 					Application.LoadLevel("mainGui");
 				}
 				if(GUI.Button(new Rect(Screen.width/2-boxW/2+15+buttonW,Screen.height/2+boxH/2-buttonH-5,buttonW,buttonH),"Reply"))
 				{
 					GameStorage.getInstance().overlap=false;
 					showNextLevelWindow=false;
-					GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel(nextLevel-1));
+					GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]));
 				}
-				if(nextLevel!=31)
+				if(MainMenuGui.playedLevelIndex+1!=MainMenuGui.selectedCampaign.levels.Count)
 				{
 					if(GUI.Button(new Rect(Screen.width/2-boxW/2+25+buttonW*2,Screen.height/2+boxH/2-buttonH-5,buttonW,buttonH),"Next level"))
 					{
 						GameStorage.getInstance().overlap=false;
 						showNextLevelWindow=false;
-						GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel(nextLevel));
+						GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex+1]));
 					}
 				}
 			}
@@ -243,7 +246,9 @@ public class CameraBehaviour : MonoBehaviour {
 				GameStorage.getInstance().overlap=false;
 				showPause=false;
 				GameStorage.getInstance().EndLevel();
+				MainMenuGui.nextMenu=MainMenuGui.GuiCategories.LevelsMenu;
 				Application.LoadLevel("mainGui");
+				
 			}
 			
 			if(GUI.Button(new Rect(Screen.width/2-boxW/2+15+buttonW,Screen.height/2+boxH/2-5-buttonH,buttonW,buttonH),"Reply"))
@@ -251,7 +256,7 @@ public class CameraBehaviour : MonoBehaviour {
 				GameStorage.getInstance().overlap=false;
 				showPause=false;
 				GameStorage.getInstance().EndLevel();
-				GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel(GameStorage.getInstance().curLevel));
+				GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]));
 			}
 			
 			if(GUI.Button(new Rect(Screen.width/2-boxW/2+25+buttonW*2,Screen.height/2+boxH/2-5-buttonH,buttonW,buttonH),"Continue"))
@@ -267,15 +272,14 @@ public class CameraBehaviour : MonoBehaviour {
 		showPause=true;
 	}
 	
-	public void nextLevelWindow(int stars, int nextLevel)
+	public void nextLevelWindow(int stars)
 	{
 		this.stars=stars;
-		this.nextLevel=nextLevel;
 		showNextLevelWindow=true;
 		if(stars>0)
 		{
 			currentRankId=PlayerPrefs.GetInt("currentRankId",-1);
-			reachedRankId=Templates.getInstance().getLevel(nextLevel-1).rankReached;
+			reachedRankId=Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]).rankReached;
 			if(reachedRankId>=0)
 			{
 				if(currentRankId<reachedRankId)

@@ -44,6 +44,8 @@ public class Templates {
 
 	};
 	
+
+	
 	public enum GunTemplates : int
 	{
 		default_gun=1,
@@ -58,10 +60,15 @@ public class Templates {
 	private ArrayList gunClasses;
 	private ArrayList levelList;
 	private ArrayList ranksList;
+	private ArrayList campaignsList;
 	private string planeTempFolder="xml/planes";
 	private string gunTempFolder="xml/guns";
 	private string levelsFolder = "levels";
 	private string ranksFolder = "xml";
+	
+	public GUISkin button_level = null;
+	public GUISkin button_level_selected = null;
+	public GUISkin button_level_start = null;
 	
 	public Templates()
 	{
@@ -73,8 +80,19 @@ public class Templates {
 		LoadGunClasses();
 		levelList=new ArrayList();
 		loadLevels();
+		campaignsList=new ArrayList();
+		loadCampaigns();
+		
 		loadAbilityIcons();
+		loadLevelsSkins();
 		Loaded();
+	}
+	
+	private void loadLevelsSkins()
+	{
+		button_level = (GUISkin) Resources.Load("gui/skins/button_level");
+		button_level_selected = (GUISkin) Resources.Load("gui/skins/button_level_selected");
+		button_level_start = (GUISkin) Resources.Load("gui/skins/button_level_start");
 	}
 	
 	private void loadAbilityIcons()
@@ -98,6 +116,49 @@ public class Templates {
 		abilityDisabledSkins[6]=(GUISkin) Resources.Load("gui/skins/ability_shield_grey");
 		abilityDisabledSkins[7]=(GUISkin) Resources.Load("gui/skins/ability_thorpede_grey");
 		abilityDisabledSkins[8]=(GUISkin) Resources.Load("gui/skins/ability_mines_grey");
+	}
+	
+	private void loadCampaigns()
+	{
+		XmlDocument doc = new XmlDocument();
+		doc.LoadXml(((TextAsset) Resources.Load(levelsFolder+"/campaigns")).text);
+		foreach(XmlNode x in doc.ChildNodes)
+		{
+			if(x.Name=="campaigns")
+			{
+				foreach(XmlNode m in x.ChildNodes)
+				{
+					if(m.Name=="campaign")
+					{
+						CampaignInfo li = new CampaignInfo();
+						foreach(XmlNode l in m.Attributes)
+						{
+							if(l.Name=="id")
+								li.id=int.Parse(l.Value);
+							else if(l.Name=="name")
+								li.name=l.Value;
+						}
+						
+						foreach(XmlNode l in m.ChildNodes)
+						{
+							int levelNum=-1;
+							if(l.Name=="level")
+							{
+								foreach(XmlNode b in l.Attributes)
+								{
+									if(b.Name=="id")
+										levelNum=int.Parse(b.Value);
+								}
+							}
+							li.levels.Add(levelNum);
+						}
+						
+						campaignsList.Add(li);
+					}
+				}
+			}
+		}
+		Debug.Log("Loaded "+campaignsList.Count+" campaigns.");
 	}
 	
 	public GUISkin getAbilityIcon(int id)
@@ -130,6 +191,13 @@ public class Templates {
 		public int id;
 		public string name;
 		// maybe ico
+	}
+	
+	public class CampaignInfo
+	{
+		public int id;
+		public string name;
+		public ArrayList levels = new ArrayList();
 	}
 	
 	public class GunOnShuttle
@@ -225,6 +293,11 @@ public class Templates {
 				return p;
 		}
 		return null;
+	}
+	
+	public ArrayList getCampaigns()
+	{
+		return campaignsList;
 	}
 	
 	public LevelInfo getLevel(int num)

@@ -94,7 +94,7 @@ public class GUIBehaviour : MonoBehaviour {
 			GameStorage.getInstance().nextShipFocus();
 		
 		GUI.skin=null;
-		if(GUI.Button(new Rect(50,50,20,20),"D"))
-			GameStorage.getInstance().isDebug=!GameStorage.getInstance().isDebug;
+		//if(GUI.Button(new Rect(50,50,20,20),"D"))
+		//	GameStorage.getInstance().isDebug=!GameStorage.getInstance().isDebug;
 	}
 }

@@ -162,7 +162,7 @@ public class GameStorage {
 		if(getFriendlyShuttles().Length==0 && getEnemyShuttles().Length>0)
 		{
 			EndLevel();
-			cam.GetComponent<CameraBehaviour>().nextLevelWindow(-1,curLevel+1);
+			cam.GetComponent<CameraBehaviour>().nextLevelWindow(-1);
 		}
 		else if(getFriendlyShuttles().Length>0 && getEnemyShuttles().Length==0)
 		{
@@ -179,12 +179,12 @@ public class GameStorage {
 				stars=1;
 			
 			EndLevel();
-			cam.GetComponent<CameraBehaviour>().nextLevelWindow(stars,curLevel+1);
+			cam.GetComponent<CameraBehaviour>().nextLevelWindow(stars);
 		}
 		else if(getFriendlyShuttles().Length==0 && getEnemyShuttles().Length==0)
 		{
 			EndLevel();
-			cam.GetComponent<CameraBehaviour>().nextLevelWindow(0,curLevel+1);
+			cam.GetComponent<CameraBehaviour>().nextLevelWindow(0);
 		}
 			
 		
