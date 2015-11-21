@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
-	id="2"
+	id="20"
 	classname="Survivor"
 	hp="80"
 	minRange="6"

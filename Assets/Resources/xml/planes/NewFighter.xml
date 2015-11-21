@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
-	id="2"
+	id="23"
 	classname="Fighter"
 	hp="100"
 	minRange="8"

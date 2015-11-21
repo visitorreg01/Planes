@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
-	id="2"
+	id="24"
 	classname="Scout"
 	hp="60"
 	minRange="15"
