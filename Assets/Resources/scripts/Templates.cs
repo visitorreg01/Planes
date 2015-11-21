@@ -45,8 +45,7 @@ public class Templates {
 		RoundFighter=21,
 		HeavyFighter=22,
 		NewFighter=23,
-		NewScout=24,
-
+		NewScout=24
 	};
 	
 
@@ -75,6 +74,16 @@ public class Templates {
 	public GUISkin button_level = null;
 	public GUISkin button_level_selected = null;
 	public GUISkin button_level_start = null;
+	public GUISkin label_level_star = null;
+	public GUISkin mainPopupRichtext = null;
+	public GUISkin none_scroll_skin = null;
+	//TEST
+	public GUISkin playBIG=null;
+	
+	public string plotContext,helpContent;
+	
+	private GUISkin[] numbers;
+	private GUISkin[] numbers_grey;
 	
 	public Templates()
 	{
@@ -88,8 +97,11 @@ public class Templates {
 		loadLevels();
 		campaignsList=new ArrayList();
 		loadCampaigns();
-		
+		numbers=new GUISkin[10];
+		numbers_grey=new GUISkin[10];
+		loadNumbersIcons();
 		loadAbilityIcons();
+		loadContents();
 		loadLevelsSkins();
 		Loaded();
 	}
@@ -99,6 +111,35 @@ public class Templates {
 		button_level = (GUISkin) Resources.Load("gui/skins/button_level");
 		button_level_selected = (GUISkin) Resources.Load("gui/skins/button_level_selected");
 		button_level_start = (GUISkin) Resources.Load("gui/skins/button_level_start");
+		label_level_star = (GUISkin) Resources.Load("gui/skins/label_level_star");
+		mainPopupRichtext = (GUISkin) Resources.Load("gui/skins/main_popup_richtext");
+		none_scroll_skin = (GUISkin) Resources.Load("gui/skins/none_scroll");
+		playBIG=(GUISkin) Resources.Load("gui/skins/playBig");
+	}
+	
+	public GUISkin[] getNumberIcons(int num, bool grey)
+	{
+		GUISkin first,second;
+		if(grey)
+		{
+			first=numbers_grey[num/10];
+			second=numbers_grey[num%10];
+		}
+		else
+		{
+			first=numbers[num/10];
+			second=numbers[num%10];
+		}
+		return new GUISkin[] {first,second};
+	}
+	
+	private void loadNumbersIcons()
+	{
+		for(int i=0;i<10;i++)
+		{
+			numbers[i]=(GUISkin) Resources.Load("gui/skins/numbers/"+i);
+			numbers_grey[i]=(GUISkin) Resources.Load("gui/skins/numbers/"+i+"_grey");
+		}
 	}
 	
 	private void loadAbilityIcons()
@@ -122,6 +163,36 @@ public class Templates {
 		abilityDisabledSkins[6]=(GUISkin) Resources.Load("gui/skins/ability_shield_grey");
 		abilityDisabledSkins[7]=(GUISkin) Resources.Load("gui/skins/ability_thorpede_grey");
 		abilityDisabledSkins[8]=(GUISkin) Resources.Load("gui/skins/ability_mines_grey");
+	}
+	
+	private void loadContents()
+	{
+		XmlDocument doc = new XmlDocument();
+		doc.LoadXml(((TextAsset) Resources.Load("xml/gui_content/main_menu")).text);
+		foreach(XmlNode x in doc.ChildNodes)
+		{
+			if(x.Name=="contents")
+			{
+				foreach(XmlNode m in x.ChildNodes)
+				{
+					if(m.Name=="content")
+					{
+						string name="",text="";
+						foreach(XmlNode l in m.Attributes)
+						{
+							if(l.Name=="name")
+								name=l.Value;
+							else if(l.Name=="text")
+								text=l.Value;
+						}
+						if(name=="plot")
+							plotContext=text;
+						else if(name=="help")
+							helpContent=text;
+					}
+				}
+			}
+		}
 	}
 	
 	private void loadCampaigns()
@@ -231,7 +302,7 @@ public class Templates {
 	public class LevelInfo
 	{
 		public int num;
-		public string levelName,file;
+		public string levelName,file,description="NONE";
 		public int rankReached=-1;
 	}
 	
@@ -344,6 +415,8 @@ public class Templates {
 								li.file=l.Value;
 							else if(l.Name=="rankReached")
 								li.rankReached=int.Parse(l.Value);
+							else if(l.Name=="description")
+								li.description=l.Value;
 						}
 						levelList.Add(li);
 					}

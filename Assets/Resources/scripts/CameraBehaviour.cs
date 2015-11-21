@@ -24,7 +24,7 @@ public class CameraBehaviour : MonoBehaviour {
 	
 	bool showNextLevelWindow = false;
 	bool showPause=false;
-	int stars=0,nextLevel=0;
+	int stars=0;
 	
 	void Start () {
 		GameStorage.getInstance().cam=this;
@@ -278,13 +278,13 @@ public class CameraBehaviour : MonoBehaviour {
 		showNextLevelWindow=true;
 		if(stars>0)
 		{
-			currentRankId=PlayerPrefs.GetInt("currentRankId",-1);
+			currentRankId=PlayerPrefs.GetInt("currentRankId"+MainMenuGui.selectedCampaign.id,-1);
 			reachedRankId=Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]).rankReached;
 			if(reachedRankId>=0)
 			{
 				if(currentRankId<reachedRankId)
 				{
-					PlayerPrefs.SetInt("currentRankId",reachedRankId);
+					PlayerPrefs.SetInt("currentRankId"+MainMenuGui.selectedCampaign.id,reachedRankId);
 					reachedRankName=Templates.getInstance().getRank(reachedRankId).name;
 					reachedRank=true;
 				}

@@ -6,7 +6,6 @@ public class GUIBehaviour : MonoBehaviour {
 	GUISkin buttonZoomInSkin,buttonZoomOutSkin;
 	GUISkin buttonPlay,buttonPlayGrey;
 	GUISkin buttonPrev,buttonNext;
-	GUISkin buttonCharge,buttonChargeGrey;
 	
 	private int camScaleSpeed=5;
 	
@@ -19,8 +18,6 @@ public class GUIBehaviour : MonoBehaviour {
 		buttonPlayGrey=(GUISkin) Resources.Load("gui/skins/button_play_grey");
 		buttonNext=(GUISkin) Resources.Load("gui/skins/button_next");
 		buttonPrev=(GUISkin) Resources.Load("gui/skins/button_prev");
-		buttonCharge=(GUISkin) Resources.Load("gui/skins/button_cha");
-		buttonChargeGrey=(GUISkin) Resources.Load("gui/skins/button_cha_grey");
 	}
 	
 	void OnGUI()
@@ -52,6 +49,9 @@ public class GUIBehaviour : MonoBehaviour {
 		
 		if(GUI.Button(new Rect(Screen.width-20-32-10-32,20,32,32),"II"))
 			GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().gamePause();
+		
+		GUI.skin=Templates.getInstance().playBIG;
+		GUI.Button(new Rect(Screen.width-32-20,30+32,32,32),"");
 		
 		if(GameStorage.getInstance().isRunning)
 		{

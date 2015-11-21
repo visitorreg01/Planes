@@ -45,16 +45,19 @@ public class MineBehaviour : MonoBehaviour {
 		Boom();
 	}
 	
-	void OnCollisionEnter(Collision col)
+	void Update()
 	{
+		GameObject target;
 		if(enemy)
 		{
-			if(col.gameObject.GetComponent<FriendlyShuttleBehaviour>()!=null)
+			target = GameStorage.getInstance().getNearbyFriendly(gameObject);
+			if(Vector2.Distance(new Vector2(target.transform.position.x,target.transform.position.z),new Vector2(transform.position.x,transform.position.z))<=Abilities.MinesParameters.Range)
 				Boom();
 		}
 		else
 		{
-			if(col.gameObject.GetComponent<EnemyShuttleBehaviour>()!=null)
+			target = GameStorage.getInstance().getNearbyEnemy(gameObject);
+			if(Vector2.Distance(new Vector2(target.transform.position.x,target.transform.position.z),new Vector2(transform.position.x,transform.position.z))<=Abilities.MinesParameters.Range)
 				Boom();
 		}
 	}

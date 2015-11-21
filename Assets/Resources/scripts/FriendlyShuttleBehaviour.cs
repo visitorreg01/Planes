@@ -235,6 +235,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		lr.SetWidth(0.05f, 0.05f);
 		GameStorage.getInstance().addFriendlyShuttle(this.gameObject);
 		temp = Templates.getInstance().getPlaneTemplate(Template);
+		if(temp==null)
+			Debug.Log("FAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		GameStorage.getInstance().totalHp+=temp.hp;
 		GameObject go;
 		MeshRenderer mr;
