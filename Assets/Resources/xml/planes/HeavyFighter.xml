@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<plane 
+	id="2"
+	classname="HF"
+	hp="150"
+	minRange="6"
+	maxRange="15"
+	maxTurnAngle="50"
+	description="Heavy fighter.">
+	<gun id="7" pos="0,1" turnAngle="0.0"/>
+	<gun id="2" pos="0,-1" turnAngle="180.0"/>
+</plane>

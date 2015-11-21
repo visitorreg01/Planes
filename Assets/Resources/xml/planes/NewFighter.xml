@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<plane 
+	id="2"
+	classname="Fighter"
+	hp="100"
+	minRange="8"
+	maxRange="20"
+	maxTurnAngle="55"
+	description="SDF.">
+	<gun id="2" pos="0,1" turnAngle="0.0"/>
+	<ability id="0"/>
+</plane>

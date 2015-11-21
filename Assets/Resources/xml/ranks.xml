@@ -9,4 +9,7 @@
 	<rank id="6" name="Vice Admiral"/>
 	<rank id="7" name="Admiral"/>
 	<rank id="8" name="Grand Admiral"/>
+	<rank id="9" name="2nd class pilot"/>
+	<rank id="10" name="1st class pilot"/>
+	<rank id="11" name="Elite pilot"/>
 </ranks>

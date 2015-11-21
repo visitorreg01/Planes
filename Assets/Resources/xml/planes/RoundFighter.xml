@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<plane 
+	id="2"
+	classname="Round Fighter"
+	hp="80"
+	minRange="10"
+	maxRange="25"
+	maxTurnAngle="60"
+	description="SFA.">
+	<gun id="2" pos="0,1" turnAngle="0.0"/>
+	<ability id="1"/>
+</plane>

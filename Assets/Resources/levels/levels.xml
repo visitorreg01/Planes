@@ -30,4 +30,14 @@
 	<level num="28" levelName="This is level two" file="mission28"/>
 	<level num="29" levelName="This is level two" file="mission29" rankReached="8"/>
 	<level num="30" levelName="This is level two" file="mission30"/>
-	</levels>
+	<level num="31" levelName="This is level two" file="dogfight1"/>
+	<level num="32" levelName="This is level two" file="dogfight2" rankReached="9"/>
+	<level num="33" levelName="This is level two" file="dogfight3"/>
+	<level num="34" levelName="This is level two" file="dogfight4"/>
+	<level num="35" levelName="This is level two" file="dogfight5"/>
+	<level num="36" levelName="This is level two" file="dogfight6" rankReached="10"/>
+	<level num="37" levelName="This is level two" file="dogfight7"/>
+	<level num="38" levelName="This is level two" file="dogfight8"/>
+	<level num="39" levelName="This is level two" file="dogfight9" rankReached="11"/>
+	<level num="40" levelName="This is level two" file="dogfight10"/>
+</levels>

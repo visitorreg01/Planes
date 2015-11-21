@@ -40,7 +40,12 @@ public class Templates {
 		EnemyFrigate=16,
 		EnemyCruiser=17,
 		EnemyBattleship=18,
-		EnemyDreadnaught=19
+		EnemyDreadnaught=19,
+		ShieldedFighter=20,
+		RoundFighter=21,
+		HeavyFighter=22,
+		NewFighter=23,
+		NewScout=24,
 
 	};
 	
@@ -53,7 +58,8 @@ public class Templates {
 		medium_gun=3,
 		large_gun=4,
 		corvette_gun=5,
-		battlecruiser_gun=6
+		battlecruiser_gun=6,
+		fighter_gun=7
 	};
 	
 	private ArrayList planeClasses;

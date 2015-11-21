@@ -32,9 +32,16 @@
 		<level id="29"/>
 		<level id="30"/>
 	</campaign>
-	<campaign id="1" name="Bonus levels">
-		<level id="3"/>
-		<level id="4"/>
-		<level id="5"/>
+	<campaign id="1" name="Dogfights">
+		<level id="31"/>
+		<level id="32"/>
+		<level id="33"/>
+		<level id="34"/>
+		<level id="35"/>
+		<level id="36"/>
+		<level id="37"/>
+		<level id="38"/>
+		<level id="39"/>
+		<level id="40"/>
 	</campaign>
 </campaigns>
