@@ -41,11 +41,16 @@ public class Templates {
 		EnemyCruiser=17,
 		EnemyBattleship=18,
 		EnemyDreadnaught=19,
-		ShieldedFighter=20,
-		RoundFighter=21,
-		HeavyFighter=22,
-		NewFighter=23,
-		NewScout=24
+		AllyShieldedFighter=20,
+		AllyRoundFighter=21,
+		AllyHeavyFighter=22,
+		AllyNewFighter=23,
+		AllyNewScout=24,
+		EnemyShieldedFighter=25,
+		EnemyRoundFighter=26,
+		EnemyHeavyFighter=27,
+		EnemyNewFighter=28,
+		EnemyNewScout=29,
 	};
 	
 
