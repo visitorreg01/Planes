@@ -11,6 +11,8 @@ public class GameStorage {
 		return instance;
 	}
 	
+	public static int captured=0;
+	
 	public GameObject currentSelectedFriendly=null;
 	public int defaultDepth = GUI.depth;
 	public bool isRunning=false;

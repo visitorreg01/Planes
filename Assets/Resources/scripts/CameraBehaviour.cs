@@ -14,13 +14,15 @@ public class CameraBehaviour : MonoBehaviour {
 	int reachedRankId=-1;
 	string reachedRankName="";
 	bool reachedRank=false;
+	public bool canReleaseMouse=false;
 	
 	float x,y;
 	float cameraH=20;
 	float terrainH,terrainW;
 	const float speed=45;
 	
-	private GameObject currentSelected=null;
+	public GameObject currentSelected=null;
+	public GameObject primarySelected=null;
 	
 	bool showNextLevelWindow = false;
 	bool showPause=false;
@@ -33,14 +35,24 @@ public class CameraBehaviour : MonoBehaviour {
 	void Update()
 	{
 		if(!GameStorage.getInstance().isRunning)
+		{
 			checkMouse();
+		}
 		if(!showNextLevelWindow)
 		{
-			if(Input.GetButtonDown("Fire2"))
-				released=true;
-			
-			if(Input.GetButtonUp("Fire2"))
+			if(Input.GetButtonDown("Fire1"))
+			{
+				if(canReleaseMouse)
+					released=true;
+			}
+			if(!canReleaseMouse) released=false;
+			if(Input.GetButtonUp("Fire1"))
+			{
 				released=false;
+			}
+				
+			
+			
 			
 			if(Input.GetAxis("Mouse ScrollWheel") > 0)
 			{
@@ -77,10 +89,12 @@ public class CameraBehaviour : MonoBehaviour {
 		}
 	}
 	
-	private void dropSelection(GameObject o)
+	public void dropSelection(GameObject o)
 	{
 		if(o.GetComponent<FriendlyShuttleBehaviour>()!=null)
 			o.GetComponent<FriendlyShuttleBehaviour>().selected=false;
+		if(o.GetComponent<EnemyShuttleBehaviour>()!=null)
+			o.GetComponent<EnemyShuttleBehaviour>().selected=false;
 		if(o.GetComponent<RocketBehaviour>()!=null)
 		{
 			if(!o.GetComponent<RocketBehaviour>().enemy)
@@ -97,10 +111,12 @@ public class CameraBehaviour : MonoBehaviour {
 		}
 	}
 	
-	private void setSelection(GameObject o)
+	public void setSelection(GameObject o)
 	{
 		if(o.GetComponent<FriendlyShuttleBehaviour>()!=null)
 			o.GetComponent<FriendlyShuttleBehaviour>().selected=true;
+		if(o.GetComponent<EnemyShuttleBehaviour>()!=null)
+			o.GetComponent<EnemyShuttleBehaviour>().selected=true;
 		if(o.GetComponent<RocketBehaviour>()!=null)
 		{
 			if(!o.GetComponent<RocketBehaviour>().enemy)
@@ -121,26 +137,65 @@ public class CameraBehaviour : MonoBehaviour {
 	{
 		if(Input.GetButtonDown("Fire1"))
 		{
+			bool f = true;
+			GameObject pp=null;
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 	    	RaycastHit hit;
-	    	if(currentSelected!=null)
+			if (Physics.Raycast(ray, out hit))
 	    	{
-	    		if(currentSelected.GetComponent<FriendlyShuttleBehaviour>()!=null)
-	    		{
-	    			if(currentSelected.GetComponent<FriendlyShuttleBehaviour>().cancelMouseDrop())
-	    				return;
-	    		}
-	    		else
-	    			dropSelection(currentSelected);
+	    		pp=hit.collider.gameObject;
 	    	}
-	    	
-	    	if (Physics.Raycast(ray, out hit))
-	    	{
-	    		currentSelected=hit.collider.gameObject;
-	    		setSelection(hit.collider.gameObject);
-	    	}
-	    	else
-	    		currentSelected=null;
+			
+			if(currentSelected!=null)
+			{
+				if(currentSelected.GetComponent<FriendlyShuttleBehaviour>()!=null)
+				{
+					if(currentSelected.GetComponent<FriendlyShuttleBehaviour>().cancelMouseDrop())
+					{
+						f=false;
+					}
+				}
+			}
+			
+			if(f)
+			{
+				if(pp!=null)
+				{
+					if(currentSelected==null)
+					{
+						setSelection(pp);
+						currentSelected=pp;
+					}
+					else
+					{
+						if(currentSelected.GetComponent<FriendlyShuttleBehaviour>()!=null)
+						{
+							if(!currentSelected.GetComponent<FriendlyShuttleBehaviour>().cancelMouseDrop())
+							{
+								dropSelection(currentSelected);
+								setSelection(pp);
+								currentSelected=pp;
+							}
+						}
+						else
+						{
+							dropSelection(currentSelected);
+							setSelection(pp);
+							currentSelected=pp;
+						}
+					}
+				}
+				else
+				{
+					if(currentSelected!=null)
+					{
+						dropSelection(currentSelected);
+						currentSelected=null;
+					}
+				}
+			}
+			
+			
 		}
 	}
 	

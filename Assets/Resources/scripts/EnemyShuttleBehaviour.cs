@@ -22,6 +22,16 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	int gasSpawned=0;
 	bool rocketSpawned=false;
 	bool thorpedeSpawned=false;
+	private Vector3 Paintvec;
+	private const float PROGRESS_HP_MAX_WIDTH=185;
+	
+	private const float damageShowTimer=2;
+	private float damageShowTime=0;
+	private int receivedDamage = 0;
+	private bool receivedDefect = false;
+	private bool block = false;
+	
+	public bool selected=false;
 	
 	private ArrayList trackDots = new ArrayList();
 	
@@ -36,6 +46,8 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	Abilities.AbilityType activeAbil=Abilities.AbilityType.none;
 	Abilities.AbilityType prevAbil = Abilities.AbilityType.none;
+	
+	private ArrayList privateAbils=new ArrayList();
 	
 	// orientation
 	Vector2 movePoint;
@@ -291,23 +303,33 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	public void Attacked(GameObject attacker, int damage, Defects.Defect defect)
 	{
+		damageShowTime=damageShowTimer;
 		if(activeAbil!=Abilities.AbilityType.shield)
 		{
+			block=false;
 			if(curDefect==null && defect!=null)
 			{
+				receivedDefect=true;
 				curDefect=defect;
 				earnedDefect=true;
 			}
+			else
+				receivedDefect=false;
+			receivedDamage=damage;
 			this.hp-=damage;
 			if(this.hp<=0)
 				this.Die();
 		}
+		else
+			block=true;
 	}
 	
 	// Use this for initialization
 	void Start () {
 		GameStorage.getInstance().addEnemyShuttle(this.gameObject);
 		temp = Templates.getInstance().getPlaneTemplate(Template);
+		foreach(int abils in temp.abilities)
+			privateAbils.Add(abils);
 		LineRenderer lr = gameObject.AddComponent<LineRenderer>();
 		lr.SetWidth(0.05f, 0.05f);
 		GameObject gD;
@@ -386,12 +408,85 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
-		if(focused && !GameStorage.getInstance().isRunning)
+		if(damageShowTime>0)
 		{
-			Vector3 vec = Camera.main.WorldToScreenPoint(transform.position);
-			GUI.Box(new Rect(vec.x,Screen.height-vec.y,100,200),temp.classname);
-			GUI.Label(new Rect(vec.x+2,Screen.height-vec.y+20,100,20),("HP: "+hp+"/"+temp.hp));
-			GUI.Label(new Rect(vec.x+2,Screen.height-vec.y+40,100,180),temp.description);
+			float posX,posY;
+			Vector3 pzp = Camera.main.WorldToScreenPoint(transform.position);
+			posX=pzp.x-50;
+			posY=Screen.height-pzp.y-50;
+			string text="";
+			if(block)
+				text="<color=green>Blocked</color>";
+			else
+			{
+				if(receivedDefect)
+					text="<color=red>-"+receivedDamage+"</color>";
+				else
+					text="-"+receivedDamage;
+			}
+			GUI.Box(new Rect(posX,posY,100,20),text);
+			damageShowTime-=Time.deltaTime;
+			if(damageShowTime<0) damageShowTime=0;
+		}
+		
+		if(selected && !GameStorage.getInstance().isRunning)
+		{
+			Paintvec = Camera.main.WorldToScreenPoint(transform.position);
+			GUISkin progressSkin = Templates.getInstance().progressHpSkin;
+			GUILayout.BeginArea(new Rect(Paintvec.x,Screen.height-Paintvec.y,200,Screen.height));
+			GUILayout.BeginVertical(GUI.skin.box);
+			GUILayout.Label("Name: "+temp.classname);
+			GUILayout.BeginVertical(GUI.skin.box);
+			GUILayout.Box(hp+"/"+temp.hp,progressSkin.box,GUILayout.Width(PROGRESS_HP_MAX_WIDTH*(((float)hp)/((float)temp.hp))));
+			GUILayout.EndVertical();
+			if(curDefect!=null)
+				GUILayout.Label("Defect: <color=brown>"+curDefect.getName()+"</color>");
+			if(privateAbils.Count>0)
+			{
+				GUILayout.Label("Abils:");
+				GUILayout.BeginHorizontal();
+				GUISkin s;
+				foreach(int ab in privateAbils)
+				{
+					s=Templates.getInstance().getAbilityIcon(ab);
+					GUILayout.Label("",s.label,GUILayout.Width(32),GUILayout.Height(32));
+				}
+				GUILayout.EndHorizontal();
+			}
+			
+			//Weapon
+			GUILayout.Label("Weapons:");
+			GUILayout.BeginHorizontal();
+			for(int i = 0;i<temp.weapons;i++)
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+			for(int i = 0;i<5-temp.weapons;i++)
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+			GUILayout.EndHorizontal();
+			GUILayout.Label("Armor:");
+			GUILayout.BeginHorizontal();
+			for(int i = 0;i<temp.armor;i++)
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+			for(int i = 0;i<5-temp.armor;i++)
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+			GUILayout.EndHorizontal();
+			GUILayout.Label("Speed:");
+			GUILayout.BeginHorizontal();
+			for(int i = 0;i<temp.speed;i++)
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+			for(int i = 0;i<5-temp.speed;i++)
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+			GUILayout.EndHorizontal();
+			GUILayout.Label("Maneuverability:");
+			GUILayout.BeginHorizontal();
+			for(int i = 0;i<temp.maneuverability;i++)
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+			for(int i = 0;i<5-temp.maneuverability;i++)
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+			GUILayout.EndHorizontal();
+			
+			GUILayout.Label(temp.description);
+			GUILayout.EndVertical();
+			GUILayout.EndArea();
 		}
 	}
 	

@@ -161,8 +161,8 @@ public class MainMenuGui : MonoBehaviour {
 			{
 				if(GUI.Button(new Rect(5,5,100,20),"full"))
 				{
-					for(int j=0;j<30;j++)
-						PlayerPrefs.SetInt("level"+j+"Stars",3);
+					for(int j=0;j<Templates.getInstance().getAllLevels().Count;j++)
+						PlayerPrefs.SetInt("level"+(j+1)+"Stars",3);
 				}
 				
 				if(GUI.Button(new Rect(20,Screen.height-40,100,20),"Back"))
@@ -171,7 +171,7 @@ public class MainMenuGui : MonoBehaviour {
 				string current_rank="";
 				int currentRankId=PlayerPrefs.GetInt("currentRankId"+MainMenuGui.selectedCampaign.id,-1);
 				if(currentRankId==-1)
-					current_rank="Ensign";
+					current_rank=selectedCampaign.defaultRank;
 				else
 					current_rank=Templates.getInstance().getRank(currentRankId).name;
 				GUI.Label(new Rect(Screen.width-5-200,10,200,50),"Current Rank: "+current_rank);
@@ -203,19 +203,38 @@ public class MainMenuGui : MonoBehaviour {
 						if(aa)
 						{
 							
-							
-							if(GUI.Button(new Rect(pos[1],pos[0],levelButtonSize,levelButtonSize),""))
+							if(i!=levelSelected)
+							{
+								if(GUI.Button(new Rect(pos[1],pos[0],levelButtonSize,levelButtonSize),""))
 								levelSelected=i;
 							
-							GUISkin[] skins = Templates.getInstance().getNumberIcons(i+1,false);
-							GUISkin sk = GUI.skin;
-							GUI.skin=skins[0];
-							GUI.Label(new Rect(pos[1]+levelButtonSize/2-25-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
-							GUI.skin=skins[1];
-							GUI.Label(new Rect(pos[1]+levelButtonSize/2-25+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
-							GUI.skin=sk;
-							
-							aa=false;
+								GUISkin[] skins = Templates.getInstance().getNumberIcons(i+1,false);
+								GUISkin sk = GUI.skin;
+								GUI.skin=skins[0];
+								GUI.Label(new Rect(pos[1]+levelButtonSize/2-25-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+								GUI.skin=skins[1];
+								GUI.Label(new Rect(pos[1]+levelButtonSize/2-25+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+								GUI.skin=sk;
+								
+								aa=false;
+							}
+							else
+							{
+								if(GUI.Button(new Rect(pos[1],pos[0],levelButtonSize,levelButtonSize),""))
+								{
+									playedLevelIndex=levelSelected;
+									GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)levels[levelSelected]));
+								}
+								GUISkin[] skins = Templates.getInstance().getNumberIcons(i+1,false);
+								GUISkin sk = GUI.skin;
+								GUI.skin=skins[0];
+								GUI.Label(new Rect(pos[1]+levelButtonSize/2-25-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+								GUI.skin=skins[1];
+								GUI.Label(new Rect(pos[1]+levelButtonSize/2-25+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+								GUI.skin=sk;
+								
+								aa=false;
+							}
 						}
 						else
 						{
@@ -249,7 +268,11 @@ public class MainMenuGui : MonoBehaviour {
 						}
 						else
 						{
-							GUI.Button(new Rect(pos[1],pos[0],levelButtonSize,levelButtonSize),"");
+							if(GUI.Button(new Rect(pos[1],pos[0],levelButtonSize,levelButtonSize),""))
+							{
+								playedLevelIndex=levelSelected;
+								GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)levels[levelSelected]));
+							}
 							GUISkin[] skins = Templates.getInstance().getNumberIcons(i+1,false);
 							GUISkin sk = GUI.skin;
 							GUI.skin=skins[0];

@@ -8,10 +8,19 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	//scale
 	const float scale = 10;
 	
+	//UISETTINGS
+	private const float PROGRESS_HP_MAX_WIDTH=185;
+	
 	public Templates.PlaneTemplates Template;
 	private Templates.PlaneTemplate temp;
 	
+	private const float damageShowTimer=2;
+	private float damageShowTime=0;
+	private int receivedDamage = 0;
+	private bool receivedDefect = false;
+	private bool block = false;
 	
+	private Vector3 Paintvec;
 	
 	private float clickDist=3f;
 	private float clickDistMin=2f;
@@ -72,8 +81,9 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	//states
 	bool focused = false;
 	public bool selected = false;
-	bool attackIconCaptured = false;
+	public bool attackIconCaptured = false;
 	bool spawn=true;
+	private ArrayList privateAbils=new ArrayList();
 	
 	private Defects.Defect curDefect = null;
 	bool earnedDefect = false;
@@ -235,6 +245,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		lr.SetWidth(0.05f, 0.05f);
 		GameStorage.getInstance().addFriendlyShuttle(this.gameObject);
 		temp = Templates.getInstance().getPlaneTemplate(Template);
+		foreach(int abils in temp.abilities)
+			privateAbils.Add(abils);
 		if(temp==null)
 			Debug.Log("FAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		GameStorage.getInstance().totalHp+=temp.hp;
@@ -500,6 +512,87 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	{
 		GUI.enabled=!GameStorage.getInstance().overlap;
 		
+		if(damageShowTime>0)
+		{
+			float posX,posY;
+			Vector3 pzp = Camera.main.WorldToScreenPoint(transform.position);
+			posX=pzp.x-50;
+			posY=Screen.height-pzp.y-50;
+			string text="";
+			if(block)
+				text="<color=green>Blocked</color>";
+			else
+			{
+				if(receivedDefect)
+					text="<color=red>-"+receivedDamage+"</color>";
+				else
+					text="-"+receivedDamage;
+			}
+			GUI.Box(new Rect(posX,posY,100,20),text);
+			damageShowTime-=Time.deltaTime;
+			if(damageShowTime<0) damageShowTime=0;
+		}
+		
+		if(selected && !GameStorage.getInstance().isRunning)
+		{	
+			Paintvec = Camera.main.WorldToScreenPoint(transform.position);
+			GUISkin progressSkin = Templates.getInstance().progressHpSkin;
+			GUILayout.BeginArea(new Rect(Paintvec.x,Screen.height-Paintvec.y,200,Screen.height));
+			GUILayout.BeginVertical(GUI.skin.box);
+			GUILayout.Label("Name: "+temp.classname);
+			GUILayout.BeginVertical(GUI.skin.box);
+			GUILayout.Box(hp+"/"+temp.hp,progressSkin.box,GUILayout.Width(PROGRESS_HP_MAX_WIDTH*(((float)hp)/((float)temp.hp))));
+			GUILayout.EndVertical();
+			if(curDefect!=null)
+				GUILayout.Label("Defect: <color=brown>"+curDefect.getName()+"</color>");
+			if(privateAbils.Count>0)
+			{
+				GUILayout.Label("Abils:");
+				GUILayout.BeginHorizontal();
+				GUISkin s;
+				foreach(int ab in privateAbils)
+				{
+					s=Templates.getInstance().getAbilityIcon(ab);
+					GUILayout.Label("",s.label,GUILayout.Width(32),GUILayout.Height(32));
+				}
+				GUILayout.EndHorizontal();
+			}
+			
+			//Weapon
+			GUILayout.Label("Weapons:");
+			GUILayout.BeginHorizontal();
+			for(int i = 0;i<temp.weapons;i++)
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+			for(int i = 0;i<5-temp.weapons;i++)
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+			GUILayout.EndHorizontal();
+			GUILayout.Label("Armor:");
+			GUILayout.BeginHorizontal();
+			for(int i = 0;i<temp.armor;i++)
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+			for(int i = 0;i<5-temp.armor;i++)
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+			GUILayout.EndHorizontal();
+			GUILayout.Label("Speed:");
+			GUILayout.BeginHorizontal();
+			for(int i = 0;i<temp.speed;i++)
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+			for(int i = 0;i<5-temp.speed;i++)
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+			GUILayout.EndHorizontal();
+			GUILayout.Label("Maneuverability:");
+			GUILayout.BeginHorizontal();
+			for(int i = 0;i<temp.maneuverability;i++)
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+			for(int i = 0;i<5-temp.maneuverability;i++)
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+			GUILayout.EndHorizontal();
+			
+			GUILayout.Label(temp.description);
+			GUILayout.EndVertical();
+			GUILayout.EndArea();
+		}
+		
 		if(!GameStorage.getInstance().isRunning)
 		{
 			Vector3 v11 = attackIcon.transform.position;
@@ -508,18 +601,18 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			GUI.skin = Templates.getInstance().getAbilityIcon(activeAbil);
 			if(GUI.RepeatButton(new Rect(aPos.x-20,Screen.height-aPos.y-20,40,40),""))
 			{
-				attackIconCaptured=true;
-				selected=true;
+					attackIconCaptured=true;
+					GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=false;
+					GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().setSelection(gameObject);
+					if(GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().currentSelected!=null)
+					{
+						GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().dropSelection(GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().currentSelected);
+					}
+					GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().setSelection(gameObject);
+					GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().currentSelected=gameObject;
+					
 			}
 			GUI.skin=null;
-		}
-		
-		if(focused && !GameStorage.getInstance().isRunning)
-		{
-			Vector3 vec = Camera.main.WorldToScreenPoint(transform.position);
-			GUI.Box(new Rect(vec.x,Screen.height-vec.y,100,200),temp.classname);
-			GUI.Label(new Rect(vec.x+2,Screen.height-vec.y+20,100,20),("HP: "+hp+"/"+temp.hp));
-			GUI.Label(new Rect(vec.x+2,Screen.height-vec.y+40,100,180),temp.description);
 		}
 		
 		if(temp.abilities.Count>0 && selected && !attackIconCaptured)
@@ -645,7 +738,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			{
 				if((Input.GetMouseButtonDown(0) && isMouseOver(gameObject)) || (Input.GetMouseButtonDown(0) && isMouseOver(attackIcon)))
 				{
-					selected=true;
+					//selected=true;
 					GameStorage.getInstance().currentSelectedFriendly=gameObject;
 				}
 				else if(Input.GetMouseButtonDown(0) && !isMouseOver(gameObject))
@@ -688,18 +781,25 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	public void Attacked(GameObject attacker, int damage, Defects.Defect defect)
 	{
+		damageShowTime=damageShowTimer;
 		if(activeAbil!=Abilities.AbilityType.shield)
 		{
+			block=false;
 			if(curDefect==null && defect!=null)
 			{
-				Debug.Log("Earned defect: "+defect);
+				receivedDefect=true;
 				curDefect=defect;
 				earnedDefect=true;
 			}
+			else
+				receivedDefect=false;
+			receivedDamage=damage;
 			this.hp-=damage;
 			if(this.hp<=0)
 				this.Die();
 		}
+		else
+			block=true;
 	}
 	
 	private void Accelerate()
@@ -973,9 +1073,16 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	public void checkAttackIconClickState()
 	{
 		if(Input.GetMouseButtonDown(0) && isMouseOver(attackIcon))
+		{
+			GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=false;
 			attackIconCaptured=true;
+			
+		}
 		if(Input.GetMouseButtonUp(0))
+		{
 			attackIconCaptured=false;
+			GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=true;
+		}
 	}
 	
 	public void StepStart()

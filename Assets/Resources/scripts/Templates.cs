@@ -50,7 +50,7 @@ public class Templates {
 		EnemyRoundFighter=26,
 		EnemyHeavyFighter=27,
 		EnemyNewFighter=28,
-		EnemyNewScout=29,
+		EnemyNewScout=29
 	};
 	
 
@@ -83,6 +83,8 @@ public class Templates {
 	public GUISkin label_level_star = null;
 	public GUISkin mainPopupRichtext = null;
 	public GUISkin none_scroll_skin = null;
+	public GUISkin progressHpSkin=null;
+	public GUISkin statPointGrey,statPointBlue;
 	//TEST
 	public GUISkin playBIG=null;
 	
@@ -120,7 +122,11 @@ public class Templates {
 		label_level_star = (GUISkin) Resources.Load("gui/skins/label_level_star");
 		mainPopupRichtext = (GUISkin) Resources.Load("gui/skins/main_popup_richtext");
 		none_scroll_skin = (GUISkin) Resources.Load("gui/skins/none_scroll");
+		progressHpSkin=(GUISkin) Resources.Load("gui/skins/progressStyle");
+		statPointBlue=(GUISkin) Resources.Load("gui/skins/statPointBlue");
+		statPointGrey=(GUISkin) Resources.Load("gui/skins/statPointGrey");
 		playBIG=(GUISkin) Resources.Load("gui/skins/playBig");
+		
 	}
 	
 	public GUISkin[] getNumberIcons(int num, bool grey)
@@ -220,6 +226,8 @@ public class Templates {
 								li.id=int.Parse(l.Value);
 							else if(l.Name=="name")
 								li.name=l.Value;
+							else if(l.Name=="defaultRank")
+								li.defaultRank=l.Value;
 						}
 						
 						foreach(XmlNode l in m.ChildNodes)
@@ -280,6 +288,7 @@ public class Templates {
 	{
 		public int id;
 		public string name;
+		public string defaultRank;
 		public ArrayList levels = new ArrayList();
 	}
 	
@@ -301,6 +310,12 @@ public class Templates {
 		public float upperSmooth=1f;
 		public float lowerSmooth=1f;
 		public string description;
+		//STATS
+		public int weapons=1;
+		public int armor=1;
+		public int speed=1;
+		public int maneuverability=1;
+		
 		public ArrayList guns = new ArrayList();
 		public ArrayList abilities = new ArrayList();
 	}
@@ -341,6 +356,10 @@ public class Templates {
 				t.upperSmooth=p.upperSmooth;
 				t.maxTurnAngle=p.maxTurnAngle;
 				t.minRange=p.minRange;
+				t.weapons=p.weapons;
+				t.armor=p.armor;
+				t.speed=p.speed;
+				t.maneuverability=p.maneuverability;
 				foreach(GunOnShuttle f in p.guns)
 				{
 					GunOnShuttle z = new GunOnShuttle();
@@ -476,6 +495,10 @@ public class Templates {
 				t.upperSmooth=p.upperSmooth;
 				t.maxTurnAngle=p.maxTurnAngle;
 				t.minRange=p.minRange;
+				t.weapons=p.weapons;
+				t.armor=p.armor;
+				t.speed=p.speed;
+				t.maneuverability=p.maneuverability;
 				foreach(GunOnShuttle f in p.guns)
 				{
 					GunOnShuttle z = new GunOnShuttle();
@@ -595,6 +618,15 @@ public class Templates {
 							p.maxTurnAngle=float.Parse(m.Value);
 						else if(m.Name=="description")
 							p.description=m.Value;
+						else if(m.Name=="weapons")
+							p.weapons=int.Parse(m.Value);
+						else if(m.Name=="armor")
+							p.armor=int.Parse(m.Value);
+						else if(m.Name=="speed")
+							p.speed=int.Parse(m.Value);
+						else if(m.Name=="maneuverability")
+							p.maneuverability=int.Parse(m.Value);
+										
 					}
 					
 					foreach(XmlNode m in x.ChildNodes)

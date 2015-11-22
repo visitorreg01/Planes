@@ -13,7 +13,9 @@ public static class Defects {
 		fired=5
 	}
 	
-	public interface Defect{};
+	public interface Defect{
+		string getName();
+	};
 	
 	public static Defect getDefect(int id)
 	{
@@ -37,22 +39,50 @@ public static class Defects {
 		}
 	}
 	
-	public class DisableTurnLeft : Defect{};
+	public class DisableTurnLeft : Defect{
+		public string getName()
+		{
+			return "Disable turn left";
+		}
+	};
 	
-	public class DisableTurnRight : Defect{};
+	public class DisableTurnRight : Defect{
+		public string getName()
+		{
+			return "Disable turn right";
+		}
+	};
 	
-	public class DisableTurn : Defect{};
+	public class DisableTurn : Defect{
+		public string getName()
+		{
+			return "Disable turn";
+		}
+	};
 	
 	public class EngineCrash : Defect
 	{
 		public float newRangeCoeff=0.5f;
+		public string getName()
+		{
+			return "Engine crash";
+		}
 	}
 	
-	public class DisableGuns : Defect{};
+	public class DisableGuns : Defect{
+		public string getName()
+		{
+			return "Disabled guns";
+		}
+	};
 	
 	public class Fired : Defect
 	{
 		public float reuse=0.5f; // in seconds!
 		public int damage=20; // total damage calculates: step time(3s)/reuse*damage
+		public string getName()
+		{
+			return "Fire";
+		}
 	}
 }
