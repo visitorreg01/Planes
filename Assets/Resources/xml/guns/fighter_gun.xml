@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <gun
-	id="2"
+	id="7"
 	gunName="PAC machinegun"
 	damage="5"
 	reuse="0.1"
 	attackAngle="30.0"
 	bulletSpeed="2"
 	bulletDispersion="1"
-	attackRange="25.0"
+	attackRange="28.0"
 	bulletMesh="bulletPrefab">
-	<defectChance id="0" chance="0.1"/>
-	<defectChance id="1" chance="0.1"/>
-	<defectChance id="2" chance="0.1"/>
-	<defectChance id="3" chance="0.1"/>
-	<defectChance id="4" chance="0.1"/>
-	<defectChance id="5" chance="0.1"/>
+	<defectChance id="0" chance="1.0"/>
+	<defectChance id="1" chance="1.0"/>
+	<defectChance id="2" chance="1.0"/>
+	<defectChance id="3" chance="1.0"/>
+	<defectChance id="4" chance="1.0"/>
+	<defectChance id="5" chance="1.0"/>
 </gun>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<gun
+	id="8"
+	gunName="PAC machinegun"
+	damage="5"
+	reuse="0.1"
+	attackAngle="35.0"
+	bulletSpeed="2"
+	bulletDispersion="1"
+	attackRange="23.0"
+	bulletMesh="bulletPrefab">
+	<defectChance id="0" chance="0.8"/>
+	<defectChance id="1" chance="0.8"/>
+	<defectChance id="2" chance="0.8"/>
+	<defectChance id="3" chance="0.8"/>
+	<defectChance id="4" chance="0.8"/>
+	<defectChance id="5" chance="0.8"/>
+</gun>

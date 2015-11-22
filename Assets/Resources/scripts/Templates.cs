@@ -58,7 +58,8 @@ public class Templates {
 		large_gun=4,
 		corvette_gun=5,
 		battlecruiser_gun=6,
-		fighter_gun=7
+		fighter_gun=7,
+		dogfight_gun=8
 	};
 	
 	private ArrayList planeClasses;

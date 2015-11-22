@@ -3,11 +3,13 @@
 	id="24"
 	classname="Scout"
 	hp="60"
-	minRange="15"
+	minRange="18"
 	maxRange="30"
-	maxTurnAngle="70"
+	maxTurnAngle="55"
+	lowerSmooth='0.6'
+	upperSmooth='0.6'
 	description="SC.">
-	<gun id="2" pos="0,1" turnAngle="0.0"/>
+	<gun id="8" pos="0,1" turnAngle="0.0"/>
 	<ability id="1"/>
 	<ability id="2"/>
 </plane>

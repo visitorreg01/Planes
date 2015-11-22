@@ -3,9 +3,11 @@
 	id="22"
 	classname="HF"
 	hp="150"
-	minRange="6"
+	minRange="8"
 	maxRange="15"
-	maxTurnAngle="50"
+	maxTurnAngle="35"		
+	lowerSmooth='0.6'
+	upperSmooth='0.6'
 	description="Heavy fighter.">
 	<gun id="7" pos="0,1" turnAngle="0.0"/>
 	<gun id="2" pos="0,-1" turnAngle="180.0"/>
