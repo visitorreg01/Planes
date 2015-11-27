@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
 	id="20"
-	classname="Shield fighter"
+	classname="S-SH5"
 	hp="80"
 	minRange="8"
 	maxRange="15"
 	maxTurnAngle="40"
 	lowerSmooth='0.6'
 	upperSmooth='0.6'
-	description="SHF.">
+	description="">
 	<gun id="8" pos="0,1" turnAngle="0.0"/>
 	<ability id="5"/>
 	weapon="2"

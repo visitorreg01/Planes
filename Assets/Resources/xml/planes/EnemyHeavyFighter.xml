@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
 	id="27"
-	classname="HF"
+	classname="M-T7"
 	hp="150"
 	minRange="8"
 	maxRange="15"
 	maxTurnAngle="35"		
 	lowerSmooth='0.6'
 	upperSmooth='0.6'
-	description="Heavy fighter.">
+	description="">
 	<gun id="7" pos="0,1" turnAngle="0.0"/>
 	<gun id="2" pos="0,-1" turnAngle="180.0"/>
 	weapon="3"

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <plane 
 	id="23"
-	classname="Fighter"
+	classname="S-SDF-6"
 	hp="100"
 	minRange="10"
 	maxRange="20"
 	maxTurnAngle="40"
 	lowerSmooth='0.6'
 	upperSmooth='0.6'
-	description="SDF.">
+	description="">
 	<gun id="7" pos="0,1" turnAngle="0.0"/>
 	<ability id="0"/>
 	weapon="2"
