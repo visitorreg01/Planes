@@ -8,8 +8,12 @@
 	maxTurnAngle="45"
 	lowerSmooth='0.4'
 	upperSmooth='0.4'
-	description="Delanel Theocracy's Gas Hauler is faster than the Corp's one.">
+	description="This Gas Hauler is faster than the Corp's one.">
 	<gun id="2" pos="0,-1" turnAngle="180.0"/>
 	<ability id="3"/>
 	<ability id="5"/>
+	weapon="1"
+	armor="3"
+	speed="3"
+	maneuverability="3"
 </plane>

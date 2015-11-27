@@ -11,4 +11,8 @@
 	description="Heavy fighter.">
 	<gun id="7" pos="0,1" turnAngle="0.0"/>
 	<gun id="2" pos="0,-1" turnAngle="180.0"/>
+	weapon="3"
+	armor="3"
+	speed="2"
+	maneuverability="2"
 </plane>

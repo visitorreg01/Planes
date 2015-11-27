@@ -11,4 +11,8 @@
 	description="SFA.">
 	<gun id="8" pos="0,1" turnAngle="0.0"/>
 	<ability id="1"/>
+	weapon="2"
+	armor="2"
+	speed="3"
+	maneuverability="3"
 </plane>

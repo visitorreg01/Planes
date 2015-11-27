@@ -15,4 +15,8 @@
 	<ability id="2"/>
 	<ability id="5"/>
 	<ability id="6"/>
+	weapon="3"
+	armor="3"
+	speed="3"
+	maneuverability="3"
 </plane>

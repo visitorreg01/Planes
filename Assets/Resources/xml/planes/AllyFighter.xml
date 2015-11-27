@@ -6,7 +6,11 @@
 	minRange="4"
 	maxRange="18"
 	maxTurnAngle="55"
-	description="Devil's Dozen Corporation's Fighter is a reliable vessel without any special characteristics.">
+	description="Corporation's Fighter is a reliable vessel without any special characteristics.">
 	<gun id="2" pos="0,1" turnAngle="0.0"/>
 	<ability id="0"/>
+	weapon="1"
+	armor="1"
+	speed="4"
+	maneuverability="4"
 </plane>

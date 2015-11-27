@@ -8,7 +8,7 @@
 	maxTurnAngle="45"
 	lowerSmooth='0.8'
 	upperSmooth='0.8'
-	description="Devil's Dozen Corporation's Battlecruiser is a special ship made by Doortay Shipyards. It's a powerful all-round vessel. ">
+	description="Battlecruiser is a special ship made by Doortay Shipyards. It's a powerful all-round vessel. ">
 	<gun id="6" pos="1,-1" turnAngle="25.0"/>
 	<gun id="6" pos="1,0" turnAngle="90.0"/>
 	<gun id="6" pos="-1,-1" turnAngle="-25.0"/>
@@ -19,4 +19,8 @@
 	<ability id="0"/>
 	<ability id="2"/>
 	<ability id="6"/>
+	weapon="4"
+	armor="4"
+	speed="3"
+	maneuverability="3"
 </plane>
