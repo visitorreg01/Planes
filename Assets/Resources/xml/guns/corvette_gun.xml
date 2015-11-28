@@ -2,7 +2,7 @@
 <gun
 	id="5"
 	gunName="Corvette special cannon"
-	damage="15"
+	damage="22"
 	reuse="0.2"
 	attackAngle="45.0"
 	bulletSpeed="2"

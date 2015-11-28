@@ -10,7 +10,7 @@
 	<gun id="5" pos="1,-0.6" turnAngle="0"/>
 	<gun id="5" pos="-1,-0.6" turnAngle="0"/>
 	<gun id="2" pos="0,-1.5" turnAngle="180"/>
-	<ability id="1"/>
+	<ability id="5"/>
 	<ability id="2"/>
 	<ability id="4"/>
 	weapon="3"
