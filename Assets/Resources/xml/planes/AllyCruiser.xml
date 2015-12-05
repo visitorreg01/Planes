@@ -6,6 +6,10 @@
 	minRange="3"
 	maxRange="13.5"
 	maxTurnAngle="40"
+	weapon="3"
+	armor="3"
+	speed="3"
+	maneuverability="3"
 	lowerSmooth='0.5'
 	upperSmooth='0.5'
 	description="Cruiser combines speed, maneuverability and firepower.">
@@ -15,8 +19,5 @@
 	<gun id="2" pos="0,-3" turnAngle="180.0"/>  
 	<ability id="2"/>
 	<ability id="5"/>
-	weapon="3"
-	armor="3"
-	speed="3"
-	maneuverability="3"
+	
 </plane>

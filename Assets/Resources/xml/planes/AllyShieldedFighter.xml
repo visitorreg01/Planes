@@ -6,13 +6,14 @@
 	minRange="8"
 	maxRange="15"
 	maxTurnAngle="40"
+	weapon="2"
+	armor="2"
+	speed="2"
+	maneuverability="2"
 	lowerSmooth='0.6'
 	upperSmooth='0.6'
 	description="">
 	<gun id="8" pos="0,1" turnAngle="0.0"/>
 	<ability id="5"/>
-	weapon="2"
-	armor="2"
-	speed="2"
-	maneuverability="2"
+	
 </plane>

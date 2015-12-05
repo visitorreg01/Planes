@@ -5,6 +5,10 @@
 	hp="500"
 	minRange="5"
 	maxRange="21"
+	weapon="3"
+	armor="3"
+	speed="4"
+	maneuverability="4"
 	maxTurnAngle="55"
 	description="Devil's Dozen Corporation's Corvette is a special ship made by Doortay Shipyards. Very effective against lttle and medium ships.">
 	<gun id="5" pos="1,-0.6" turnAngle="0"/>
@@ -13,8 +17,5 @@
 	<ability id="5"/>
 	<ability id="2"/>
 	<ability id="4"/>
-	weapon="3"
-	armor="3"
-	speed="4"
-	maneuverability="4"
+
 </plane>

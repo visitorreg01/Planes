@@ -5,14 +5,15 @@
 	hp="150"
 	minRange="8"
 	maxRange="15"
-	maxTurnAngle="35"		
+	maxTurnAngle="35"	
+	weapon="3"
+	armor="3"
+	speed="2"
+	maneuverability="2"	
 	lowerSmooth='0.6'
 	upperSmooth='0.6'
 	description="">
 	<gun id="7" pos="0,1" turnAngle="0.0"/>
 	<gun id="2" pos="0,-1" turnAngle="180.0"/>
-	weapon="3"
-	armor="3"
-	speed="2"
-	maneuverability="2"
+	
 </plane>

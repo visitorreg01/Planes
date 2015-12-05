@@ -6,6 +6,10 @@
 	minRange="4"
 	maxRange="15"
 	maxTurnAngle="50"
+	weapon="3"
+	armor="3"
+	speed="3"
+	maneuverability="3"
 	lowerSmooth='0.4'
 	upperSmooth='0.4'
 	description="Devil's Dozen Corporation's Frigate provides wide tactical capabilities to any commanding officer.">
@@ -15,8 +19,5 @@
 	<ability id="4"/>
 	<ability id="2"/>
 	<ability id="7"/>
-	weapon="3"
-	armor="3"
-	speed="3"
-	maneuverability="3"
+	
 </plane>

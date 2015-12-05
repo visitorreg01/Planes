@@ -6,6 +6,10 @@
 	minRange="5"
 	maxRange="15"
 	maxTurnAngle="45"
+	weapon="3"
+	armor="2"
+	speed="3"
+	maneuverability="3"
 	lowerSmooth='0.5'
 	upperSmooth='0.5'
 	description="Theocracy's Assault bot is slower, more fragile and maneuverable than Cor's analogue.">
@@ -13,8 +17,5 @@
 	<gun id="2" pos="-0.5,0" turnAngle="0.0"/>
 	<ability id="5"/>
 	<ability id="6"/>
-	weapon="3"
-	armor="2"
-	speed="3"
-	maneuverability="3"
+	
 </plane>

@@ -7,6 +7,10 @@
 	maxRange="10.5"
 	maxTurnAngle="25"
 	lowerSmooth='0.25'
+	weapon="5"
+	armor="5"
+	speed="1"
+	maneuverability="1"
 	upperSmooth='0.25'
 	description="Delanel Theocracy's Dreadnaught carries more armor but less weaponry than Corp's analogue.">
 	<gun id="4" pos="2,-1" turnAngle="90.0"/>
@@ -22,8 +26,5 @@
 	<gun id="2" pos="-1,-3" turnAngle="-135.0"/>
 	<ability id="4"/>
 	<ability id="6"/>
-	weapon="5"
-	armor="5"
-	speed="1"
-	maneuverability="1"
+	
 </plane>

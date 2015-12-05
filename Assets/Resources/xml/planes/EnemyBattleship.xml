@@ -6,6 +6,10 @@
 	minRange="3"
 	maxRange="12"
 	maxTurnAngle="35"
+	weapon="5"
+	armor="5"
+	speed="2"
+	maneuverability="2"
 	lowerSmooth='0.7'
 	upperSmooth='0.7'
 	description="This Battleship carries more armor but less weaponry than Corp's analogue.">
@@ -17,8 +21,5 @@
 	<gun id="2" pos="0,-3" turnAngle="180.0"/>
 	<ability id="5"/>
 	<ability id="6"/>
-	weapon="5"
-	armor="5"
-	speed="2"
-	maneuverability="2"
+	
 </plane>

@@ -8,6 +8,10 @@
 	maxTurnAngle="35"
 	lowerSmooth='0.7'
 	upperSmooth='0.7'
+	weapon="5"
+	armor="5"
+	speed="2"
+	maneuverability="2"
 	description="Battleship is a backbone of its fleet carrying massive broadside firepower.">
 	<gun id="4" pos="2,-1" turnAngle="90.0"/>
 	<gun id="4" pos="2,1" turnAngle="90.0"/>
@@ -18,8 +22,5 @@
 	<gun id="2" pos="0,-3" turnAngle="180.0"/>
 	<ability id="5"/>
 	<ability id="6"/>
-	weapon="5"
-	armor="5"
-	speed="2"
-	maneuverability="2"
+	
 </plane>

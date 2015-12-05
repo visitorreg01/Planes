@@ -6,6 +6,10 @@
 	minRange="5"
 	maxRange="12"
 	maxTurnAngle="30"
+	weapon="3"
+	armor="3"
+	speed="3"
+	maneuverability="3"
 	lowerSmooth='0.5'
 	upperSmooth='0.5'
 	description="Delanel Theocracy's Cruiser carries more armor but less weaponry than Corp's analogue.">
@@ -15,8 +19,5 @@
 	<ability id="2"/>
 	<ability id="5"/>
 	<ability id="6"/>
-	weapon="3"
-	armor="3"
-	speed="3"
-	maneuverability="3"
+	
 </plane>
