@@ -19,12 +19,15 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	private int receivedDamage = 0;
 	private bool receivedDefect = false;
 	private bool block = false;
+	public bool iconsShowed=false;
+	public bool showPopup=false;
+	
+	private Color goodColor = new Color(1,1,1,1);
+	private Color disColor = new Color(1,1,1,0.2f);
 	
 	private Vector3 Paintvec;
 	
 	private float clickDist=3f;
-	private float clickDistMin=2f;
-	private float clickDistAccuracy=0.1f;
 	
 	private Material lineMat;
 	private ArrayList minesList=new ArrayList();
@@ -241,14 +244,13 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	{
 		attackIcon = Instantiate(Resources.Load("prefab/attackIcon") as GameObject);
 		attackIcon.SetActive(false);
+		
 		LineRenderer lr = gameObject.AddComponent<LineRenderer>();
 		lr.SetWidth(0.05f, 0.05f);
 		GameStorage.getInstance().addFriendlyShuttle(this.gameObject);
 		temp = Templates.getInstance().getPlaneTemplate(Template);
 		foreach(int abils in temp.abilities)
 			privateAbils.Add(abils);
-		if(temp==null)
-			Debug.Log("FAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		GameStorage.getInstance().totalHp+=temp.hp;
 		GameObject go;
 		MeshRenderer mr;
@@ -415,6 +417,13 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void Update()
 	{
+		Vector2 av = Camera.main.WorldToScreenPoint(attackIcon.transform.position);
+		Vector2 bv = av+new Vector2(Templates.ResolutionProblems.getActionAbilityOffset(Screen.width)+Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,0);
+		
+		av=new Vector2(Camera.main.ScreenToWorldPoint(av).x,Camera.main.ScreenToWorldPoint(av).z);
+		bv=new Vector2(Camera.main.ScreenToWorldPoint(bv).x,Camera.main.ScreenToWorldPoint(bv).z);
+		clickDist=Vector2.Distance(av,bv);
+		
 		if(selected)
 		{
 			int i=0;
@@ -433,10 +442,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			foreach(GameObject go in arcObjs)
 				go.SetActive(false);
 		}
-		clickDist=0.15f*GameStorage.getInstance().zoom;
-		if(clickDist<clickDistMin)
-			clickDist=clickDistMin;
-
+		
 		for(int i = 0;i<shuttleGunsMeshes.Count;i++)
 		{
 			GameObject goss = (GameObject) shuttleGunsMeshes[i];
@@ -506,11 +512,16 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		transform.eulerAngles=new Vector3(0,angle,0);
 	}
 	
-	
-	
 	void OnGUI()
 	{
+		if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+			showPopup=selected;
+		
 		GUI.enabled=!GameStorage.getInstance().overlap;
+		if(GameStorage.getInstance().overlap)
+			GUI.color=disColor;
+		else
+			GUI.color=goodColor;
 		
 		if(damageShowTime>0)
 		{
@@ -530,11 +541,18 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			}
 			GUI.Box(new Rect(posX,posY,100,20),text);
 			damageShowTime-=Time.deltaTime;
-			if(damageShowTime<0) damageShowTime=0;
+			if(damageShowTime<0)
+			{				
+				damageShowTime=0;
+				receivedDamage=0;
+				receivedDefect=false;
+			}
 		}
 		
-		if(selected && !GameStorage.getInstance().isRunning)
+		
+		if(showPopup && !GameStorage.getInstance().isRunning)
 		{	
+			GUI.FocusControl(null);
 			Paintvec = Camera.main.WorldToScreenPoint(transform.position);
 			GUISkin progressSkin = Templates.getInstance().progressHpSkin;
 			GUILayout.BeginArea(new Rect(Paintvec.x,Screen.height-Paintvec.y,200,Screen.height));
@@ -592,6 +610,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			GUILayout.EndVertical();
 			GUILayout.EndArea();
 		}
+			
 		
 		if(!GameStorage.getInstance().isRunning)
 		{
@@ -599,47 +618,38 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			Vector2 aPos = new Vector2(Camera.main.WorldToScreenPoint(v11).x,Camera.main.WorldToScreenPoint(v11).y);
 			
 			GUI.skin = Templates.getInstance().getAbilityIcon(activeAbil);
-			if(GUI.RepeatButton(new Rect(aPos.x-20,Screen.height-aPos.y-20,40,40),""))
+			if(GUI.RepeatButton(new Rect(aPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Screen.height-aPos.y-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),""))
 			{
 					attackIconCaptured=true;
 					GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=false;
-					GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().setSelection(gameObject);
-					if(GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().currentSelected!=null)
-					{
-						GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().dropSelection(GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().currentSelected);
-					}
-					GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().setSelection(gameObject);
 					GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().currentSelected=gameObject;
-					
+					iconsShowed=true;
 			}
 			GUI.skin=null;
 		}
 		
-		if(temp.abilities.Count>0 && selected && !attackIconCaptured)
+		if(temp.abilities.Count>0 && (selected || iconsShowed) && !attackIconCaptured)
 		{
-			Vector3 v1 = attackIcon.transform.position+new Vector3(clickDist,0,0);
-			Vector3 v2 = attackIcon.transform.position+new Vector3(-clickDist,0,0);
-			Vector3 v3 = attackIcon.transform.position+new Vector3(0,0,clickDist);
-			Vector3 v4 = attackIcon.transform.position+new Vector3(0,0,-clickDist);
-			firstAbilPos=new Vector2(Camera.main.WorldToScreenPoint(v1).x,Camera.main.WorldToScreenPoint(v1).y);
-			secondAbilPos=new Vector2(Camera.main.WorldToScreenPoint(v2).x,Camera.main.WorldToScreenPoint(v2).y);
-			thirdAbilPos=new Vector2(Camera.main.WorldToScreenPoint(v3).x,Camera.main.WorldToScreenPoint(v3).y);
-			fourthAbilPos=new Vector2(Camera.main.WorldToScreenPoint(v4).x,Camera.main.WorldToScreenPoint(v4).y);
 			
+			Vector2 startVec = new Vector2(Camera.main.WorldToScreenPoint(attackIcon.transform.position).x,Camera.main.WorldToScreenPoint(attackIcon.transform.position).y);
 			
+			firstAbilPos=startVec+new Vector2(Templates.ResolutionProblems.getActionAbilityOffset(Screen.width),0);
+			secondAbilPos=startVec+new Vector2(-Templates.ResolutionProblems.getActionAbilityOffset(Screen.width),0);
+			thirdAbilPos=startVec+new Vector2(0,Templates.ResolutionProblems.getActionAbilityOffset(Screen.width));
+			fourthAbilPos=startVec+new Vector2(0,-Templates.ResolutionProblems.getActionAbilityOffset(Screen.width));
 			
 			if(temp.abilities.Count>=1)
 			{
 				if(abilityInReuse || earnedDefect)
 				{
 					GUI.skin=Templates.getInstance().getAbilityIconGrey((int)temp.abilities[0]);
-					GUI.Button(new Rect(firstAbilPos.x-20,Screen.height-firstAbilPos.y-20,40,40),"");
+					GUI.Button(new Rect(firstAbilPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Screen.height-firstAbilPos.y-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"");
 					GUI.skin=null;
 				}
 				else
 				{
 					GUI.skin=Templates.getInstance().getAbilityIcon((int)temp.abilities[0]);
-					if(GUI.Button(new Rect(firstAbilPos.x-20,Screen.height-firstAbilPos.y-20,40,40),""))
+					if(GUI.Button(new Rect(firstAbilPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Screen.height-firstAbilPos.y-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),""))
 					{
 						Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[0];
 						prevAbil=activeAbil;
@@ -655,13 +665,13 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				if(abilityInReuse || earnedDefect)
 				{
 					GUI.skin=Templates.getInstance().getAbilityIconGrey((int)temp.abilities[1]);
-					GUI.Button(new Rect(secondAbilPos.x-20,Screen.height-secondAbilPos.y-20,40,40),"");
+					GUI.Button(new Rect(secondAbilPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Screen.height-secondAbilPos.y-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"");
 					GUI.skin=null;
 				}
 				else
 				{
 					GUI.skin=Templates.getInstance().getAbilityIcon((int)temp.abilities[1]);
-					if(GUI.Button(new Rect(secondAbilPos.x-20,Screen.height-secondAbilPos.y-20,40,40),""))
+					if(GUI.Button(new Rect(secondAbilPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Screen.height-secondAbilPos.y-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),""))
 					{
 						Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[1];
 						prevAbil=activeAbil;
@@ -677,13 +687,13 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				if(abilityInReuse || earnedDefect)
 				{
 					GUI.skin=Templates.getInstance().getAbilityIconGrey((int)temp.abilities[2]);
-					GUI.Button(new Rect(thirdAbilPos.x-20,Screen.height-thirdAbilPos.y-20,40,40),"");
+					GUI.Button(new Rect(thirdAbilPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Screen.height-thirdAbilPos.y-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"");
 					GUI.skin=null;
 				}
 				else
 				{
 					GUI.skin=Templates.getInstance().getAbilityIcon((int)temp.abilities[2]);
-					if(GUI.Button(new Rect(thirdAbilPos.x-20,Screen.height-thirdAbilPos.y-20,40,40),""))
+					if(GUI.Button(new Rect(thirdAbilPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Screen.height-thirdAbilPos.y-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),""))
 					{
 						Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[2];
 						prevAbil=activeAbil;
@@ -699,13 +709,13 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				if(abilityInReuse || earnedDefect)
 				{
 					GUI.skin=Templates.getInstance().getAbilityIconGrey((int)temp.abilities[3]);
-					GUI.Button(new Rect(fourthAbilPos.x-20,Screen.height-fourthAbilPos.y-20,40,40),"");
+					GUI.Button(new Rect(fourthAbilPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Screen.height-fourthAbilPos.y-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"");
 					GUI.skin=null;
 				}
 				else
 				{
 					GUI.skin=Templates.getInstance().getAbilityIcon((int)temp.abilities[3]);
-					if(GUI.Button(new Rect(fourthAbilPos.x-20,Screen.height-fourthAbilPos.y-20,40,40),""))
+					if(GUI.Button(new Rect(fourthAbilPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Screen.height-fourthAbilPos.y-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),""))
 					{
 						Abilities.AbilityType selectedAbil = (Abilities.AbilityType)temp.abilities[3];
 						prevAbil=activeAbil;
@@ -727,7 +737,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	public bool cancelMouseDrop()
 	{
-		return !(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist+clickDistAccuracy*GameStorage.getInstance().zoom);
+		return !(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist);
 	}
 	
 	public void checkShuttleClickState()
@@ -743,7 +753,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				}
 				else if(Input.GetMouseButtonDown(0) && !isMouseOver(gameObject))
 				{
-					if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist+clickDistAccuracy*GameStorage.getInstance().zoom)
+					if(Vector2.Distance(new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x,Camera.main.ScreenToWorldPoint(Input.mousePosition).z),new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z))>clickDist)
 					{
 						selected=false;
 						GameStorage.getInstance().currentSelectedFriendly=null;
@@ -791,9 +801,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				curDefect=defect;
 				earnedDefect=true;
 			}
-			else
-				receivedDefect=false;
-			receivedDamage=damage;
+			receivedDamage+=damage;
 			this.hp-=damage;
 			if(this.hp<=0)
 				this.Die();

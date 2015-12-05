@@ -117,9 +117,16 @@ public class RocketBehaviour : MonoBehaviour {
 	public void checkAttackIconClickState()
 	{
 		if(Input.GetMouseButtonDown(0) && isMouseOver(attackIcon))
+		{
+			GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=false;
 			attackIconCaptured=true;
+		}
+		
 		if(Input.GetMouseButtonUp(0))
+		{
 			attackIconCaptured=false;
+			GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=true;
+		}
 	}
 	
 	void OnGUI()
@@ -137,6 +144,7 @@ public class RocketBehaviour : MonoBehaviour {
 					if(GUI.RepeatButton(new Rect(aPos.x-20,Screen.height-aPos.y-20,40,40),""))
 					{
 						attackIconCaptured=true;
+						GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=false;
 						selected=true;
 					}
 					GUI.skin=null;

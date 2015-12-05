@@ -80,18 +80,41 @@ public class Templates {
 	public GUISkin button_level = null;
 	public GUISkin button_level_selected = null;
 	public GUISkin button_level_start = null;
+	public GUISkin button_level_grey;
 	public GUISkin label_level_star = null;
 	public GUISkin mainPopupRichtext = null;
 	public GUISkin none_scroll_skin = null;
 	public GUISkin progressHpSkin=null;
 	public GUISkin statPointGrey,statPointBlue;
+	public GUISkin bg;
+	public GUISkin menu_button_plot,menu_button_help,menu_button;
+	public GUISkin zalp_button,zalp_button_grey;
+	public GUISkin buttonZoomInSkin,buttonZoomOutSkin;
+	public GUISkin buttonPlay,buttonPlayGrey;
+	public GUISkin buttonPrev,buttonNext;
+	public GUISkin buttonPause;
+	public GUISkin buttonRestart,buttonContinue,buttonMenu,buttonNextLevel;
+	public GUISkin popupWindow;
+	public GUISkin gamePausedStyle;
+	public GUISkin gamePausedDescStyle;
+	public GUISkin gamePausedNameStyle;
+	public GUISkin pauseMission,pauseMissionOk,pauseMissionFail;
+	public GUISkin startLarge;
+	public GUISkin rankStyle;
 	//TEST
-	public GUISkin playBIG=null;
 	
 	public string plotContext,helpContent;
 	
 	private GUISkin[] numbers;
 	private GUISkin[] numbers_grey;
+	
+	public void reloadIcons()
+	{
+		loadNumbersIcons();
+		loadAbilityIcons();
+		loadContents();
+		loadLevelsSkins();
+	}
 	
 	public Templates()
 	{
@@ -116,17 +139,42 @@ public class Templates {
 	
 	private void loadLevelsSkins()
 	{
-		button_level = (GUISkin) Resources.Load("gui/skins/button_level");
-		button_level_selected = (GUISkin) Resources.Load("gui/skins/button_level_selected");
-		button_level_start = (GUISkin) Resources.Load("gui/skins/button_level_start");
-		label_level_star = (GUISkin) Resources.Load("gui/skins/label_level_star");
-		mainPopupRichtext = (GUISkin) Resources.Load("gui/skins/main_popup_richtext");
-		none_scroll_skin = (GUISkin) Resources.Load("gui/skins/none_scroll");
-		progressHpSkin=(GUISkin) Resources.Load("gui/skins/progressStyle");
-		statPointBlue=(GUISkin) Resources.Load("gui/skins/statPointBlue");
-		statPointGrey=(GUISkin) Resources.Load("gui/skins/statPointGrey");
-		playBIG=(GUISkin) Resources.Load("gui/skins/playBig");
-		
+		button_level = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_level");
+		button_level_selected = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_level_selected");
+		button_level_start = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_level_start");
+		label_level_star = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/label_level_star");
+		mainPopupRichtext = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/main_popup_richtext");
+		none_scroll_skin = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/none_scroll");
+		progressHpSkin=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/progressStyle");
+		statPointBlue=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/statPointBlue");
+		statPointGrey=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/statPointGrey");
+		bg = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/bg");
+		menu_button = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/menu_button");
+		menu_button_help = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/menu_button_help");
+		menu_button_plot = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/menu_button_plot");
+		button_level_grey = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_level_grey");
+		zalp_button = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_zalp");
+		zalp_button_grey = (GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_zalp_grey");
+		buttonZoomInSkin=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_zoomIn");
+		buttonZoomOutSkin=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_zoomOut");
+		buttonPlay=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_play");
+		buttonPlayGrey=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_play_grey");
+		buttonNext=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_next");
+		buttonPrev=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_prev");
+		buttonPause=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_pause");
+		buttonRestart=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_restart");
+		buttonContinue=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_continue");
+		buttonMenu=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_menu");
+		buttonNextLevel=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/button_nextLevel");
+		popupWindow=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/popup_window");
+		gamePausedStyle=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/gamePausedLabel");
+		gamePausedDescStyle=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/gamePauseDesc");
+		gamePausedNameStyle=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/gamePauseName");
+		pauseMission=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/pauseMission");
+		pauseMissionOk=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/pauseMissionOk");
+		pauseMissionFail=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/pauseMissionFail");
+		startLarge=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/largeStar");
+		rankStyle=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/rankStyle");
 	}
 	
 	public GUISkin[] getNumberIcons(int num, bool grey)
@@ -149,32 +197,32 @@ public class Templates {
 	{
 		for(int i=0;i<10;i++)
 		{
-			numbers[i]=(GUISkin) Resources.Load("gui/skins/numbers/"+i);
-			numbers_grey[i]=(GUISkin) Resources.Load("gui/skins/numbers/"+i+"_grey");
+			numbers[i]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/numbers/"+i);
+			numbers_grey[i]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/numbers/"+i+"_grey");
 		}
 	}
 	
 	private void loadAbilityIcons()
 	{
-		abilitySkins[0]=(GUISkin) Resources.Load("gui/skins/ability_common");
-		abilitySkins[1]=(GUISkin) Resources.Load("gui/skins/ability_180");
-		abilitySkins[2]=(GUISkin) Resources.Load("gui/skins/ability_360");
-		abilitySkins[3]=(GUISkin) Resources.Load("gui/skins/ability_dt");
-		abilitySkins[4]=(GUISkin) Resources.Load("gui/skins/ability_gas");
-		abilitySkins[5]=(GUISkin) Resources.Load("gui/skins/ability_rocket");
-		abilitySkins[6]=(GUISkin) Resources.Load("gui/skins/ability_shield");
-		abilitySkins[7]=(GUISkin) Resources.Load("gui/skins/ability_thorpede");
-		abilitySkins[8]=(GUISkin) Resources.Load("gui/skins/ability_mines");
+		abilitySkins[0]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_common");
+		abilitySkins[1]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_180");
+		abilitySkins[2]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_360");
+		abilitySkins[3]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_dt");
+		abilitySkins[4]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_gas");
+		abilitySkins[5]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_rocket");
+		abilitySkins[6]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_shield");
+		abilitySkins[7]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_thorpede");
+		abilitySkins[8]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_mines");
 		
-		abilityDisabledSkins[0]=(GUISkin) Resources.Load("gui/skins/ability_common");
-		abilityDisabledSkins[1]=(GUISkin) Resources.Load("gui/skins/ability_180_grey");
-		abilityDisabledSkins[2]=(GUISkin) Resources.Load("gui/skins/ability_360_grey");
-		abilityDisabledSkins[3]=(GUISkin) Resources.Load("gui/skins/ability_dt_grey");
-		abilityDisabledSkins[4]=(GUISkin) Resources.Load("gui/skins/ability_gas_grey");
-		abilityDisabledSkins[5]=(GUISkin) Resources.Load("gui/skins/ability_rocket_grey");
-		abilityDisabledSkins[6]=(GUISkin) Resources.Load("gui/skins/ability_shield_grey");
-		abilityDisabledSkins[7]=(GUISkin) Resources.Load("gui/skins/ability_thorpede_grey");
-		abilityDisabledSkins[8]=(GUISkin) Resources.Load("gui/skins/ability_mines_grey");
+		abilityDisabledSkins[0]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_common");
+		abilityDisabledSkins[1]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_180_grey");
+		abilityDisabledSkins[2]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_360_grey");
+		abilityDisabledSkins[3]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_dt_grey");
+		abilityDisabledSkins[4]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_gas_grey");
+		abilityDisabledSkins[5]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_rocket_grey");
+		abilityDisabledSkins[6]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_shield_grey");
+		abilityDisabledSkins[7]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_thorpede_grey");
+		abilityDisabledSkins[8]=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/ability_mines_grey");
 	}
 	
 	private void loadContents()
@@ -323,7 +371,7 @@ public class Templates {
 	public class LevelInfo
 	{
 		public int num;
-		public string levelName,file,description="NONE";
+		public string levelName,file,description="",hint="";
 		public int rankReached=-1;
 	}
 	
@@ -442,6 +490,8 @@ public class Templates {
 								li.rankReached=int.Parse(l.Value);
 							else if(l.Name=="description")
 								li.description=l.Value;
+							else if(l.Name=="hint")
+								li.hint=l.Value;
 						}
 						levelList.Add(li);
 					}
@@ -618,7 +668,7 @@ public class Templates {
 							p.maxTurnAngle=float.Parse(m.Value);
 						else if(m.Name=="description")
 							p.description=m.Value;
-						else if(m.Name=="weapons")
+						else if(m.Name=="weapon")
 							p.weapons=int.Parse(m.Value);
 						else if(m.Name=="armor")
 							p.armor=int.Parse(m.Value);
@@ -666,5 +716,206 @@ public class Templates {
 			}
 		}
 		Debug.Log("Loaded: "+planeClasses.Count+" plane classes.");
+	}
+	
+	public static class ResolutionProblems {
+		private static float Ethalon=1352;
+		private static float mainMenuFontEth=36;
+		private static float mainMenuPaddingTopEth=35;
+		
+		//levels
+		private static float levelsButtonSizeEth=96;
+		private static float levelsStartPositinEth=100;
+		private static float levelsNumberHEth=58,levelsNumberWEth=50;
+		private static float starOffsetXEth=12,starOffsetYEth=58,thirdStarYOffsetEth=5;
+		private static float levelsNumberOffsetX=15,levelsNumberOffsetY=13;
+		private static float starSize=28;
+		private static float levelButtonStartW=98;
+		private static float levelButtonStartH=29;
+		
+		//PAUSE/WIN/LOSE
+		private static float pauseBoxH=600;
+		private static float pauseButtonW=136,pauseButtonH=40,pauseButtonOffset=17,pauseDopWidth=60,pauseOffsetX=10;
+		private static int gamePauseFontSize=22, pauseDescFontSize=14, pauseNameFontSize=15,reachedRankFontSize=16;
+		private static float missionH=50,missionW=200,accH=50,accW=300,failH=70,failW=250,largeStarSize=70;
+		
+		
+		//Game phase
+		private static float abilIconOffset=50;
+		private static float abilIconSize=40;
+		
+		
+		public static int getMainMenuFontSize(float swidth)
+		{
+			return (int)(mainMenuFontEth*swidth/Ethalon);
+		}
+		
+		public static int getMainMenuPaddingTop(float swidth)
+		{
+			return (int)(mainMenuPaddingTopEth*swidth/Ethalon);
+		}
+		
+		public static float getLevelsButtonSize(float swidth)
+		{
+			return levelsButtonSizeEth*swidth/Ethalon;
+		}
+		
+		public static float getLevelsStartPosition(float swidth)
+		{
+			return levelsStartPositinEth*swidth/Ethalon;
+		}
+		
+		public static float getLevelsNumberH(float swidth)
+		{
+			return levelsNumberHEth*swidth/Ethalon;
+		}
+		
+		public static float getLevelsNumberW(float swidth)
+		{
+			return levelsNumberWEth*swidth/Ethalon;
+		}
+		
+		public static float getLevelsStarOffsetX(float swidth)
+		{
+			return starOffsetXEth*swidth/Ethalon;
+		}
+		
+		public static float getLevelsStarOffsetY(float swidth)
+		{
+			return starOffsetYEth*swidth/Ethalon;
+		}
+		
+		public static float getLevelsThirdstarOffsetY(float swidth)
+		{
+			return thirdStarYOffsetEth*swidth/Ethalon;
+		}
+		
+		public static float getLevelsNumberOffsetX(float swidth)
+		{
+			return levelsNumberOffsetX*swidth/Ethalon;
+		}
+		
+		public static float getLevelsNumberOffsetY(float swidth)
+		{
+			return levelsNumberOffsetY*swidth/Ethalon;
+		}
+		
+		public static float getLevelsStarSize(float swidth)
+		{
+			return starSize*swidth/Ethalon;
+		}
+		
+		public static float getActionAbilityOffset(float swidth)
+		{
+			return abilIconOffset*swidth/Ethalon;
+		}
+		
+		public static float getActionAbilitySize(float swidth)
+		{
+			return abilIconSize*swidth/Ethalon;
+		}
+		
+		public static float getLevelButtonStartW(float swidth)
+		{
+			return levelButtonStartW*swidth/Ethalon;
+		}
+		
+		public static float getLevelButtonStartH(float swidth)
+		{
+			return levelButtonStartH*swidth/Ethalon;
+		}
+		
+		public static float getPauseButtonStartW(float swidth)
+		{
+			return pauseButtonW*swidth/Ethalon;
+		}
+		
+		public static float getPauseButtonStartH(float swidth)
+		{
+			return pauseButtonH*swidth/Ethalon;
+		}
+		
+		public static float getPauseButtonOffset(float swidth)
+		{
+			return pauseButtonOffset*swidth/Ethalon;
+		}
+		
+		public static float getPauseButtonDopWidth(float swidth)
+		{
+			return pauseDopWidth*swidth/Ethalon;
+		}
+		
+		public static float getPauseButtonOffsetX(float swidth)
+		{
+			return pauseOffsetX*swidth/Ethalon;
+		}
+		
+		public static float getPauseButtonBoxH(float swidth)
+		{
+			return pauseBoxH*swidth/Ethalon;
+		}
+		
+		public static int getPauseMenuFontSize(float swidth)
+		{
+			return (int)(gamePauseFontSize*swidth/Ethalon);
+		}
+		
+		public static int getPauseDescFontSize(float swidth)
+		{
+			return (int)(pauseDescFontSize*swidth/Ethalon);
+		}
+		
+		public static int getPauseNameFontSize(float swidth)
+		{
+			return (int)(pauseNameFontSize*swidth/Ethalon);
+		}
+		
+		public static int getPauseReachedRankFontSize(float swidth)
+		{
+			return (int)(reachedRankFontSize*swidth/Ethalon);
+		}
+		
+		public static float getPauseMissionH(float swidth)
+		{
+			return missionH*swidth/Ethalon;
+		}
+		
+		public static float getPauseMissionW(float swidth)
+		{
+			return missionW*swidth/Ethalon;
+		}
+		
+		public static float getPauseAccH(float swidth)
+		{
+			return accH*swidth/Ethalon;
+		}
+		
+		public static float getPauseAccW(float swidth)
+		{
+			return accW*swidth/Ethalon;
+		}
+		
+		public static float getPauseFailH(float swidth)
+		{
+			return failH*swidth/Ethalon;
+		}
+		
+		public static float getPauseFailW(float swidth)
+		{
+			return failW*swidth/Ethalon;
+		}
+		
+		public static float getPauseLargeStarSize(float swidth)
+		{
+			return largeStarSize*swidth/Ethalon;
+		}
+		
+		public static string getSkinsFolder()
+		{
+			if(Screen.width>Ethalon)
+				return "skinsHigh";
+			else
+				return "skinsLow";
+		}
 	}
 }

@@ -113,14 +113,6 @@ public class ThorpedeBehaviour : MonoBehaviour {
 		transform.eulerAngles=new Vector3(0,angle,0);
 	}
 	
-	public void checkAttackIconClickState()
-	{
-		if(Input.GetMouseButtonDown(0) && isMouseOver(attackIcon))
-			attackIconCaptured=true;
-		if(Input.GetMouseButtonUp(0))
-			attackIconCaptured=false;
-	}
-	
 	void OnGUI()
 	{
 		if(!GameStorage.getInstance().overlap)
@@ -136,6 +128,7 @@ public class ThorpedeBehaviour : MonoBehaviour {
 					if(GUI.RepeatButton(new Rect(aPos.x-20,Screen.height-aPos.y-20,40,40),""))
 					{
 						attackIconCaptured=true;
+						GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=false;
 						selected=true;
 					}
 					GUI.skin=null;
@@ -251,6 +244,21 @@ public class ThorpedeBehaviour : MonoBehaviour {
 	{
 		LineRenderer lr = gameObject.GetComponent<LineRenderer>();
 		lr.SetVertexCount(0);
+	}
+	
+	public void checkAttackIconClickState()
+	{
+		if(Input.GetMouseButtonDown(0) && isMouseOver(attackIcon))
+		{
+			GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=false;
+			attackIconCaptured=true;
+		}
+		
+		if(Input.GetMouseButtonUp(0))
+		{
+			attackIconCaptured=false;
+			GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=true;
+		}
 	}
 	
 	void checkShuttleClickState()

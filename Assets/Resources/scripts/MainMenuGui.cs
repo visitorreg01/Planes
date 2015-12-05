@@ -4,21 +4,24 @@ using System.Collections;
 public class MainMenuGui : MonoBehaviour {
 
 	ArrayList levels; 
-	int startPosition=100;
+	float startPosition=100;
 	int betweenDist=0;
-	int levelButtonSize=96;
+	float levelButtonSize=96;
 	
 	int levelSelected=-1;
 	
 	//STARS
-	private const int STAR_X_OFFSET=12;
-	private const int STAR_Y_OFFSET=58;
-	private const int THIRDSTAR_Y_OFFSET=5;
+	private float STAR_X_OFFSET=12;
+	private float STAR_Y_OFFSET=58;
+	private float THIRDSTAR_Y_OFFSET=5;
 	//NUMBERS
-	private const int NUMBER_OFFSET_X=15;
-	private const int NUMBER_OFFSET_Y=13;
+	private float NUMBER_OFFSET_X=15;
+	private float NUMBER_OFFSET_Y=13;
 	
 	Vector2 scrollPos = Vector2.zero;
+	
+	private const float MENU_BUT_H_COEFF=745/362;
+	private const float LEVEL_BUT_START_H_COEFF=98/38;
 	
 	int lastMouseX=0,mouseXDiff=0,curMouseX=0;
 	
@@ -32,6 +35,8 @@ public class MainMenuGui : MonoBehaviour {
 	
 	
 	bool mouseLock=false;
+	
+	string resWs="",resHs="";
 	
 	public static int playedLevelIndex=-1;
 	public static Templates.CampaignInfo selectedCampaign=null;
@@ -58,27 +63,33 @@ public class MainMenuGui : MonoBehaviour {
 		switchMenu(nextMenu);
 	}
 	
-	int[] calculateLevelPosition(int i)
+	float[] calculateLevelPosition(int i)
 	{
-		int h,w;
+		float h,w;
 		if(i%2==0)
 			h=Screen.height/2+levelButtonSize;
 		else
 			h=Screen.height/2;
 		
 		w=startPosition+levelButtonSize/2*i+betweenDist*i;
-		return new int[] {h,w};
+		return new float[] {h,w};
 	}
 	
-	int[] calculateStartButtonPosition(int i)
+	float[] calculateStartButtonPosition(int i)
 	{
-		int h,w;
+		float h,w;
+		
+		float startH,startW;
+		startW=Templates.ResolutionProblems.getLevelButtonStartW(Screen.width);
+		startH=Templates.ResolutionProblems.getLevelButtonStartH(Screen.width);
+		
+		
 		if(i%2==0)
 			h=Screen.height/2+2*levelButtonSize+2;
 		else
-			h=Screen.height/2-40;
+			h=Screen.height/2-2-startH;
 		w=startPosition+levelButtonSize/2*i+betweenDist*i-1;
-		return new int[] {h,w};
+		return new float[] {h,w};
 	}
 	
 	public void switchMenu(GuiCategories nextBlock)
@@ -120,6 +131,12 @@ public class MainMenuGui : MonoBehaviour {
 		if(Input.GetMouseButtonUp(0))
 			mouseLock=false;
 		
+		if(mainMenu && !helpMenu && !plotMenu)
+		{
+			if(Input.GetKeyUp(KeyCode.Q))
+				Application.Quit();
+		}
+		
 		mouseXDiff=0;
 		if(mouseLock)
 		{
@@ -133,8 +150,24 @@ public class MainMenuGui : MonoBehaviour {
 	{
 		if(GameStorage.getInstance().allReady)
 		{
+			Templates.getInstance().menu_button.button.fontSize=Templates.ResolutionProblems.getMainMenuFontSize(Screen.width);
+			Templates.getInstance().menu_button.button.padding=new RectOffset(0,0,Templates.ResolutionProblems.getMainMenuPaddingTop(Screen.width),0);
+			
+			GUI.Box(new Rect(0,0,Screen.width,Screen.height),"",Templates.getInstance().bg.box);
 			
 			GUI.Label(new Rect(0,0,100,20),Screen.width+"x"+Screen.height);
+			resWs = GUI.TextField(new Rect(0,20,50,20),resWs,4);
+			resHs = GUI.TextField(new Rect(50,20,50,20),resHs,4);
+			if(GUI.Button(new Rect(100,20,50,20),"GO"))
+			{
+				int resW,resH;
+				resW=int.Parse(resWs);
+				resH=int.Parse(resHs);
+				Screen.SetResolution(resW,resH,true,60);
+				Templates.getInstance().reloadIcons();
+				Debug.Log("Graphics reloaded");
+			}
+			
 			if(campaignMenu)
 			{
 				if(GUI.Button(new Rect(20,Screen.height-40,100,20),"Back"))
@@ -159,6 +192,15 @@ public class MainMenuGui : MonoBehaviour {
 			
 			if(levelsMenu)
 			{
+				startPosition=Templates.ResolutionProblems.getLevelsStartPosition(Screen.width);
+				
+				STAR_X_OFFSET=Templates.ResolutionProblems.getLevelsStarOffsetX(Screen.width);
+				STAR_Y_OFFSET=Templates.ResolutionProblems.getLevelsStarOffsetY(Screen.width);
+				THIRDSTAR_Y_OFFSET=Templates.ResolutionProblems.getLevelsThirdstarOffsetY(Screen.width);
+				
+				NUMBER_OFFSET_X=Templates.ResolutionProblems.getLevelsNumberOffsetX(Screen.width);
+				NUMBER_OFFSET_Y=Templates.ResolutionProblems.getLevelsNumberOffsetY(Screen.width);
+				
 				if(GUI.Button(new Rect(5,5,100,20),"full"))
 				{
 					for(int j=0;j<Templates.getInstance().getAllLevels().Count;j++)
@@ -187,14 +229,16 @@ public class MainMenuGui : MonoBehaviour {
 				bool aa=true;
 				
 				GUI.skin=Templates.getInstance().none_scroll_skin;
-				scrollPos = GUI.BeginScrollView(new Rect(0,100,Screen.width,Screen.height),scrollPos,new Rect(0,100,startPosition+96/2*levels.Count+96/2+startPosition,Screen.height-200));
+				scrollPos = GUI.BeginScrollView(new Rect(0,startPosition,Screen.width,Screen.height),scrollPos,new Rect(0,startPosition,startPosition+Templates.ResolutionProblems.getLevelButtonStartW(Screen.width)/2*levels.Count+Templates.ResolutionProblems.getLevelButtonStartW(Screen.width)/2+startPosition,Screen.height-2*startPosition));
 				scrollPos+=new Vector2(mouseXDiff/400,0);
+				
+				levelButtonSize=Templates.ResolutionProblems.getLevelsButtonSize(Screen.width);
 				
 				foreach(int l in levels)
 				{
 					if(i!=levelSelected) GUI.skin=Templates.getInstance().button_level; else GUI.skin=Templates.getInstance().button_level_selected;
 					lv=Templates.getInstance().getLevel(l);
-					int[] pos = calculateLevelPosition(i);
+					float[] pos = calculateLevelPosition(i);
 					k = PlayerPrefs.GetInt("level"+lv.num+"Stars",0);
 					
 					
@@ -211,9 +255,9 @@ public class MainMenuGui : MonoBehaviour {
 								GUISkin[] skins = Templates.getInstance().getNumberIcons(i+1,false);
 								GUISkin sk = GUI.skin;
 								GUI.skin=skins[0];
-								GUI.Label(new Rect(pos[1]+levelButtonSize/2-25-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+								GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsNumberW(Screen.width)/2-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,Templates.ResolutionProblems.getLevelsNumberW(Screen.width),Templates.ResolutionProblems.getLevelsNumberH(Screen.width)),"");
 								GUI.skin=skins[1];
-								GUI.Label(new Rect(pos[1]+levelButtonSize/2-25+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+								GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsNumberW(Screen.width)/2+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,Templates.ResolutionProblems.getLevelsNumberW(Screen.width),Templates.ResolutionProblems.getLevelsNumberH(Screen.width)),"");
 								GUI.skin=sk;
 								
 								aa=false;
@@ -223,14 +267,14 @@ public class MainMenuGui : MonoBehaviour {
 								if(GUI.Button(new Rect(pos[1],pos[0],levelButtonSize,levelButtonSize),""))
 								{
 									playedLevelIndex=levelSelected;
-									GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)levels[levelSelected]));
+									GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)levels[levelSelected]),true);
 								}
 								GUISkin[] skins = Templates.getInstance().getNumberIcons(i+1,false);
 								GUISkin sk = GUI.skin;
 								GUI.skin=skins[0];
-								GUI.Label(new Rect(pos[1]+levelButtonSize/2-25-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+								GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsNumberW(Screen.width)/2-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,Templates.ResolutionProblems.getLevelsNumberW(Screen.width),Templates.ResolutionProblems.getLevelsNumberH(Screen.width)),"");
 								GUI.skin=skins[1];
-								GUI.Label(new Rect(pos[1]+levelButtonSize/2-25+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+								GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsNumberW(Screen.width)/2+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,Templates.ResolutionProblems.getLevelsNumberW(Screen.width),Templates.ResolutionProblems.getLevelsNumberH(Screen.width)),"");
 								GUI.skin=sk;
 								
 								aa=false;
@@ -238,16 +282,15 @@ public class MainMenuGui : MonoBehaviour {
 						}
 						else
 						{
-							GUI.enabled=false;
-							GUI.Button(new Rect(pos[1],pos[0],levelButtonSize,levelButtonSize),"");
+							
+							GUI.Button(new Rect(pos[1],pos[0],levelButtonSize,levelButtonSize),"",Templates.getInstance().button_level_grey.button);
 							GUISkin[] skins = Templates.getInstance().getNumberIcons(i+1,true);
 							GUISkin sk = GUI.skin;
 							GUI.skin=skins[0];
-							GUI.Label(new Rect(pos[1]+levelButtonSize/2-25-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+							GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsNumberW(Screen.width)/2-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,Templates.ResolutionProblems.getLevelsNumberW(Screen.width),Templates.ResolutionProblems.getLevelsNumberH(Screen.width)),"");
 							GUI.skin=skins[1];
-							GUI.Label(new Rect(pos[1]+levelButtonSize/2-25+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+							GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsNumberW(Screen.width)/2+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,Templates.ResolutionProblems.getLevelsNumberW(Screen.width),Templates.ResolutionProblems.getLevelsNumberH(Screen.width)),"");
 							GUI.skin=sk;
-							GUI.enabled=true;
 						}
 					}
 					else
@@ -261,9 +304,9 @@ public class MainMenuGui : MonoBehaviour {
 							GUISkin[] skins = Templates.getInstance().getNumberIcons(i+1,false);
 							GUISkin sk = GUI.skin;
 							GUI.skin=skins[0];
-							GUI.Label(new Rect(pos[1]+levelButtonSize/2-25-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+							GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsNumberW(Screen.width)/2-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,Templates.ResolutionProblems.getLevelsNumberW(Screen.width),Templates.ResolutionProblems.getLevelsNumberH(Screen.width)),"");
 							GUI.skin=skins[1];
-							GUI.Label(new Rect(pos[1]+levelButtonSize/2-25+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+							GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsNumberW(Screen.width)/2+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,Templates.ResolutionProblems.getLevelsNumberW(Screen.width),Templates.ResolutionProblems.getLevelsNumberH(Screen.width)),"");
 							GUI.skin=sk;
 						}
 						else
@@ -271,31 +314,31 @@ public class MainMenuGui : MonoBehaviour {
 							if(GUI.Button(new Rect(pos[1],pos[0],levelButtonSize,levelButtonSize),""))
 							{
 								playedLevelIndex=levelSelected;
-								GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)levels[levelSelected]));
+								GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)levels[levelSelected]),true);
 							}
 							GUISkin[] skins = Templates.getInstance().getNumberIcons(i+1,false);
 							GUISkin sk = GUI.skin;
 							GUI.skin=skins[0];
-							GUI.Label(new Rect(pos[1]+levelButtonSize/2-25-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+							GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsNumberW(Screen.width)/2-NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,Templates.ResolutionProblems.getLevelsNumberW(Screen.width),Templates.ResolutionProblems.getLevelsNumberH(Screen.width)),"");
 							GUI.skin=skins[1];
-							GUI.Label(new Rect(pos[1]+levelButtonSize/2-25+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,50,58),"");
+							GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsNumberW(Screen.width)/2+NUMBER_OFFSET_X,pos[0]+NUMBER_OFFSET_Y,Templates.ResolutionProblems.getLevelsNumberW(Screen.width),Templates.ResolutionProblems.getLevelsNumberH(Screen.width)),"");
 							GUI.skin=sk;
 						}
 						GUI.skin=Templates.getInstance().label_level_star;
 						if(k==3)
 						{
-							GUI.Label(new Rect(pos[1]+STAR_X_OFFSET,pos[0]+STAR_Y_OFFSET,28,28),"");
-							GUI.Label(new Rect(pos[1]+levelButtonSize-28-STAR_X_OFFSET,pos[0]+STAR_Y_OFFSET,28,28),"");
-							GUI.Label(new Rect(pos[1]+levelButtonSize/2-14,pos[0]+STAR_Y_OFFSET+THIRDSTAR_Y_OFFSET,28,28),"");
+							GUI.Label(new Rect(pos[1]+STAR_X_OFFSET,pos[0]+STAR_Y_OFFSET,Templates.ResolutionProblems.getLevelsStarSize(Screen.width),Templates.ResolutionProblems.getLevelsStarSize(Screen.width)),"");
+							GUI.Label(new Rect(pos[1]+levelButtonSize-Templates.ResolutionProblems.getLevelsStarSize(Screen.width)-STAR_X_OFFSET,pos[0]+STAR_Y_OFFSET,Templates.ResolutionProblems.getLevelsStarSize(Screen.width),Templates.ResolutionProblems.getLevelsStarSize(Screen.width)),"");
+							GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsStarSize(Screen.width)/2,pos[0]+STAR_Y_OFFSET+THIRDSTAR_Y_OFFSET,Templates.ResolutionProblems.getLevelsStarSize(Screen.width),Templates.ResolutionProblems.getLevelsStarSize(Screen.width)),"");
 						}
 						else if(k==2)
 						{
-							GUI.Label(new Rect(pos[1]+STAR_X_OFFSET,pos[0]+STAR_Y_OFFSET,28,28),"");
-							GUI.Label(new Rect(pos[1]+levelButtonSize-28-STAR_X_OFFSET,pos[0]+STAR_Y_OFFSET,28,28),"");
+							GUI.Label(new Rect(pos[1]+STAR_X_OFFSET,pos[0]+STAR_Y_OFFSET,Templates.ResolutionProblems.getLevelsStarSize(Screen.width),Templates.ResolutionProblems.getLevelsStarSize(Screen.width)),"");
+							GUI.Label(new Rect(pos[1]+levelButtonSize-Templates.ResolutionProblems.getLevelsStarSize(Screen.width)-STAR_X_OFFSET,pos[0]+STAR_Y_OFFSET,Templates.ResolutionProblems.getLevelsStarSize(Screen.width),Templates.ResolutionProblems.getLevelsStarSize(Screen.width)),"");
 						}
 						else if(k==1)
 						{
-							GUI.Label(new Rect(pos[1]+levelButtonSize/2-14,pos[0]+STAR_Y_OFFSET+THIRDSTAR_Y_OFFSET,28,28),"");
+							GUI.Label(new Rect(pos[1]+levelButtonSize/2-Templates.ResolutionProblems.getLevelsStarSize(Screen.width)/2,pos[0]+STAR_Y_OFFSET+THIRDSTAR_Y_OFFSET,Templates.ResolutionProblems.getLevelsStarSize(Screen.width),Templates.ResolutionProblems.getLevelsStarSize(Screen.width)),"");
 						}
 					}
 					i++;
@@ -304,17 +347,40 @@ public class MainMenuGui : MonoBehaviour {
 				
 				if(levelSelected>=0)
 				{
-					int[] pos = calculateStartButtonPosition(levelSelected);
+					float[] pos = calculateStartButtonPosition(levelSelected);
 					GUI.skin=Templates.getInstance().button_level_start;
-					if(GUI.Button(new Rect(pos[1],pos[0],98,38),""))
+					
+					float startH,startW;
+					startW=Templates.ResolutionProblems.getLevelButtonStartW(Screen.width);
+					startH=Templates.ResolutionProblems.getLevelButtonStartH(Screen.width);
+					
+					if(GUI.Button(new Rect(pos[1],pos[0],startW,startH),""))
 					{
 						playedLevelIndex=levelSelected;
-						GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)levels[levelSelected]));
+						GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)levels[levelSelected]),true);
 					}
 					GUI.skin=null;
 				}
 				
 				GUI.EndScrollView();
+				
+				if(levelSelected>=0)
+				{
+					Templates.LevelInfo lev = Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[levelSelected]);
+					float[] q = calculateStartButtonPosition(1);
+					GUILayout.BeginArea(new Rect(10,10,Screen.width-20,q[0]-Templates.ResolutionProblems.getLevelButtonStartH(Screen.width)/2),"",GUI.skin.box);
+					GUILayout.BeginVertical();
+					GUILayout.BeginHorizontal();
+					GUILayout.FlexibleSpace();
+					GUILayout.Label("Mission "+(levelSelected+1)+": "+lev.levelName);
+					GUILayout.FlexibleSpace();
+					GUILayout.EndHorizontal();
+					
+					GUILayout.Label(lev.description);
+					
+					GUILayout.EndVertical();
+					GUILayout.EndArea();
+				}
 			}
 			
 			if(mainMenu)
@@ -381,22 +447,29 @@ public class MainMenuGui : MonoBehaviour {
 				{
 					GUI.enabled=true;
 				
-					int boxH,boxW;
-					boxW=Screen.width/100*40;
-					boxH=Screen.height/100*80;
+					//new
+					float helpplotH,helpplotW,menuBH,menuBW;
 					
-					int buttonH,buttonW;
-					buttonW=boxW-10;
-					buttonH=boxH/4-20;
-					
-					if(GUI.Button(new Rect(Screen.width-30-boxW+5,Screen.height/100*10+25,buttonW,buttonH),"Missions"))
-						switchMenu(GuiCategories.CampaignMenu);
-					if(GUI.Button(new Rect(Screen.width-30-boxW+5,Screen.height/100*10+35+buttonH,buttonW,buttonH),"Plot"))
-						plotMenu=true;
-						
-					GUI.Button(new Rect(Screen.width-30-boxW+5,Screen.height/100*10+45+buttonH*2,buttonW,buttonH),"Credits");
-					if(GUI.Button(new Rect(Screen.width-30-boxW+5,Screen.height/100*10+55+buttonH*3,buttonW,buttonH),"Help"))
+					helpplotH=Screen.width*0.07f;
+					helpplotW=helpplotH;
+					if(GUI.Button(new Rect(30,Screen.height-30-helpplotH,helpplotW,helpplotH),"",Templates.getInstance().menu_button_help.button))
 						helpMenu=true;
+					if(GUI.Button(new Rect(Screen.width-30-helpplotW,Screen.height-30-helpplotH,helpplotW,helpplotH),"",Templates.getInstance().menu_button_plot.button))
+						plotMenu=true;
+					
+					float bw = Screen.width/2-(30+helpplotW);
+					float bwdif = bw-bw*0.7f;
+					menuBW=bw*0.7f;
+					bwdif/=2;
+					float campaingsPosX=30+helpplotW+bwdif;
+					menuBH=menuBW/MENU_BUT_H_COEFF;
+					
+					float menuButY=Screen.height-menuBH+menuBH*0.09f;
+					float creditsPosX=Screen.width-30-helpplotW-bwdif-menuBW;
+					
+					if(GUI.Button(new Rect(campaingsPosX,menuButY,menuBW,menuBH),"Campaings",Templates.getInstance().menu_button.button))
+						switchMenu(GuiCategories.CampaignMenu);
+					GUI.Button(new Rect(creditsPosX,menuButY,menuBW,menuBH),"Credits",Templates.getInstance().menu_button.button);
 				}
 			}
 			

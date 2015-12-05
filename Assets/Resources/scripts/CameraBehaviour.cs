@@ -89,10 +89,20 @@ public class CameraBehaviour : MonoBehaviour {
 		}
 	}
 	
+	public void dropPopupShowed()
+	{
+		foreach(GameObject o in GameStorage.getInstance().getFriendlyShuttles())
+			o.GetComponent<FriendlyShuttleBehaviour>().showPopup=false;
+		foreach(GameObject o in GameStorage.getInstance().getEnemyShuttles())
+			o.GetComponent<EnemyShuttleBehaviour>().showPopup=false;
+	}
+	
 	public void dropSelection(GameObject o)
 	{
 		if(o.GetComponent<FriendlyShuttleBehaviour>()!=null)
+		{
 			o.GetComponent<FriendlyShuttleBehaviour>().selected=false;
+		}
 		if(o.GetComponent<EnemyShuttleBehaviour>()!=null)
 			o.GetComponent<EnemyShuttleBehaviour>().selected=false;
 		if(o.GetComponent<RocketBehaviour>()!=null)
@@ -135,8 +145,27 @@ public class CameraBehaviour : MonoBehaviour {
 	
 	private void checkMouse()
 	{
+		if(!(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer))
+		{
+			GameObject pp=null;
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+	    	RaycastHit hit;
+			if (Physics.Raycast(ray, out hit))
+	    		pp=hit.collider.gameObject;
+			
+			dropPopupShowed();
+			if(pp!=null)
+			{
+				if(pp.GetComponent<FriendlyShuttleBehaviour>()!=null)
+					pp.GetComponent<FriendlyShuttleBehaviour>().showPopup=true;
+				if(pp.GetComponent<EnemyShuttleBehaviour>()!=null)
+					pp.GetComponent<EnemyShuttleBehaviour>().showPopup=true;
+			}
+		}
+		
 		if(Input.GetButtonDown("Fire1"))
 		{
+			
 			bool f = true;
 			GameObject pp=null;
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -157,6 +186,7 @@ public class CameraBehaviour : MonoBehaviour {
 				}
 			}
 			
+		
 			if(f)
 			{
 				if(pp!=null)
@@ -170,6 +200,7 @@ public class CameraBehaviour : MonoBehaviour {
 					{
 						if(currentSelected.GetComponent<FriendlyShuttleBehaviour>()!=null)
 						{
+							
 							if(!currentSelected.GetComponent<FriendlyShuttleBehaviour>().cancelMouseDrop())
 							{
 								dropSelection(currentSelected);
@@ -179,7 +210,7 @@ public class CameraBehaviour : MonoBehaviour {
 						}
 						else
 						{
-							dropSelection(currentSelected);
+							
 							setSelection(pp);
 							currentSelected=pp;
 						}
@@ -189,6 +220,8 @@ public class CameraBehaviour : MonoBehaviour {
 				{
 					if(currentSelected!=null)
 					{
+						if(currentSelected.GetComponent<FriendlyShuttleBehaviour>()!=null)
+							currentSelected.GetComponent<FriendlyShuttleBehaviour>().iconsShowed=false;
 						dropSelection(currentSelected);
 						currentSelected=null;
 					}
@@ -197,6 +230,19 @@ public class CameraBehaviour : MonoBehaviour {
 			
 			
 		}
+		
+		
+		/*
+		GameObject pp=null;
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    	RaycastHit hit;
+		if (Physics.Raycast(ray, out hit))
+    		pp=hit.collider.gameObject;
+		if(pp==null)
+			Debug.Log("null");
+		else
+			Debug.Log("not null");
+		*/
 	}
 	
 	void OnGUI()
@@ -208,45 +254,149 @@ public class CameraBehaviour : MonoBehaviour {
 			GUI.depth=200;
 			
 			GUI.Box(new Rect(0,0,Screen.width,Screen.height),"");
-			int boxW=Screen.width/100*20;
-			int boxH=Screen.height/100*40;
-			string boxLabel="End mission "+(MainMenuGui.playedLevelIndex+1)+"\n";
+			float buttonH,buttonW;
+			buttonW=Templates.ResolutionProblems.getPauseButtonStartW(Screen.width);
+			buttonH=Templates.ResolutionProblems.getPauseButtonStartH(Screen.width);
+			float boxW=buttonW*3+Templates.ResolutionProblems.getPauseButtonDopWidth(Screen.width);
+			float boxH=Templates.ResolutionProblems.getPauseButtonBoxH(Screen.width);
 			
-			if(stars==-1)
-				boxLabel+="LOSE!";
-			else if(stars==0)
-				boxLabel+="DRAW!";
-			else
-			{
-				boxLabel+="WIN!\nStars: "+stars;
-				if(reachedRank)
-					boxLabel+="\nReached rank:\n"+reachedRankName;
-			}
-			GUI.Box(new Rect(Screen.width/2-boxW/2,Screen.height/2-boxH/2,boxW,boxH),boxLabel);
-			int buttonH,buttonW;
-			buttonH=boxH/100*20;
+			GUILayout.BeginArea(new Rect(Screen.width/2-boxW/2,Screen.height/2-boxH/2,boxW,boxH));
+			GUILayout.BeginVertical(Templates.getInstance().popupWindow.box);
 			
-			if(stars==-1 || MainMenuGui.playedLevelIndex+1==MainMenuGui.selectedCampaign.levels.Count) buttonW=boxW/2-10;
-			else buttonW=boxW/3-10;
+			GUILayout.Label("");
+			
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
+			GUISkin f = Templates.getInstance().gamePausedStyle;
+			f.label.fontSize=Templates.ResolutionProblems.getPauseMenuFontSize(Screen.width);
+			GUILayout.Label("Game paused",f.label);
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
 			
 			if(stars==-1 || stars==0)
 			{
-				if(GUI.Button(new Rect(Screen.width/2-boxW/2+5,Screen.height/2+boxH/2-buttonH-5,buttonW,buttonH),"To Main"))
+				GUILayout.BeginVertical();
+				GUILayout.FlexibleSpace();
+				
+				GUILayout.BeginHorizontal();
+				GUILayout.FlexibleSpace();
+				GUILayout.Label("",Templates.getInstance().pauseMission.label,GUILayout.Width(Templates.ResolutionProblems.getPauseMissionW(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPauseMissionH(Screen.width)));
+				GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
+				
+				GUILayout.BeginHorizontal();
+				GUILayout.FlexibleSpace();
+				GUILayout.Label("",Templates.getInstance().pauseMissionFail.label,GUILayout.Width(Templates.ResolutionProblems.getPauseFailW(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPauseFailH(Screen.width)));
+				GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
+				
+				GUILayout.FlexibleSpace();
+				
+				if(GameStorage.tries>=1)
+				{
+					GUILayout.BeginHorizontal();
+					GUILayout.FlexibleSpace();
+					GUISkin zz = Templates.getInstance().gamePausedNameStyle;
+					zz.label.fontSize = Templates.ResolutionProblems.getPauseNameFontSize(Screen.width);
+					GUILayout.Label("Hint:",zz.label);
+					GUILayout.FlexibleSpace();
+					GUILayout.EndHorizontal();
+					
+					zz = Templates.getInstance().gamePausedDescStyle;
+					zz.label.fontSize=Templates.ResolutionProblems.getPauseDescFontSize(Screen.width);
+					GUILayout.Label(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]).hint,zz.label);
+					
+				}
+				
+				
+				GUILayout.EndVertical();
+				
+				GUILayout.FlexibleSpace();
+				GUILayout.BeginHorizontal();
+				GUILayout.Label("",GUILayout.Width(Templates.ResolutionProblems.getPauseButtonOffsetX(Screen.width)));
+				if(GUILayout.Button("",Templates.getInstance().buttonMenu.button,GUILayout.Width(buttonW),GUILayout.Height(buttonH)))
 				{
 					GameStorage.getInstance().overlap=false;
 					showNextLevelWindow=false;
 					MainMenuGui.nextMenu=MainMenuGui.GuiCategories.LevelsMenu;
+					GameStorage.tries=0;
 					Application.LoadLevel("mainGui");
 				}
-				if(GUI.Button(new Rect(Screen.width/2-boxW/2+15+buttonW,Screen.height/2+boxH/2-buttonH-5,buttonW,buttonH),"Reply"))
+				
+				if(GUILayout.Button("",Templates.getInstance().buttonRestart.button,GUILayout.Width(buttonW),GUILayout.Height(buttonH)))
 				{
 					GameStorage.getInstance().overlap=false;
 					showNextLevelWindow=false;
-					GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]));
+					GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]),false);
 				}
+				
+				GUI.enabled=false;
+				GUILayout.Button("",Templates.getInstance().buttonNextLevel.button,GUILayout.Width(buttonW),GUILayout.Height(buttonH));
+				GUI.enabled=true;
+				GUILayout.EndHorizontal();
 			}
 			else
 			{
+				GUILayout.BeginVertical();
+				GUILayout.FlexibleSpace();
+				
+				GUILayout.BeginHorizontal();
+				GUILayout.FlexibleSpace();
+				GUILayout.Label("",Templates.getInstance().pauseMission.label,GUILayout.Width(Templates.ResolutionProblems.getPauseMissionW(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPauseMissionH(Screen.width)));
+				GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
+				
+				GUILayout.BeginHorizontal();
+				GUILayout.FlexibleSpace();
+				GUILayout.Label("",Templates.getInstance().pauseMissionOk.label,GUILayout.Width(Templates.ResolutionProblems.getPauseAccW(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPauseAccH(Screen.width)));
+				GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
+				
+				//stars
+				GUILayout.FlexibleSpace();
+				
+				GUILayout.BeginHorizontal();
+				GUILayout.FlexibleSpace();
+				if(stars>=1)
+					GUILayout.Label("",Templates.getInstance().startLarge.label,GUILayout.Width(Templates.ResolutionProblems.getPauseLargeStarSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPauseLargeStarSize(Screen.width)));
+				if(stars>=2)
+					GUILayout.Label("",Templates.getInstance().startLarge.label,GUILayout.Width(Templates.ResolutionProblems.getPauseLargeStarSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPauseLargeStarSize(Screen.width)));
+				if(stars>=3)
+					GUILayout.Label("",Templates.getInstance().startLarge.label,GUILayout.Width(Templates.ResolutionProblems.getPauseLargeStarSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPauseLargeStarSize(Screen.width)));
+				GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
+				
+				if(reachedRank)
+				{
+					GUILayout.FlexibleSpace();
+					GUILayout.BeginVertical();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.FlexibleSpace();
+					GUISkin pop = Templates.getInstance().gamePausedNameStyle;
+					pop.label.fontSize = Templates.ResolutionProblems.getPauseNameFontSize(Screen.width);
+					GUILayout.Label("Reached rank:",pop.label);
+					GUILayout.FlexibleSpace();
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.FlexibleSpace();
+					pop = Templates.getInstance().rankStyle;
+					pop.label.fontSize=Templates.ResolutionProblems.getPauseReachedRankFontSize(Screen.width);
+					GUILayout.Label(reachedRankName,pop.label);
+					GUILayout.FlexibleSpace();
+					GUILayout.EndHorizontal();
+					
+					GUILayout.EndVertical();
+				}
+				
+				GUILayout.FlexibleSpace();
+				GUILayout.EndVertical();
+				
+				
+				GUILayout.FlexibleSpace();
+				GUILayout.BeginHorizontal();
+				GUILayout.Label("",GUILayout.Width(Templates.ResolutionProblems.getPauseButtonOffsetX(Screen.width)));
 				int maxStars = PlayerPrefs.GetInt("level"+((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex])+"Stars",0);
 				if(maxStars==0)
 					PlayerPrefs.SetInt("level"+((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex])+"Stars",stars);
@@ -257,68 +407,116 @@ public class CameraBehaviour : MonoBehaviour {
 				}
 				PlayerPrefs.Save();
 				
-				if(GUI.Button(new Rect(Screen.width/2-boxW/2+5,Screen.height/2+boxH/2-buttonH-5,buttonW,buttonH),"To Main"))
+				if(GUILayout.Button("",Templates.getInstance().buttonMenu.button,GUILayout.Width(buttonW),GUILayout.Height(buttonH)))
 				{
 					GameStorage.getInstance().overlap=false;
 					showNextLevelWindow=false;
 					MainMenuGui.nextMenu=MainMenuGui.GuiCategories.LevelsMenu;
+					GameStorage.tries=0;
 					Application.LoadLevel("mainGui");
 				}
-				if(GUI.Button(new Rect(Screen.width/2-boxW/2+15+buttonW,Screen.height/2+boxH/2-buttonH-5,buttonW,buttonH),"Reply"))
+				if(GUILayout.Button("",Templates.getInstance().buttonRestart.button,GUILayout.Width(buttonW),GUILayout.Height(buttonH)))
 				{
 					GameStorage.getInstance().overlap=false;
 					showNextLevelWindow=false;
-					GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]));
+					GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]),false);
 				}
 				if(MainMenuGui.playedLevelIndex+1!=MainMenuGui.selectedCampaign.levels.Count)
 				{
-					if(GUI.Button(new Rect(Screen.width/2-boxW/2+25+buttonW*2,Screen.height/2+boxH/2-buttonH-5,buttonW,buttonH),"Next level"))
+					if(GUILayout.Button("",Templates.getInstance().buttonNextLevel.button,GUILayout.Width(buttonW),GUILayout.Height(buttonH)))
 					{
 						GameStorage.getInstance().overlap=false;
 						showNextLevelWindow=false;
-						GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex+1]));
+						MainMenuGui.playedLevelIndex++;
+						GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]),true);
 					}
 				}
+				GUILayout.EndHorizontal();
 			}
 			GUI.depth=GameStorage.getInstance().defaultDepth;
+			
+			GUILayout.Label("",GUILayout.Height(Templates.ResolutionProblems.getPauseButtonOffset(Screen.width)));
+			GUILayout.EndVertical();
+			GUILayout.EndArea();
 		}
 		
 		if(showPause)
 		{
 			GameStorage.getInstance().overlap=true;
+			canReleaseMouse=false;
 			GUI.depth=200;
 			GUI.Box(new Rect(0,0,Screen.width,Screen.height),"");
-			int boxW=Screen.width/100*20;
-			int boxH=Screen.height/100*40;
-			string boxLabel="Game Pause";
-			GUI.Box(new Rect(Screen.width/2-boxW/2,Screen.height/2-boxH/2,boxW,boxH),boxLabel);
-			int buttonH,buttonW;
-			buttonW=boxW/3-10;
-			buttonH=boxH/100*20;
+			float buttonH,buttonW;
+			buttonW=Templates.ResolutionProblems.getPauseButtonStartW(Screen.width);
+			buttonH=Templates.ResolutionProblems.getPauseButtonStartH(Screen.width);
+			float boxW=buttonW*3+Templates.ResolutionProblems.getPauseButtonDopWidth(Screen.width);
+			float boxH=Templates.ResolutionProblems.getPauseButtonBoxH(Screen.width);
 			
-			if(GUI.Button(new Rect(Screen.width/2-boxW/2+5,Screen.height/2+boxH/2-5-buttonH,buttonW,buttonH),"Main Menu"))
+			GUILayout.BeginArea(new Rect(Screen.width/2-boxW/2,Screen.height/2-boxH/2,boxW,boxH));
+			GUILayout.BeginVertical(Templates.getInstance().popupWindow.box);
+			
+			GUILayout.Label("");
+			
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
+			GUISkin f = Templates.getInstance().gamePausedStyle;
+			f.label.fontSize=Templates.ResolutionProblems.getPauseMenuFontSize(Screen.width);
+			GUILayout.Label("Game paused",f.label);
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+			
+
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
+			f = Templates.getInstance().gamePausedNameStyle;
+			f.label.fontSize=Templates.ResolutionProblems.getPauseNameFontSize(Screen.width);
+			GUILayout.Label("Mission "+(MainMenuGui.playedLevelIndex+1)+": "+Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]).levelName,f.label);
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+			
+			GUILayout.Label("");
+			
+			
+			f = Templates.getInstance().gamePausedDescStyle;
+			f.label.fontSize=Templates.ResolutionProblems.getPauseDescFontSize(Screen.width);
+			GUILayout.Label(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]).description,f.label);
+			
+			GUILayout.FlexibleSpace();
+			
+			GUILayout.BeginHorizontal();
+			GUILayout.Label("",GUILayout.Width(Templates.ResolutionProblems.getPauseButtonOffsetX(Screen.width)));
+			if(GUILayout.Button("",Templates.getInstance().buttonMenu.button,GUILayout.Width(buttonW),GUILayout.Height(buttonH)))
 			{
 				GameStorage.getInstance().overlap=false;
 				showPause=false;
+				canReleaseMouse=true;
 				GameStorage.getInstance().EndLevel();
 				MainMenuGui.nextMenu=MainMenuGui.GuiCategories.LevelsMenu;
+				GameStorage.tries=0;
 				Application.LoadLevel("mainGui");
 				
 			}
 			
-			if(GUI.Button(new Rect(Screen.width/2-boxW/2+15+buttonW,Screen.height/2+boxH/2-5-buttonH,buttonW,buttonH),"Reply"))
+			if(GUILayout.Button("",Templates.getInstance().buttonRestart.button,GUILayout.Width(buttonW),GUILayout.Height(buttonH)))
 			{
 				GameStorage.getInstance().overlap=false;
 				showPause=false;
+				canReleaseMouse=true;
 				GameStorage.getInstance().EndLevel();
-				GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]));
+				GameStorage.getInstance().LoadLevel(Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]),false);
 			}
 			
-			if(GUI.Button(new Rect(Screen.width/2-boxW/2+25+buttonW*2,Screen.height/2+boxH/2-5-buttonH,buttonW,buttonH),"Continue"))
+			if(GUILayout.Button("",Templates.getInstance().buttonContinue.button,GUILayout.Width(buttonW),GUILayout.Height(buttonH)))
 			{
+				canReleaseMouse=true;
 				GameStorage.getInstance().overlap=false;
 				showPause=false;
 			}
+			
+			GUILayout.EndHorizontal();
+			GUILayout.Label("",GUILayout.Height(Templates.ResolutionProblems.getPauseButtonOffset(Screen.width)));
+			GUILayout.EndVertical();
+			GUILayout.EndArea();
 		}
 	}
 	

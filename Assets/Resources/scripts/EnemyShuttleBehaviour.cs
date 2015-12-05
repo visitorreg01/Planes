@@ -25,6 +25,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	private Vector3 Paintvec;
 	private const float PROGRESS_HP_MAX_WIDTH=185;
 	
+	public bool showPopup=false;
 	private const float damageShowTimer=2;
 	private float damageShowTime=0;
 	private int receivedDamage = 0;
@@ -184,29 +185,32 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	{
 		if(Time.time<=GameStorage.getInstance().getFixedTime()+3)
 		{
-			if(!(defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns)) && activeAbil!=Abilities.AbilityType.gas && activeAbil!=Abilities.AbilityType.homingMissle && activeAbil!=Abilities.AbilityType.homingThorpede)
+			if(!((defectInUse && curDefect.GetType()==typeof(Defects.DisableGuns))))
 			{
-				Templates.GunTemplate gunTemp;
-				GameObject friendly;
-				foreach(Templates.GunOnShuttle gun in temp.guns)
+				if(!Abilities.getLockGun(activeAbil))
 				{
-					gunTemp=Templates.getInstance().getGunTemplate(gun.gunId);
-					if(!gun.ready)
-						if(gun.shotTime+gunTemp.reuse<Time.time)
-							gun.ready=true;
-					
-					friendly=GameStorage.getInstance().getFriendlyInFireZone(gameObject,gun);
-					if(friendly!=null)
+					Templates.GunTemplate gunTemp;
+					GameObject friendly;
+					foreach(Templates.GunOnShuttle gun in temp.guns)
 					{
-						if(gun.ready)
+						gunTemp=Templates.getInstance().getGunTemplate(gun.gunId);
+						if(!gun.ready)
+							if(gun.shotTime+gunTemp.reuse<Time.time)
+								gun.ready=true;
+						
+						friendly=GameStorage.getInstance().getFriendlyInFireZone(gameObject,gun);
+						if(friendly!=null)
 						{
-							gun.shotTime=Time.time;
-							gun.ready=false;
-							// WARN
-							Vector2 f = Quaternion.Euler(0,0,-angle)*gun.pos;
-							GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/"+gunTemp.bulletMesh) as GameObject,new Vector3(transform.position.x+f.x,0,transform.position.z+f.y),Quaternion.Euler(0,angle,0));
-							bullet.GetComponent<BulletBehaviour>().enemy=true;
-							bullet.GetComponent<BulletBehaviour>().Launch(new Vector2(friendly.transform.position.x,friendly.transform.position.z),new Vector2(transform.position.x+f.x,transform.position.z+f.y),gun);	
+							if(gun.ready)
+							{
+								gun.shotTime=Time.time;
+								gun.ready=false;
+								// WARN
+								Vector2 f = Quaternion.Euler(0,0,-angle)*gun.pos;
+								GameObject bullet = (GameObject) Instantiate(Resources.Load("prefab/"+gunTemp.bulletMesh) as GameObject,new Vector3(transform.position.x+f.x,0,transform.position.z+f.y),Quaternion.Euler(0,angle,0));
+								bullet.GetComponent<BulletBehaviour>().enemy=true;
+								bullet.GetComponent<BulletBehaviour>().Launch(new Vector2(friendly.transform.position.x,friendly.transform.position.z),new Vector2(transform.position.x+f.x,transform.position.z+f.y),gun);	
+							}
 						}
 					}
 				}
@@ -313,9 +317,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 				curDefect=defect;
 				earnedDefect=true;
 			}
-			else
-				receivedDefect=false;
-			receivedDamage=damage;
+			receivedDamage+=damage;
 			this.hp-=damage;
 			if(this.hp<=0)
 				this.Die();
@@ -408,6 +410,9 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
+		if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+			showPopup=selected;
+		
 		if(damageShowTime>0)
 		{
 			float posX,posY;
@@ -426,67 +431,137 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 			}
 			GUI.Box(new Rect(posX,posY,100,20),text);
 			damageShowTime-=Time.deltaTime;
-			if(damageShowTime<0) damageShowTime=0;
+			if(damageShowTime<0)
+			{				
+				damageShowTime=0;
+				receivedDamage=0;
+				receivedDefect=false;
+			}
 		}
 		
-		if(selected && !GameStorage.getInstance().isRunning)
-		{
-			Paintvec = Camera.main.WorldToScreenPoint(transform.position);
-			GUISkin progressSkin = Templates.getInstance().progressHpSkin;
-			GUILayout.BeginArea(new Rect(Paintvec.x,Screen.height-Paintvec.y,200,Screen.height));
-			GUILayout.BeginVertical(GUI.skin.box);
-			GUILayout.Label("Name: "+temp.classname);
-			GUILayout.BeginVertical(GUI.skin.box);
-			GUILayout.Box(hp+"/"+temp.hp,progressSkin.box,GUILayout.Width(PROGRESS_HP_MAX_WIDTH*(((float)hp)/((float)temp.hp))));
-			GUILayout.EndVertical();
-			if(curDefect!=null)
-				GUILayout.Label("Defect: <color=brown>"+curDefect.getName()+"</color>");
-			if(privateAbils.Count>0)
+		if(!(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer))
+	    {
+	   		if(showPopup && !GameStorage.getInstance().isRunning)
 			{
-				GUILayout.Label("Abils:");
-				GUILayout.BeginHorizontal();
-				GUISkin s;
-				foreach(int ab in privateAbils)
+				Paintvec = Camera.main.WorldToScreenPoint(transform.position);
+				GUISkin progressSkin = Templates.getInstance().progressHpSkin;
+				GUILayout.BeginArea(new Rect(Paintvec.x,Screen.height-Paintvec.y,200,Screen.height));
+				GUILayout.BeginVertical(GUI.skin.box);
+				GUILayout.Label("Name: "+temp.classname);
+				GUILayout.BeginVertical(hp+"/"+temp.hp,GUI.skin.box);
+				GUILayout.Box("",progressSkin.box,GUILayout.Width(PROGRESS_HP_MAX_WIDTH*(((float)hp)/((float)temp.hp))));
+				GUILayout.EndVertical();
+				if(curDefect!=null)
+					GUILayout.Label("Defect: <color=brown>"+curDefect.getName()+"</color>");
+				if(privateAbils.Count>0)
 				{
-					s=Templates.getInstance().getAbilityIcon(ab);
-					GUILayout.Label("",s.label,GUILayout.Width(32),GUILayout.Height(32));
+					GUILayout.Label("Abils:");
+					GUILayout.BeginHorizontal();
+					GUISkin s;
+					foreach(int ab in privateAbils)
+					{
+						s=Templates.getInstance().getAbilityIcon(ab);
+						GUILayout.Label("",s.label,GUILayout.Width(32),GUILayout.Height(32));
+					}
+					GUILayout.EndHorizontal();
 				}
+				
+				//Weapon
+				GUILayout.Label("Weapons:");
+				GUILayout.BeginHorizontal();
+				for(int i = 0;i<temp.weapons;i++)
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				for(int i = 0;i<5-temp.weapons;i++)
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
 				GUILayout.EndHorizontal();
+				GUILayout.Label("Armor:");
+				GUILayout.BeginHorizontal();
+				for(int i = 0;i<temp.armor;i++)
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				for(int i = 0;i<5-temp.armor;i++)
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.EndHorizontal();
+				GUILayout.Label("Speed:");
+				GUILayout.BeginHorizontal();
+				for(int i = 0;i<temp.speed;i++)
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				for(int i = 0;i<5-temp.speed;i++)
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.EndHorizontal();
+				GUILayout.Label("Maneuverability:");
+				GUILayout.BeginHorizontal();
+				for(int i = 0;i<temp.maneuverability;i++)
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				for(int i = 0;i<5-temp.maneuverability;i++)
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.EndHorizontal();
+				
+				GUILayout.Label(temp.description);
+				GUILayout.EndVertical();
+				GUILayout.EndArea();
 			}
-			
-			//Weapon
-			GUILayout.Label("Weapons:");
-			GUILayout.BeginHorizontal();
-			for(int i = 0;i<temp.weapons;i++)
-				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
-			for(int i = 0;i<5-temp.weapons;i++)
-				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
-			GUILayout.EndHorizontal();
-			GUILayout.Label("Armor:");
-			GUILayout.BeginHorizontal();
-			for(int i = 0;i<temp.armor;i++)
-				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
-			for(int i = 0;i<5-temp.armor;i++)
-				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
-			GUILayout.EndHorizontal();
-			GUILayout.Label("Speed:");
-			GUILayout.BeginHorizontal();
-			for(int i = 0;i<temp.speed;i++)
-				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
-			for(int i = 0;i<5-temp.speed;i++)
-				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
-			GUILayout.EndHorizontal();
-			GUILayout.Label("Maneuverability:");
-			GUILayout.BeginHorizontal();
-			for(int i = 0;i<temp.maneuverability;i++)
-				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
-			for(int i = 0;i<5-temp.maneuverability;i++)
-				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
-			GUILayout.EndHorizontal();
-			
-			GUILayout.Label(temp.description);
-			GUILayout.EndVertical();
-			GUILayout.EndArea();
+	    }
+		else
+		{
+			if(selected && !GameStorage.getInstance().isRunning)
+			{
+				Paintvec = Camera.main.WorldToScreenPoint(transform.position);
+				GUISkin progressSkin = Templates.getInstance().progressHpSkin;
+				GUILayout.BeginArea(new Rect(Paintvec.x,Screen.height-Paintvec.y,200,Screen.height));
+				GUILayout.BeginVertical(GUI.skin.box);
+				GUILayout.Label("Name: "+temp.classname);
+				GUILayout.BeginVertical(hp+"/"+temp.hp,GUI.skin.box);
+				GUILayout.Box("",progressSkin.box,GUILayout.Width(PROGRESS_HP_MAX_WIDTH*(((float)hp)/((float)temp.hp))));
+				GUILayout.EndVertical();
+				if(curDefect!=null)
+					GUILayout.Label("Defect: <color=brown>"+curDefect.getName()+"</color>");
+				if(privateAbils.Count>0)
+				{
+					GUILayout.Label("Abils:");
+					GUILayout.BeginHorizontal();
+					GUISkin s;
+					foreach(int ab in privateAbils)
+					{
+						s=Templates.getInstance().getAbilityIcon(ab);
+						GUILayout.Label("",s.label,GUILayout.Width(32),GUILayout.Height(32));
+					}
+					GUILayout.EndHorizontal();
+				}
+				
+				//Weapon
+				GUILayout.Label("Weapons:");
+				GUILayout.BeginHorizontal();
+				for(int i = 0;i<temp.weapons;i++)
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				for(int i = 0;i<5-temp.weapons;i++)
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.EndHorizontal();
+				GUILayout.Label("Armor:");
+				GUILayout.BeginHorizontal();
+				for(int i = 0;i<temp.armor;i++)
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				for(int i = 0;i<5-temp.armor;i++)
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.EndHorizontal();
+				GUILayout.Label("Speed:");
+				GUILayout.BeginHorizontal();
+				for(int i = 0;i<temp.speed;i++)
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				for(int i = 0;i<5-temp.speed;i++)
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.EndHorizontal();
+				GUILayout.Label("Maneuverability:");
+				GUILayout.BeginHorizontal();
+				for(int i = 0;i<temp.maneuverability;i++)
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				for(int i = 0;i<5-temp.maneuverability;i++)
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.EndHorizontal();
+				
+				GUILayout.Label(temp.description);
+				GUILayout.EndVertical();
+				GUILayout.EndArea();
+			}
 		}
 	}
 	

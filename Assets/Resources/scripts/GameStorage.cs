@@ -11,6 +11,7 @@ public class GameStorage {
 		return instance;
 	}
 	
+	public static int tries=0;
 	public static int captured=0;
 	
 	public GameObject currentSelectedFriendly=null;
@@ -64,11 +65,16 @@ public class GameStorage {
 			gg.GetComponent<FriendlyShuttleBehaviour>().setMaxAttackIcon();
 	}
 	
-	public void LoadLevel(Templates.LevelInfo lv)
+	public void LoadLevel(Templates.LevelInfo lv, bool clearTries)
 	{
 		totalHp=0;
 		curHp=0;
 		curLevel=lv.num;
+		if(clearTries)
+			tries=0;
+		else
+			tries++;
+		
 		Application.LoadLevel(lv.file);
 	}
 	

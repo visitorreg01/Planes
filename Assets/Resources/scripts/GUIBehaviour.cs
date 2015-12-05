@@ -2,30 +2,22 @@
 using System.Collections;
 
 public class GUIBehaviour : MonoBehaviour {
-
-	GUISkin buttonZoomInSkin,buttonZoomOutSkin;
-	GUISkin buttonPlay,buttonPlayGrey;
-	GUISkin buttonPrev,buttonNext;
-	
 	private int camScaleSpeed=5;
-	
-	
-	void Start()
-	{
-		buttonZoomInSkin=(GUISkin) Resources.Load("gui/skins/button_zoomIn");
-		buttonZoomOutSkin=(GUISkin) Resources.Load("gui/skins/button_zoomOut");
-		buttonPlay=(GUISkin) Resources.Load("gui/skins/button_play");
-		buttonPlayGrey=(GUISkin) Resources.Load("gui/skins/button_play_grey");
-		buttonNext=(GUISkin) Resources.Load("gui/skins/button_next");
-		buttonPrev=(GUISkin) Resources.Load("gui/skins/button_prev");
-	}
+	private Color normColor = new Color(1,1,1,1);
+	private Color disabledColor = new Color(1,1,1,0.3f);
 	
 	void OnGUI()
 	{
 		GUI.enabled=!GameStorage.getInstance().overlap;
+		if(GameStorage.getInstance().overlap)
+			GUI.color=disabledColor;
+		else
+			GUI.color=normColor;
+		
+		//GUI.Label(new Rect(50,50,100,100),"Tries: "+GameStorage.tries);
 		
 		if(GameStorage.getInstance().isRunning)
-			GUI.enabled=false;
+			GUI.Button(new Rect(20+Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2+5,Screen.height-20-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)*2-10,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().zalp_button_grey.button);
 		else
 		{
 			bool res=false;
@@ -35,38 +27,33 @@ public class GUIBehaviour : MonoBehaviour {
 					res=true;
 			}
 			
-			if(!res)
-				GUI.enabled=false;
+			if(res)
+			{
+				if(GUI.Button(new Rect(20+Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2+5,Screen.height-20-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)*2-10,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().zalp_button.button))
+					GameStorage.getInstance().setThorpedesAndRocketsAbils();
+			}
+			else
+			{
+				GUI.Button(new Rect(20+Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2+5,Screen.height-20-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)*2-10,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().zalp_button_grey.button);
+			}
 		}
-		
-		if(GameStorage.getInstance().overlap)
-			GUI.enabled=false;
-		
-		if(GUI.Button(new Rect(5,5,32,32),"Q"))
-			GameStorage.getInstance().setThorpedesAndRocketsAbils();
 		
 		GUI.enabled=!GameStorage.getInstance().overlap;
 		
-		if(GUI.Button(new Rect(Screen.width-20-32-10-32,20,32,32),"II"))
+		if(GUI.Button(new Rect(Screen.width-20-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)-10-Templates.ResolutionProblems.getActionAbilitySize(Screen.width),20,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().buttonPause.button))
 			GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().gamePause();
-		
-		GUI.skin=Templates.getInstance().playBIG;
-		GUI.Button(new Rect(Screen.width-32-20,30+32,32,32),"");
 		
 		if(GameStorage.getInstance().isRunning)
 		{
-			GUI.skin=buttonPlayGrey;
-			GUI.Button(new Rect(Screen.width-32-20,20,32,32),"");
+			GUI.Button(new Rect(Screen.width-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)-20,20,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().buttonPlayGrey.button);
 		}
 		else
 		{
-			GUI.skin=buttonPlay;
-			if(GUI.Button(new Rect(Screen.width-32-20,20,32,32),""))
+			if(GUI.Button(new Rect(Screen.width-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)-20,20,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().buttonPlay.button))
 				GameStorage.getInstance().StepStart();
 		}
 		
-		GUI.skin=buttonZoomInSkin;
-		if(GUI.Button(new Rect(Screen.width-32-62,Screen.height-32-20,32,32),""))
+		if(GUI.Button(new Rect(Screen.width-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)*2-30,Screen.height-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)-20,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().buttonZoomInSkin.button))
 		{
 			if(GameStorage.getInstance().cam.cameraSize-camScaleSpeed*GameStorage.getInstance().cam.cameraZoomSpeed>=GameStorage.getInstance().cam.cameraSizeMin)
 			{
@@ -75,8 +62,7 @@ public class GUIBehaviour : MonoBehaviour {
 			}
 		}
 		
-		GUI.skin=buttonZoomOutSkin;
-		if(GUI.Button(new Rect(Screen.width-32-20,Screen.height-32-20,32,32),""))
+		if(GUI.Button(new Rect(Screen.width-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)-20,Screen.height-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)-20,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().buttonZoomOutSkin.button))
 		{
 			if(GameStorage.getInstance().cam.cameraSize+camScaleSpeed*GameStorage.getInstance().cam.cameraZoomSpeed<=GameStorage.getInstance().cam.cameraSizeMax)
 			{
@@ -85,12 +71,10 @@ public class GUIBehaviour : MonoBehaviour {
 			}
 		}
 		
-		GUI.skin=buttonPrev;
-		if(GUI.Button(new Rect(20,Screen.height-20-32,32,32),""))
+		if(GUI.Button(new Rect(20,Screen.height-20-Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().buttonPrev.button))
 			GameStorage.getInstance().prevShipFocus();
 		
-		GUI.skin=buttonNext;
-		if(GUI.Button(new Rect(20+32+10,Screen.height-20-32,32,32),""))
+		if(GUI.Button(new Rect(20+Templates.ResolutionProblems.getActionAbilitySize(Screen.width)+10,Screen.height-20-Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().buttonNext.button))
 			GameStorage.getInstance().nextShipFocus();
 		
 		GUI.skin=null;
