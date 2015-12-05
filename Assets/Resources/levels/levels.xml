@@ -1,52 +1,43 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <levels>
-	<level num="1" levelName="This is level one" file="mission1" hint="They can't stop us
-Let 'em try
-For heavy metal
-We will die!
-
-Quit my job this morning said forever
-I would hold my head up high
-Cause I need metal in my life
-Just like an eagle needs to fly
-" rankReached="0" description="English is a West Germanic language that was first spoken in early medieval England and is now a global lingua franca.[4][5] It is an official language of almost 60 sovereign states, the most commonly spoken language in the United Kingdom, the United States, Canada, Australia, Ireland, and New Zealand, and a widely spoken language in countries in the Caribbean, Africa, and South Asia.[6] It is the third most common native language in the world, after Mandarin and Spanish.[7] It is widely learned as a second language and is an official language of the United Nations, of the European Union, and of many other world and regional international organisations."/>
-	<level num="2" levelName="This is level two" file="mission2"/>
-	<level num="3" levelName="This is level two" file="mission3"/>
-	<level num="4" levelName="This is level two" file="mission4" rankReached="1"/>
-	<level num="5" levelName="This is level two" file="mission5"/>
-	<level num="6" levelName="This is level two" file="mission6"/>
-	<level num="7" levelName="This is level two" file="mission7"/>
-	<level num="8" levelName="This is level two" file="mission8" rankReached="2"/>
-	<level num="9" levelName="This is level two" file="mission9"/>
-	<level num="10" levelName="This is level two" file="mission10"/>
-	<level num="11" levelName="This is level two" file="mission11"/>
-	<level num="12" levelName="This is level two" file="mission12"/>
-	<level num="13" levelName="This is level two" file="mission13" rankReached="3"/>
-	<level num="14" levelName="This is level two" file="mission14"/>
-	<level num="15" levelName="This is level two" file="mission15"/>
-	<level num="16" levelName="This is level two" file="mission16"/>
-	<level num="17" levelName="This is level two" file="mission17" rankReached="4"/>
-	<level num="18" levelName="This is level two" file="mission18"/>
-	<level num="19" levelName="This is level two" file="mission19"/>
-	<level num="20" levelName="This is level two" file="mission20"/>
-	<level num="21" levelName="This is level two" file="mission21"/>
-	<level num="22" levelName="This is level two" file="mission22" rankReached="5"/>
-	<level num="23" levelName="This is level two" file="mission23"/>
-	<level num="24" levelName="This is level two" file="mission24" rankReached="6"/>
-	<level num="25" levelName="This is level two" file="mission25"/>
-	<level num="26" levelName="This is level two" file="mission26"/>
-	<level num="27" levelName="This is level two" file="mission27" rankReached="7"/>
-	<level num="28" levelName="This is level two" file="mission28"/>
-	<level num="29" levelName="This is level two" file="mission29" rankReached="8"/>
-	<level num="30" levelName="This is level two" file="mission30"/>
-	<level num="31" levelName="This is level two" file="dogfight1"/>
-	<level num="32" levelName="This is level two" file="dogfight2" rankReached="9"/>
-	<level num="33" levelName="This is level two" file="dogfight3"/>
-	<level num="34" levelName="This is level two" file="dogfight4"/>
-	<level num="35" levelName="This is level two" file="dogfight5"/>
-	<level num="36" levelName="This is level two" file="dogfight6" rankReached="10"/>
-	<level num="37" levelName="This is level two" file="dogfight7"/>
-	<level num="38" levelName="This is level two" file="dogfight8"/>
-	<level num="39" levelName="This is level two" file="dogfight9" rankReached="11"/>
-	<level num="40" levelName="This is level two" file="dogfight10"/>
+	<level num="1" levelName="First encounter" file="mission1" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="2" levelName="Dangerous patrol" file="mission2" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="3" levelName="Fast response" file="mission3" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="4" levelName="Escalation" file="mission4" rankReached="1" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="5" levelName="Orbital defence" file="mission5" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="6" levelName="Counter-attack" file="mission6" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="7" levelName="Offensive continues" file="mission7" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="8" levelName="Baptism of fire" file="mission8" rankReached="2" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="9" levelName="Tactical advantages" file="mission9" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="10" levelName="Ambush" file="mission10" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="11" levelName="Heavy artillery" file="mission11" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="12" levelName="Operation 'New Old World'" file="mission12" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="13" levelName="Tactical opportunity" file="mission13" rankReached="3" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="14" levelName="Fierceful resistance" file="mission14" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="15" levelName="Rogue attack" file="mission15" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="16" levelName="Maneuverable fight" file="mission16" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="17" levelName="Capital experiment" file="mission17" rankReached="4" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="18" levelName="Bloody trick" file="mission18" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="19" levelName="Retreat" file="mission19" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="20" levelName="Fighting the beasts" file="mission20" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="21" levelName="Intrusion" file="mission21" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="22" levelName="Asteroid belt" file="mission22" rankReached="5" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="23" levelName="Strategic goal" file="mission23" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="24" levelName="Developing the success" file="mission24" rankReached="6" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="25" levelName="Capital on the horison" file="mission25" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="26" levelName="Rush" file="mission26" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="27" levelName="Mission: possible" file="mission27" rankReached="7" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="28" levelName="The threat" file="mission28" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="29" levelName="Approaching the capital" file="mission29" rankReached="8" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="30" levelName="Final assault" file="mission30" hint="Use fighter's ability to make a 180-degree turn." description="В пространстве Корпорации замечен истребитель Теократии. Он отказался покинуть территорию."/>
+	<level num="31" levelName="Dogfight 1" file="dogfight1"/>
+	<level num="32" levelName="Dogfight 2" file="dogfight2" rankReached="9"/>
+	<level num="33" levelName="Dogfight 3" file="dogfight3"/>
+	<level num="34" levelName="Dogfight 4" file="dogfight4"/>
+	<level num="35" levelName="Dogfight 5" file="dogfight5"/>
+	<level num="36" levelName="Dogfight 6" file="dogfight6" rankReached="10"/>
+	<level num="37" levelName="Dogfight 7" file="dogfight7"/>
+	<level num="38" levelName="Dogfight 8" file="dogfight8"/>
+	<level num="39" levelName="Dogfight 9" file="dogfight9" rankReached="11"/>
+	<level num="40" levelName="Dogfight 10" file="dogfight10"/>
 </levels>

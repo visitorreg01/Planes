@@ -42,21 +42,21 @@ public static class Defects {
 	public class DisableTurnLeft : Defect{
 		public string getName()
 		{
-			return "Disable turn left";
+			return "Disabled turn left";
 		}
 	};
 	
 	public class DisableTurnRight : Defect{
 		public string getName()
 		{
-			return "Disable turn right";
+			return "Disabled turn right";
 		}
 	};
 	
 	public class DisableTurn : Defect{
 		public string getName()
 		{
-			return "Disable turn";
+			return "Disabled turn";
 		}
 	};
 	
@@ -65,14 +65,14 @@ public static class Defects {
 		public float newRangeCoeff=0.5f;
 		public string getName()
 		{
-			return "Engine crash";
+			return "Engines off";
 		}
 	}
 	
 	public class DisableGuns : Defect{
 		public string getName()
 		{
-			return "Disabled guns";
+			return "Weapons systems off";
 		}
 	};
 	
@@ -82,7 +82,7 @@ public static class Defects {
 		public int damage=20; // total damage calculates: step time(3s)/reuse*damage
 		public string getName()
 		{
-			return "Fire";
+			return "Internal fire";
 		}
 	}
 }
