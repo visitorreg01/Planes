@@ -51,14 +51,16 @@ public class MineBehaviour : MonoBehaviour {
 		if(enemy)
 		{
 			target = GameStorage.getInstance().getNearbyFriendly(gameObject);
-			if(Vector2.Distance(new Vector2(target.transform.position.x,target.transform.position.z),new Vector2(transform.position.x,transform.position.z))<=Abilities.MinesParameters.Range)
-				Boom();
+			if(target!=null)
+				if(Vector2.Distance(new Vector2(target.transform.position.x,target.transform.position.z),new Vector2(transform.position.x,transform.position.z))<=Abilities.MinesParameters.Range)
+					Boom();
 		}
 		else
 		{
 			target = GameStorage.getInstance().getNearbyEnemy(gameObject);
-			if(Vector2.Distance(new Vector2(target.transform.position.x,target.transform.position.z),new Vector2(transform.position.x,transform.position.z))<=Abilities.MinesParameters.Range)
-				Boom();
+			if(target!=null)
+				if(Vector2.Distance(new Vector2(target.transform.position.x,target.transform.position.z),new Vector2(transform.position.x,transform.position.z))<=Abilities.MinesParameters.Range)
+					Boom();
 		}
 	}
 }

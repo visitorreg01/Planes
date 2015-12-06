@@ -24,12 +24,30 @@ public class CameraBehaviour : MonoBehaviour {
 	public GameObject currentSelected=null;
 	public GameObject primarySelected=null;
 	
+	Vector3 lastMousePos=new Vector3(0,0,0);
+	Vector3 curMousePos;
+	
 	bool showNextLevelWindow = false;
 	bool showPause=false;
 	int stars=0;
 	
 	void Start () {
 		GameStorage.getInstance().cam=this;
+		curMousePos=transform.position;
+	}
+	
+	void LateUpdate()
+	{
+		if(Input.GetButtonDown("Fire1"))
+		{
+			if(canReleaseMouse)
+				released=true;
+		}
+		if(!canReleaseMouse) released=false;
+		if(Input.GetButtonUp("Fire1"))
+		{
+			released=false;
+		}
 	}
 	
 	void Update()
@@ -40,17 +58,9 @@ public class CameraBehaviour : MonoBehaviour {
 		}
 		if(!showNextLevelWindow)
 		{
-			if(Input.GetButtonDown("Fire1"))
-			{
-				if(canReleaseMouse)
-					released=true;
-			}
-			if(!canReleaseMouse) released=false;
-			if(Input.GetButtonUp("Fire1"))
-			{
-				released=false;
-			}
-				
+			/*
+			
+			*/	
 			
 			
 			
@@ -75,7 +85,8 @@ public class CameraBehaviour : MonoBehaviour {
 			
 			if(released)
 			{
-				Camera.main.transform.position += new Vector3(speed * Input.GetAxis("Mouse X") * Time.deltaTime, 0, speed * Input.GetAxis("Mouse Y") * Time.deltaTime)*-1;
+				curMousePos=(Camera.main.ScreenToWorldPoint (Input.mousePosition))- lastMousePos;
+				Camera.main.transform.position += curMousePos*-1;
 				if(Camera.main.transform.position.z>scale)
 					Camera.main.transform.position=new Vector3(Camera.main.transform.position.x,cameraH,scale);
 				if(Camera.main.transform.position.z<-scale)
@@ -86,6 +97,7 @@ public class CameraBehaviour : MonoBehaviour {
 					Camera.main.transform.position=new Vector3(-scale,cameraH,Camera.main.transform.position.z);
 				
 			}
+			lastMousePos=Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		}
 	}
 	

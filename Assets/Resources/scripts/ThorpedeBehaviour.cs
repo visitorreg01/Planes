@@ -125,7 +125,7 @@ public class ThorpedeBehaviour : MonoBehaviour {
 					Vector2 aPos = new Vector2(Camera.main.WorldToScreenPoint(v11).x,Camera.main.WorldToScreenPoint(v11).y);
 					
 					GUI.skin = Templates.getInstance().getAbilityIcon(Abilities.AbilityType.homingThorpede);
-					if(GUI.RepeatButton(new Rect(aPos.x-20,Screen.height-aPos.y-20,40,40),""))
+					if(GUI.RepeatButton(new Rect(aPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Screen.height-aPos.y-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),""))
 					{
 						attackIconCaptured=true;
 						GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=false;
@@ -251,7 +251,7 @@ public class ThorpedeBehaviour : MonoBehaviour {
 		if(Input.GetMouseButtonDown(0) && isMouseOver(attackIcon))
 		{
 			GameStorage.getInstance().cam.GetComponent<CameraBehaviour>().canReleaseMouse=false;
-			attackIconCaptured=true;
+			//attackIconCaptured=true;
 		}
 		
 		if(Input.GetMouseButtonUp(0))

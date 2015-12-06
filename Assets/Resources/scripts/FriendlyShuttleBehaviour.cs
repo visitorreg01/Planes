@@ -1097,6 +1097,9 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	{
 		if(earnedDefect)
 			defectInUse=true;
+		selected=false;
+		iconsShowed=false;
+		showPopup=false;
 	}
 	
 	public void StepEnd()
