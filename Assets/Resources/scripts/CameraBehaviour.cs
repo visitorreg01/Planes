@@ -304,7 +304,7 @@ public class CameraBehaviour : MonoBehaviour {
 				
 				GUILayout.FlexibleSpace();
 				
-				if(GameStorage.tries>=1)
+				if(GameStorage.tries>=1 && Templates.getInstance().getLevel((int)MainMenuGui.selectedCampaign.levels[MainMenuGui.playedLevelIndex]).hint.Length>0)
 				{
 					GUILayout.BeginHorizontal();
 					GUILayout.FlexibleSpace();
