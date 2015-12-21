@@ -408,6 +408,108 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 		Destroy(this.gameObject);
 	}
 	
+	public Vector3 isOutOfViewport()
+	{
+		Vector3 ruc = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width,0,0));
+		Vector3 luc = Camera.main.ScreenToWorldPoint(new Vector3(0,0,0));
+		Vector3 rlc = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width,Screen.height,0));
+		Vector3 llc = Camera.main.ScreenToWorldPoint(new Vector3(0,Screen.height,0));
+		float maxX,maxY,minX,minY;
+		if(ruc.x>luc.x) { maxX=ruc.x; minX=luc.x;} else {maxX=luc.x; minX=ruc.x;}
+		if(ruc.y>rlc.y) { maxY=ruc.z; minY=rlc.z;} else {maxY=rlc.z; minY=ruc.z;}
+		
+		if(gameObject.transform.position.x <= maxX && gameObject.transform.position.x >= minX && gameObject.transform.position.z <= maxY && gameObject.transform.position.z >= minY)
+			return new Vector3(-1,-1,-1);
+		
+		int code=0;
+		if(gameObject.transform.position.x >= minX && gameObject.transform.position.x <= maxX)
+		{
+			if(gameObject.transform.position.z <= minY)
+				code=5;
+			else if(gameObject.transform.position.z >= maxY)
+				code=1;
+		}
+		else if(gameObject.transform.position.z >= minY && gameObject.transform.position.z <= maxY)
+		{
+			if(gameObject.transform.position.x <= minX)
+				code=3;
+			else if(gameObject.transform.position.x >= maxX)
+				code=7;
+		}
+		else
+		{
+			if(gameObject.transform.position.x < minX)
+			{
+				if(gameObject.transform.position.z < minY)
+					code=4;
+				else if(gameObject.transform.position.z > maxY)
+					code=2;
+			}
+			else if(gameObject.transform.position.x > maxX)
+			{
+				if(gameObject.transform.position.z < minY)
+					code=6;
+				else if(gameObject.transform.position.z > maxY)
+					code=8;
+			}
+		}
+		
+		Vector3 pos = new Vector3(-1,-1,-1);
+		switch(code)
+		{
+			case 1:
+				pos = new Vector3(gameObject.transform.position.x,0,maxY);
+				break;
+			case 2:
+				pos = new Vector3(minX,0,maxY);
+				break;
+			case 3:
+				pos = new Vector3(minX,0,gameObject.transform.position.z);
+				break;
+			case 4:
+				pos = new Vector3(minX,0,minY);
+				break;
+			case 5:
+				pos = new Vector3(gameObject.transform.position.x,0,minY);
+				break;
+			case 6:
+				pos = new Vector3(maxX,0,minY);
+				break;
+			case 7:
+				pos = new Vector3(maxX,0,gameObject.transform.position.z);
+				break;
+			case 8:
+				pos = new Vector3(maxX,0,maxY);
+				break;
+		}
+		
+		Vector3 center = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width/2,Screen.height/2,0));
+		Vector2 v1,v2;
+		v1=new Vector2(0,5);
+		v2=new Vector2(transform.position.x,transform.position.z)-new Vector2(center.x,center.z);
+		float mySinPhi = (v1.x*v2.y - v1.y*v2.x);
+		float mangle = Vector2.Angle(v1,v2);
+		if(mySinPhi<=0)
+			mangle=(180-mangle)+180;
+		
+		float retAng=0;
+		if(code==5)
+			retAng=180;
+		else if(code==1)
+			retAng=0;
+		else if(code==7)
+			retAng=90;
+		else if(code==3)
+			retAng=270;
+		else
+			retAng=-mangle;
+		
+		Vector3 ret;
+		pos = Camera.main.WorldToScreenPoint(pos);
+		ret = new Vector3(pos.x,pos.y,retAng);
+		return ret;
+	}
+	
 	void OnGUI()
 	{
 		if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
@@ -443,13 +545,14 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 	    {
 	   		if(showPopup && !GameStorage.getInstance().isRunning)
 			{
+				GUI.FocusControl(null);
 				Paintvec = Camera.main.WorldToScreenPoint(transform.position);
 				GUISkin progressSkin = Templates.getInstance().progressHpSkin;
-				GUILayout.BeginArea(new Rect(Paintvec.x,Screen.height-Paintvec.y,200,Screen.height));
+				GUILayout.BeginArea(new Rect(Templates.ResolutionProblems.getPopupBannerOffset(Screen.width),Templates.ResolutionProblems.getPopupBannerOffset(Screen.width),Templates.ResolutionProblems.getPopupBannerWidth(Screen.width),Screen.height-Templates.ResolutionProblems.getPopupBannerOffset(Screen.width)*2));
 				GUILayout.BeginVertical(GUI.skin.box);
 				GUILayout.Label("Name: "+temp.classname);
-				GUILayout.BeginVertical(hp+"/"+temp.hp,GUI.skin.box);
-				GUILayout.Box("",progressSkin.box,GUILayout.Width(PROGRESS_HP_MAX_WIDTH*(((float)hp)/((float)temp.hp))));
+				GUILayout.BeginVertical(GUI.skin.box);
+				GUILayout.Box(hp+"/"+temp.hp,progressSkin.box,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerHpWidth(Screen.width)*(((float)hp)/((float)temp.hp))));
 				GUILayout.EndVertical();
 				if(curDefect!=null)
 					GUILayout.Label("Defect: <color=brown>"+curDefect.getName()+"</color>");
@@ -461,7 +564,7 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 					foreach(int ab in privateAbils)
 					{
 						s=Templates.getInstance().getAbilityIcon(ab);
-						GUILayout.Label("",s.label,GUILayout.Width(32),GUILayout.Height(32));
+						GUILayout.Label("",s.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerAbilSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerAbilSize(Screen.width)));
 					}
 					GUILayout.EndHorizontal();
 				}
@@ -470,30 +573,30 @@ public class EnemyShuttleBehaviour : MonoBehaviour {
 				GUILayout.Label("Weapons:");
 				GUILayout.BeginHorizontal();
 				for(int i = 0;i<temp.weapons;i++)
-					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 				for(int i = 0;i<5-temp.weapons;i++)
-					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 				GUILayout.EndHorizontal();
 				GUILayout.Label("Armor:");
 				GUILayout.BeginHorizontal();
 				for(int i = 0;i<temp.armor;i++)
-					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 				for(int i = 0;i<5-temp.armor;i++)
-					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 				GUILayout.EndHorizontal();
 				GUILayout.Label("Speed:");
 				GUILayout.BeginHorizontal();
 				for(int i = 0;i<temp.speed;i++)
-					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 				for(int i = 0;i<5-temp.speed;i++)
-					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 				GUILayout.EndHorizontal();
 				GUILayout.Label("Maneuverability:");
 				GUILayout.BeginHorizontal();
 				for(int i = 0;i<temp.maneuverability;i++)
-					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+					GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 				for(int i = 0;i<5-temp.maneuverability;i++)
-					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+					GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 				GUILayout.EndHorizontal();
 				
 				GUILayout.Label(temp.description);

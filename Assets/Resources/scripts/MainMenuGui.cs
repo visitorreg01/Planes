@@ -153,7 +153,6 @@ public class MainMenuGui : MonoBehaviour {
 			Templates.getInstance().menu_button.button.fontSize=Templates.ResolutionProblems.getMainMenuFontSize(Screen.width);
 			Templates.getInstance().menu_button.button.padding=new RectOffset(0,0,Templates.ResolutionProblems.getMainMenuPaddingTop(Screen.width),0);
 			
-			GUI.Box(new Rect(0,0,Screen.width,Screen.height),"",Templates.getInstance().bg.box);
 			
 			GUI.Label(new Rect(0,0,100,20),Screen.width+"x"+Screen.height);
 			resWs = GUI.TextField(new Rect(0,20,50,20),resWs,4);
@@ -170,17 +169,38 @@ public class MainMenuGui : MonoBehaviour {
 			
 			if(campaignMenu)
 			{
-				if(GUI.Button(new Rect(20,Screen.height-40,100,20),"Back"))
+				GUI.Box(new Rect(0,0,Screen.width,Screen.height),"",Templates.getInstance().campaigns_bg.box);
+				GUI.Box(new Rect(0,Screen.height*0.07f,Screen.width,Screen.height*0.85f),"",Templates.getInstance().mission_bg.box);
+				
+				
+				if(GUI.Button(new Rect(Screen.width*0.06f,Screen.height-Templates.ResolutionProblems.getCompanyPanelBackButtonH(Screen.height)-10,Templates.ResolutionProblems.getCompanyPanelBackButtonW(Screen.width),Templates.ResolutionProblems.getCompanyPanelBackButtonH(Screen.height)),"",Templates.getInstance().company_panel_hover.button))
 					switchMenu(GuiCategories.MainMenu);
 				
 				ArrayList camp = Templates.getInstance().getCampaigns();
-				int buttonH,buttonW;
-				buttonW=Screen.width/100*40;
-				buttonH=Screen.height/camp.Count-10*camp.Count;
-				int i=0;
+				int i=0,fi=-1;
+				Templates.getInstance().company_panel_hover.box.fontSize=Templates.ResolutionProblems.getCompanyPanelFontSize(Screen.width);
+				Templates.getInstance().company_panel.box.fontSize=Templates.ResolutionProblems.getCompanyPanelFontSize(Screen.width);
+				Templates.getInstance().company_panel.label.fontSize=Templates.ResolutionProblems.getCompanyPanelLabelFontSize(Screen.width);
+				
+				for(i=0;i<3;i++)
+				{
+					if(Input.mousePosition.x >= Screen.width*0.028f &&
+					   Input.mousePosition.x <= Screen.width*0.028f+Screen.width*0.65f &&
+					   Screen.height-Input.mousePosition.y >= Screen.height*0.12f+(Templates.ResolutionProblems.getCompanyPanelH(Screen.height)-Templates.ResolutionProblems.getCompanyPanelOffset(Screen.height))*i &&
+					   Screen.height-Input.mousePosition.y <= Screen.height*0.12f+(Templates.ResolutionProblems.getCompanyPanelH(Screen.height)-Templates.ResolutionProblems.getCompanyPanelOffset(Screen.height))*i +Templates.ResolutionProblems.getCompanyPanelH(Screen.height)-Templates.ResolutionProblems.getCompanyPanelOffset(Screen.height))
+						fi=i;
+				}
+				i=0;
+				
 				foreach(Templates.CampaignInfo c in camp)
 				{
-					if(GUI.Button(new Rect(Screen.width-20-buttonW,10+buttonH*i+20*i,buttonW,buttonH),((Templates.CampaignInfo)c).name))
+					if(fi==i)
+						GUI.Box(new Rect(Screen.width*0.028f,Screen.height*0.12f+(Templates.ResolutionProblems.getCompanyPanelH(Screen.height)-Templates.ResolutionProblems.getCompanyPanelOffset(Screen.height))*i,Screen.width*0.65f,Templates.ResolutionProblems.getCompanyPanelH(Screen.height)),((Templates.CampaignInfo)c).name,Templates.getInstance().company_panel_hover.box);
+					else
+						GUI.Box(new Rect(Screen.width*0.028f,Screen.height*0.12f+(Templates.ResolutionProblems.getCompanyPanelH(Screen.height)-Templates.ResolutionProblems.getCompanyPanelOffset(Screen.height))*i,Screen.width*0.65f,Templates.ResolutionProblems.getCompanyPanelH(Screen.height)),((Templates.CampaignInfo)c).name,Templates.getInstance().company_panel.box);
+					
+					GUI.Label(new Rect(Screen.width*0.13f,Screen.height*0.2f+(Templates.ResolutionProblems.getCompanyPanelH(Screen.height)-Templates.ResolutionProblems.getCompanyPanelOffset(Screen.height))*i,Screen.width*0.5f,Templates.ResolutionProblems.getCompanyPanelH(Screen.height)),((Templates.CampaignInfo)c).desc,Templates.getInstance().company_panel.label);
+					if(GUI.Button(new Rect(Screen.width*0.028f,Screen.height*0.12f+(Templates.ResolutionProblems.getCompanyPanelH(Screen.height)-Templates.ResolutionProblems.getCompanyPanelOffset(Screen.height))*i,Screen.width*0.65f,Templates.ResolutionProblems.getCompanyPanelH(Screen.height)-Templates.ResolutionProblems.getCompanyPanelOffset(Screen.height)),"",Templates.getInstance().company_panel.button))
 					{
 						selectedCampaign=(Templates.CampaignInfo)c;
 						switchMenu(GuiCategories.LevelsMenu);
@@ -192,6 +212,8 @@ public class MainMenuGui : MonoBehaviour {
 			
 			if(levelsMenu)
 			{
+				GUI.Box(new Rect(0,0,Screen.width,Screen.height),"",Templates.getInstance().campaigns_bg.box);
+			
 				startPosition=Templates.ResolutionProblems.getLevelsStartPosition(Screen.width);
 				
 				STAR_X_OFFSET=Templates.ResolutionProblems.getLevelsStarOffsetX(Screen.width);
@@ -385,6 +407,8 @@ public class MainMenuGui : MonoBehaviour {
 			
 			if(mainMenu)
 			{
+				GUI.Box(new Rect(0,0,Screen.width,Screen.height),"",Templates.getInstance().bg.box);
+			
 				if(plotMenu)
 				{
 					GUI.enabled=true;

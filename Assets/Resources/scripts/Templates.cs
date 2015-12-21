@@ -101,6 +101,10 @@ public class Templates {
 	public GUISkin pauseMission,pauseMissionOk,pauseMissionFail;
 	public GUISkin startLarge;
 	public GUISkin rankStyle;
+	public GUISkin arrowRedSkin,arrowBlueSkin;
+	public GUISkin campaigns_bg;
+	public GUISkin mission_bg;
+	public GUISkin company_panel,company_panel_hover;
 	//TEST
 	
 	public string plotContext,helpContent;
@@ -175,6 +179,12 @@ public class Templates {
 		pauseMissionFail=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/pauseMissionFail");
 		startLarge=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/largeStar");
 		rankStyle=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/rankStyle");
+		arrowRedSkin=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/arrowRedSkin");
+		arrowBlueSkin=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/arrowBlueSkin");
+		campaigns_bg=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/campaigns_bg");
+		mission_bg=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/mission_bg");
+		company_panel=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/company_panel");
+		company_panel_hover=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/company_panel_hover");
 	}
 	
 	public GUISkin[] getNumberIcons(int num, bool grey)
@@ -276,6 +286,8 @@ public class Templates {
 								li.name=l.Value;
 							else if(l.Name=="defaultRank")
 								li.defaultRank=l.Value;
+							else if(l.Name=="description")
+								li.desc=l.Value;
 						}
 						
 						foreach(XmlNode l in m.ChildNodes)
@@ -337,6 +349,7 @@ public class Templates {
 		public int id;
 		public string name;
 		public string defaultRank;
+		public string desc = "";
 		public ArrayList levels = new ArrayList();
 	}
 	
@@ -720,6 +733,7 @@ public class Templates {
 	
 	public static class ResolutionProblems {
 		private static float Ethalon=1352;
+		private static float EthalonH=743;
 		private static float mainMenuFontEth=36;
 		private static float mainMenuPaddingTopEth=35;
 		
@@ -743,6 +757,16 @@ public class Templates {
 		//Game phase
 		private static float abilIconOffset=50;
 		private static float abilIconSize=40;
+		private static float popupInfoBannerOffset=40;
+		private static float popupInfoBannerWidth=200;
+		private static float popupInfoBannerHpBannerWidth=185;
+		private static float popupInfoBannerAbilSize=32;
+		private static float popupInfoBannerPointSize=16;
+		
+		private static int company_panel_fontSize=28;
+		private static int company_panel_label_fontSize=16;
+		private static float company_panel_h=180,company_panel_offset=30;
+		private static float company_panel_backButtonH=60,company_panel_backButtonW=205;
 		
 		
 		public static int getMainMenuFontSize(float swidth)
@@ -908,6 +932,61 @@ public class Templates {
 		public static float getPauseLargeStarSize(float swidth)
 		{
 			return largeStarSize*swidth/Ethalon;
+		}
+		
+		public static float getPopupBannerOffset(float swidth)
+		{
+			return popupInfoBannerOffset*swidth/Ethalon;
+		}
+		
+		public static float getPopupBannerWidth(float swidth)
+		{
+			return popupInfoBannerWidth*swidth/Ethalon;
+		}
+		
+		public static float getPopupBannerHpWidth(float swidth)
+		{
+			return popupInfoBannerHpBannerWidth*swidth/Ethalon;
+		}
+		
+		public static float getPopupBannerPointSize(float swidth)
+		{
+			return popupInfoBannerPointSize*swidth/Ethalon;
+		}
+		
+		public static float getPopupBannerAbilSize(float swidth)
+		{
+			return popupInfoBannerAbilSize*swidth/Ethalon;
+		}
+		
+		public static int getCompanyPanelFontSize(float swidth)
+		{
+			return (int)(company_panel_fontSize*swidth/Ethalon);
+		}
+		
+		public static int getCompanyPanelLabelFontSize(float swidth)
+		{
+			return (int)(company_panel_label_fontSize*swidth/Ethalon);
+		}
+		
+		public static float getCompanyPanelH(float swidth)
+		{
+			return company_panel_h*swidth/EthalonH;
+		}
+		
+		public static float getCompanyPanelBackButtonH(float swidth)
+		{
+			return company_panel_backButtonH*swidth/EthalonH;
+		}
+		
+		public static float getCompanyPanelBackButtonW(float swidth)
+		{
+			return company_panel_backButtonW*swidth/Ethalon;
+		}
+		
+		public static float getCompanyPanelOffset(float swidth)
+		{
+			return company_panel_offset*swidth/EthalonH;
 		}
 		
 		public static string getSkinsFolder()

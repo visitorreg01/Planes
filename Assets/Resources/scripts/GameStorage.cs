@@ -90,6 +90,7 @@ public class GameStorage {
 		gasList.Clear();
 		gasRemoveList.Clear();
 		asteroidsList.Clear();
+		time=-1;
 	}
 	
 	public void StepStart()

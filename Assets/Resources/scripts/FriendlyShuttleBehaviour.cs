@@ -9,7 +9,6 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	const float scale = 10;
 	
 	//UISETTINGS
-	private const float PROGRESS_HP_MAX_WIDTH=185;
 	
 	public Templates.PlaneTemplates Template;
 	private Templates.PlaneTemplate temp;
@@ -21,6 +20,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	private bool block = false;
 	public bool iconsShowed=false;
 	public bool showPopup=false;
+	
+	public GameObject TEST_CURSORS;
+	private Vector3 cursorPos;
+	
+	private float cursorXoffset,cursorYoffset;
 	
 	private Color goodColor = new Color(1,1,1,1);
 	private Color disColor = new Color(1,1,1,0.2f);
@@ -244,6 +248,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	{
 		attackIcon = Instantiate(Resources.Load("prefab/attackIcon") as GameObject);
 		attackIcon.SetActive(false);
+		if(GameStorage.getInstance().getFixedTime()==-1)
+			GameStorage.getInstance().overlap=false;
 		
 		LineRenderer lr = gameObject.AddComponent<LineRenderer>();
 		lr.SetWidth(0.05f, 0.05f);
@@ -333,6 +339,18 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			updateAttackIconPosition();
 		}
 		
+		if(prevAbil==Abilities.AbilityType.doubleThrottle)
+		{
+			attackIconDist=temp.maxRange;
+			attackIconDistMin=temp.minRange;
+			
+			float dst = Vector2.Distance(new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z),new Vector2(transform.position.x,transform.position.z));
+			float angles = getAttackIconAngle();
+			
+			Vector2 newPosAt=Quaternion.Euler(0,0,-angles)*new Vector2(0,1)*dst/2;
+			attackIcon.transform.position=new Vector3(newPosAt.x+transform.position.x,0,newPosAt.y+transform.position.z);
+		}
+		
 		if(activeAbil==Abilities.AbilityType.none)
 		{
 			if(prevAbil==Abilities.AbilityType.homingMissle)
@@ -361,20 +379,6 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 					o.GetComponent<MineBehaviour>().ready=true;
 				}
 				minesList.Clear();
-			}
-			
-			
-			
-			if(prevAbil==Abilities.AbilityType.doubleThrottle)
-			{
-				attackIconDist=temp.maxRange;
-				attackIconDistMin=temp.minRange;
-				
-				float dst = Vector2.Distance(new Vector2(attackIcon.transform.position.x,attackIcon.transform.position.z),new Vector2(transform.position.x,transform.position.z));
-				float angles = getAttackIconAngle();
-				
-				Vector2 newPosAt=Quaternion.Euler(0,0,-angles)*new Vector2(0,1)*dst/2;
-				attackIcon.transform.position=new Vector3(newPosAt.x+transform.position.x,0,newPosAt.y+transform.position.z);
 			}
 		}
 		else
@@ -417,6 +421,10 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void Update()
 	{
+		
+		if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+			showPopup=selected;
+		
 		Vector2 av = Camera.main.WorldToScreenPoint(attackIcon.transform.position);
 		Vector2 bv = av+new Vector2(Templates.ResolutionProblems.getActionAbilityOffset(Screen.width)+Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,0);
 		
@@ -424,7 +432,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		bv=new Vector2(Camera.main.ScreenToWorldPoint(bv).x,Camera.main.ScreenToWorldPoint(bv).z);
 		clickDist=Vector2.Distance(av,bv);
 		
-		if(selected)
+		if(showPopup)
 		{
 			int i=0;
 			foreach(GameObject go in arcObjs)
@@ -512,16 +520,121 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		transform.eulerAngles=new Vector3(0,angle,0);
 	}
 	
+	public Vector3 isOutOfViewport()
+	{
+		Vector3 ruc = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width,0,0));
+		Vector3 luc = Camera.main.ScreenToWorldPoint(new Vector3(0,0,0));
+		Vector3 rlc = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width,Screen.height,0));
+		Vector3 llc = Camera.main.ScreenToWorldPoint(new Vector3(0,Screen.height,0));
+		float maxX,maxY,minX,minY;
+		if(ruc.x>luc.x) { maxX=ruc.x; minX=luc.x;} else {maxX=luc.x; minX=ruc.x;}
+		if(ruc.y>rlc.y) { maxY=ruc.z; minY=rlc.z;} else {maxY=rlc.z; minY=ruc.z;}
+		
+		if(gameObject.transform.position.x <= maxX && gameObject.transform.position.x >= minX && gameObject.transform.position.z <= maxY && gameObject.transform.position.z >= minY)
+			return new Vector3(-1,-1,-1);
+		
+		int code=0;
+		if(gameObject.transform.position.x >= minX && gameObject.transform.position.x <= maxX)
+		{
+			if(gameObject.transform.position.z <= minY)
+				code=5;
+			else if(gameObject.transform.position.z >= maxY)
+				code=1;
+		}
+		else if(gameObject.transform.position.z >= minY && gameObject.transform.position.z <= maxY)
+		{
+			if(gameObject.transform.position.x <= minX)
+				code=3;
+			else if(gameObject.transform.position.x >= maxX)
+				code=7;
+		}
+		else
+		{
+			if(gameObject.transform.position.x < minX)
+			{
+				if(gameObject.transform.position.z < minY)
+					code=4;
+				else if(gameObject.transform.position.z > maxY)
+					code=2;
+			}
+			else if(gameObject.transform.position.x > maxX)
+			{
+				if(gameObject.transform.position.z < minY)
+					code=6;
+				else if(gameObject.transform.position.z > maxY)
+					code=8;
+			}
+		}
+		
+		Vector3 pos = new Vector3(-1,-1,-1);
+		switch(code)
+		{
+			case 1:
+				pos = new Vector3(gameObject.transform.position.x,0,maxY);
+				break;
+			case 2:
+				pos = new Vector3(minX,0,maxY);
+				break;
+			case 3:
+				pos = new Vector3(minX,0,gameObject.transform.position.z);
+				break;
+			case 4:
+				pos = new Vector3(minX,0,minY);
+				break;
+			case 5:
+				pos = new Vector3(gameObject.transform.position.x,0,minY);
+				break;
+			case 6:
+				pos = new Vector3(maxX,0,minY);
+				break;
+			case 7:
+				pos = new Vector3(maxX,0,gameObject.transform.position.z);
+				break;
+			case 8:
+				pos = new Vector3(maxX,0,maxY);
+				break;
+		}
+		
+		Vector3 center = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width/2,Screen.height/2,0));
+		Vector2 v1,v2;
+		v1=new Vector2(0,5);
+		v2=new Vector2(transform.position.x,transform.position.z)-new Vector2(center.x,center.z);
+		float mySinPhi = (v1.x*v2.y - v1.y*v2.x);
+		float mangle = Vector2.Angle(v1,v2);
+		if(mySinPhi<=0)
+			mangle=(180-mangle)+180;
+		
+		float retAng=0;
+		if(code==5)
+			retAng=180;
+		else if(code==1)
+			retAng=0;
+		else if(code==7)
+			retAng=90;
+		else if(code==3)
+			retAng=270;
+		else
+			retAng=-mangle;
+		
+		Vector3 ret;
+		pos = Camera.main.WorldToScreenPoint(pos);
+		ret = new Vector3(pos.x,pos.y,retAng);
+		return ret;
+	}
+	
 	void OnGUI()
 	{
 		if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
 			showPopup=selected;
-		
 		GUI.enabled=!GameStorage.getInstance().overlap;
 		if(GameStorage.getInstance().overlap)
 			GUI.color=disColor;
 		else
 			GUI.color=goodColor;
+		
+		//TEST
+		//GUI.Label(new Rect(100,100,40,40),"",Templates.getInstance().arrowRedSkin.label);
+		//TEST_END
 		
 		if(damageShowTime>0)
 		{
@@ -555,11 +668,11 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			GUI.FocusControl(null);
 			Paintvec = Camera.main.WorldToScreenPoint(transform.position);
 			GUISkin progressSkin = Templates.getInstance().progressHpSkin;
-			GUILayout.BeginArea(new Rect(Paintvec.x,Screen.height-Paintvec.y,200,Screen.height));
+			GUILayout.BeginArea(new Rect(Templates.ResolutionProblems.getPopupBannerOffset(Screen.width),Templates.ResolutionProblems.getPopupBannerOffset(Screen.width),Templates.ResolutionProblems.getPopupBannerWidth(Screen.width),Screen.height-Templates.ResolutionProblems.getPopupBannerOffset(Screen.width)*2));
 			GUILayout.BeginVertical(GUI.skin.box);
 			GUILayout.Label("Name: "+temp.classname);
 			GUILayout.BeginVertical(GUI.skin.box);
-			GUILayout.Box(hp+"/"+temp.hp,progressSkin.box,GUILayout.Width(PROGRESS_HP_MAX_WIDTH*(((float)hp)/((float)temp.hp))));
+			GUILayout.Box(hp+"/"+temp.hp,progressSkin.box,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerHpWidth(Screen.width)*(((float)hp)/((float)temp.hp))));
 			GUILayout.EndVertical();
 			if(curDefect!=null)
 				GUILayout.Label("Defect: <color=brown>"+curDefect.getName()+"</color>");
@@ -571,7 +684,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 				foreach(int ab in privateAbils)
 				{
 					s=Templates.getInstance().getAbilityIcon(ab);
-					GUILayout.Label("",s.label,GUILayout.Width(32),GUILayout.Height(32));
+					GUILayout.Label("",s.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerAbilSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerAbilSize(Screen.width)));
 				}
 				GUILayout.EndHorizontal();
 			}
@@ -580,30 +693,30 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 			GUILayout.Label("Weapons:");
 			GUILayout.BeginHorizontal();
 			for(int i = 0;i<temp.weapons;i++)
-				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 			for(int i = 0;i<5-temp.weapons;i++)
-				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 			GUILayout.EndHorizontal();
 			GUILayout.Label("Armor:");
 			GUILayout.BeginHorizontal();
 			for(int i = 0;i<temp.armor;i++)
-				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 			for(int i = 0;i<5-temp.armor;i++)
-				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 			GUILayout.EndHorizontal();
 			GUILayout.Label("Speed:");
 			GUILayout.BeginHorizontal();
 			for(int i = 0;i<temp.speed;i++)
-				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 			for(int i = 0;i<5-temp.speed;i++)
-				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 			GUILayout.EndHorizontal();
 			GUILayout.Label("Maneuverability:");
 			GUILayout.BeginHorizontal();
 			for(int i = 0;i<temp.maneuverability;i++)
-				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.Label("",Templates.getInstance().statPointBlue.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 			for(int i = 0;i<5-temp.maneuverability;i++)
-				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(16),GUILayout.Height(16));
+				GUILayout.Label("",Templates.getInstance().statPointGrey.label,GUILayout.Width(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)),GUILayout.Height(Templates.ResolutionProblems.getPopupBannerPointSize(Screen.width)));
 			GUILayout.EndHorizontal();
 			
 			GUILayout.Label(temp.description);

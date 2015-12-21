@@ -16,6 +16,9 @@ public class CameraBehaviour : MonoBehaviour {
 	bool reachedRank=false;
 	public bool canReleaseMouse=false;
 	
+	private Vector3 cursorPos;
+	private float cursorXoffset,cursorYoffset;
+	
 	float x,y;
 	float cameraH=20;
 	float terrainH,terrainW;
@@ -215,6 +218,8 @@ public class CameraBehaviour : MonoBehaviour {
 							
 							if(!currentSelected.GetComponent<FriendlyShuttleBehaviour>().cancelMouseDrop())
 							{
+								if(currentSelected.GetComponent<FriendlyShuttleBehaviour>()!=null)
+									currentSelected.GetComponent<FriendlyShuttleBehaviour>().iconsShowed=false;
 								dropSelection(currentSelected);
 								setSelection(pp);
 								currentSelected=pp;
@@ -259,6 +264,60 @@ public class CameraBehaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
+		foreach(GameObject g in GameStorage.getInstance().getEnemyShuttles())
+		{
+			cursorPos=g.GetComponent<EnemyShuttleBehaviour>().isOutOfViewport();
+			if(cursorPos!=new Vector3(-1,-1,-1))
+			{
+				if(cursorPos.x>=Screen.width-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2)
+					cursorXoffset=Screen.width-Templates.ResolutionProblems.getActionAbilitySize(Screen.width);
+				else if(cursorPos.x<=Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2)
+					cursorXoffset=0;
+				else
+					cursorXoffset=cursorPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2;
+				
+				cursorYoffset=0;
+				
+				if(cursorPos.y<=Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2)
+					cursorYoffset=Screen.height-Templates.ResolutionProblems.getActionAbilitySize(Screen.width);
+				else if(cursorPos.y>=Screen.height-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2)
+					cursorYoffset=0;
+				else
+					cursorYoffset=(Screen.height-cursorPos.y)-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2;
+				
+				GUIUtility.RotateAroundPivot(cursorPos.z,new Vector2(cursorXoffset+Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,cursorYoffset+Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2));
+				GUI.Label(new Rect(cursorXoffset,cursorYoffset,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().arrowRedSkin.label);
+				GUI.matrix=Matrix4x4.identity;
+			}
+		}
+		
+		foreach(GameObject g in GameStorage.getInstance().getFriendlyShuttles())
+		{
+			cursorPos=g.GetComponent<FriendlyShuttleBehaviour>().isOutOfViewport();
+			if(cursorPos!=new Vector3(-1,-1,-1))
+			{
+				if(cursorPos.x>=Screen.width-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2)
+					cursorXoffset=Screen.width-Templates.ResolutionProblems.getActionAbilitySize(Screen.width);
+				else if(cursorPos.x<=Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2)
+					cursorXoffset=0;
+				else
+					cursorXoffset=cursorPos.x-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2;
+				
+				cursorYoffset=0;
+				
+				if(cursorPos.y<=Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2)
+					cursorYoffset=Screen.height-Templates.ResolutionProblems.getActionAbilitySize(Screen.width);
+				else if(cursorPos.y>=Screen.height-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2)
+					cursorYoffset=0;
+				else
+					cursorYoffset=(Screen.height-cursorPos.y)-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2;
+				
+				GUIUtility.RotateAroundPivot(cursorPos.z,new Vector2(cursorXoffset+Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2,cursorYoffset+Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2));
+				GUI.Label(new Rect(cursorXoffset,cursorYoffset,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().arrowBlueSkin.label);
+				GUI.matrix=Matrix4x4.identity;
+			}
+		}
+		
 		if(showNextLevelWindow)
 		{
 			showPause=false;
@@ -456,7 +515,6 @@ public class CameraBehaviour : MonoBehaviour {
 		{
 			GameStorage.getInstance().overlap=true;
 			canReleaseMouse=false;
-			GUI.depth=200;
 			GUI.Box(new Rect(0,0,Screen.width,Screen.height),"");
 			float buttonH,buttonW;
 			buttonW=Templates.ResolutionProblems.getPauseButtonStartW(Screen.width);
