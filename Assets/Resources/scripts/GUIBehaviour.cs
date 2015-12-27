@@ -6,6 +6,9 @@ public class GUIBehaviour : MonoBehaviour {
 	private Color normColor = new Color(1,1,1,1);
 	private Color disabledColor = new Color(1,1,1,0.3f);
 	
+	private int fps=0;
+	private int prev_sec=0;
+	
 	void OnGUI()
 	{
 		GUI.enabled=!GameStorage.getInstance().overlap;
@@ -14,7 +17,18 @@ public class GUIBehaviour : MonoBehaviour {
 		else
 			GUI.color=normColor;
 		
-		//GUI.Label(new Rect(50,50,100,100),"Tries: "+GameStorage.tries);
+		//fps++;
+		//if((int)Time.time>prev_sec)
+		//{
+		//	GUI.Label(new Rect(20,20,200,20),"FPS: "+fps);
+		//	fps=0;
+		//	prev_sec=(int)Time.time;
+		//}
+		
+		if(GUI.Button(new Rect(20,20,100,20),"Fade in"))
+			GameStorage.fadeIn(0);
+		if(GUI.Button(new Rect(120,20,100,20),"Fade out"))
+			GameStorage.fadeOut(0.25f);
 		
 		if(GameStorage.getInstance().isRunning)
 			GUI.Button(new Rect(20+Templates.ResolutionProblems.getActionAbilitySize(Screen.width)/2+5,Screen.height-20-Templates.ResolutionProblems.getActionAbilitySize(Screen.width)*2-10,Templates.ResolutionProblems.getActionAbilitySize(Screen.width),Templates.ResolutionProblems.getActionAbilitySize(Screen.width)),"",Templates.getInstance().zalp_button_grey.button);

@@ -16,6 +16,8 @@ public class CameraBehaviour : MonoBehaviour {
 	bool reachedRank=false;
 	public bool canReleaseMouse=false;
 	
+	private GameObject tile_bg_go;
+	
 	private Vector3 cursorPos;
 	private float cursorXoffset,cursorYoffset;
 	
@@ -36,7 +38,13 @@ public class CameraBehaviour : MonoBehaviour {
 	
 	void Start () {
 		GameStorage.getInstance().cam=this;
+		loadTileGo();
 		curMousePos=transform.position;
+	}
+	
+	public void loadTileGo()
+	{
+		tile_bg_go=GameObject.Find("tile_bg");
 	}
 	
 	void LateUpdate()
@@ -55,6 +63,28 @@ public class CameraBehaviour : MonoBehaviour {
 	
 	void Update()
 	{
+		if(GameStorage.fadeDirection==1)
+		{
+			GameStorage.fadeAlpha+=1.3f*Time.deltaTime;
+			if(GameStorage.fadeAlpha > GameStorage.targetFadeAlpha)
+				GameStorage.fadeAlpha = GameStorage.targetFadeAlpha;
+			
+		}
+		else
+		{
+			GameStorage.fadeAlpha-=1.3f*Time.deltaTime;
+			if(GameStorage.fadeAlpha < GameStorage.targetFadeAlpha)
+				GameStorage.fadeAlpha = GameStorage.targetFadeAlpha;
+		}
+		
+		if(tile_bg_go!=null)
+		{
+			Color c = tile_bg_go.GetComponent<Renderer>().material.color;
+			c.a=GameStorage.fadeAlpha;
+			tile_bg_go.GetComponent<Renderer>().material.color=c;
+		}
+		
+		
 		if(!GameStorage.getInstance().isRunning)
 		{
 			checkMouse();

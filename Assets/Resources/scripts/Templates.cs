@@ -105,6 +105,7 @@ public class Templates {
 	public GUISkin campaigns_bg;
 	public GUISkin mission_bg;
 	public GUISkin company_panel,company_panel_hover;
+	public GUISkin fader;
 	//TEST
 	
 	public string plotContext,helpContent;
@@ -185,6 +186,7 @@ public class Templates {
 		mission_bg=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/mission_bg");
 		company_panel=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/company_panel");
 		company_panel_hover=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/company_panel_hover");
+		fader=(GUISkin) Resources.Load("gui/"+Templates.ResolutionProblems.getSkinsFolder()+"/fader");
 	}
 	
 	public GUISkin[] getNumberIcons(int num, bool grey)
@@ -739,7 +741,7 @@ public class Templates {
 		
 		//levels
 		private static float levelsButtonSizeEth=96;
-		private static float levelsStartPositinEth=100;
+		private static float levelsStartPositinEth=0;
 		private static float levelsNumberHEth=58,levelsNumberWEth=50;
 		private static float starOffsetXEth=12,starOffsetYEth=58,thirdStarYOffsetEth=5;
 		private static float levelsNumberOffsetX=15,levelsNumberOffsetY=13;

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <campaigns>
-	<campaign id="0" defaultRank="Ensign" name="Main campaign">
+	<campaign id="0" defaultRank="Ensign" name="FAST RESPONSE" description="-THEOCRACY FORCES PENETRATE DEEPER INTO THE TERRITORY OF THE CORPORATION.
+-COMMAND ALLOCATES 2 ASSAULT BOT TO REPEL AGGRESSION.">
 		<level id="1"/>
 		<level id="2"/>
 		<level id="3"/>
@@ -32,7 +33,21 @@
 		<level id="29"/>
 		<level id="30"/>
 	</campaign>
-	<campaign id="1" defaultRank="3rd class pilot" name="Dogfights">
+	<campaign id="1" defaultRank="3rd class pilot" name="Dogfights" description="-THEOCRACY FORCES PENETRATE DEEPER INTO THE TERRITORY OF THE CORPORATION.
+-COMMAND ALLOCATES 2 ASSAULT BOT TO REPEL AGGRESSION.">
+		<level id="31"/>
+		<level id="32"/>
+		<level id="33"/>
+		<level id="34"/>
+		<level id="35"/>
+		<level id="36"/>
+		<level id="37"/>
+		<level id="38"/>
+		<level id="39"/>
+		<level id="40"/>
+	</campaign>
+	<campaign id="2" defaultRank="3rd class pilot" name="TEST" description="-THEOCRACY FORCES PENETRATE DEEPER INTO THE TERRITORY OF THE CORPORATION.
+-COMMAND ALLOCATES 2 ASSAULT BOT TO REPEL AGGRESSION.">
 		<level id="31"/>
 		<level id="32"/>
 		<level id="33"/>

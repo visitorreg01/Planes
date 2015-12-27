@@ -38,11 +38,27 @@ public class GameStorage {
 	private ArrayList minesList;
 	private ArrayList minesRemoveList;
 	
+	public static float fadeAlpha=0f;
+	public static float targetFadeAlpha=0f;
+	public static int fadeDirection=-1;
+	
 	public bool overlap=false;
 	
 	public bool allReady = false;
 	
 	private float time;
+	
+	public static void fadeOut(float max)
+	{
+		targetFadeAlpha=max;
+		fadeDirection=1;
+	}
+	
+	public static void fadeIn(float max)
+	{
+		targetFadeAlpha=max;
+		fadeDirection=-1;
+	}
 	
 	public GameStorage()
 	{
@@ -75,7 +91,10 @@ public class GameStorage {
 		else
 			tries++;
 		
+		fadeOut(0.25f);
 		Application.LoadLevel(lv.file);
+		if(cam!=null)
+			cam.GetComponent<CameraBehaviour>().loadTileGo();
 	}
 	
 	public void EndLevel()
@@ -91,6 +110,7 @@ public class GameStorage {
 		gasRemoveList.Clear();
 		asteroidsList.Clear();
 		time=-1;
+		fadeAlpha=0;
 	}
 	
 	public void StepStart()
@@ -106,10 +126,12 @@ public class GameStorage {
 			f.GetComponent<EnemyShuttleBehaviour>().StepStart();
 		}
 		currentFocusShip=0;
+		GameStorage.fadeIn(0);
 	}
 	
 	public void StepStop()
 	{
+		GameStorage.fadeOut(0.25f);
 		isRunning=false;
 		foreach(GameObject f in GameStorage.getInstance().getFriendlyShuttles())
 			f.GetComponent<FriendlyShuttleBehaviour>().StepEnd();

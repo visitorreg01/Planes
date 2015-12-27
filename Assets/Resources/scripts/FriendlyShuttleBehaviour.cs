@@ -260,6 +260,8 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 		GameStorage.getInstance().totalHp+=temp.hp;
 		GameObject go;
 		MeshRenderer mr;
+		lineMat = Resources.Load("materials/holograms/Hologram3") as Material;
+		lr.material=lineMat;
 		Mesh m;
 		foreach(Templates.GunOnShuttle goss in temp.guns)
 		{
@@ -624,6 +626,7 @@ public class FriendlyShuttleBehaviour : MonoBehaviour {
 	
 	void OnGUI()
 	{
+		
 		if(Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
 			showPopup=selected;
 		GUI.enabled=!GameStorage.getInstance().overlap;

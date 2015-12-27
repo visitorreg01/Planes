@@ -4,7 +4,7 @@ using System.Collections;
 public class MainMenuGui : MonoBehaviour {
 
 	ArrayList levels; 
-	float startPosition=100;
+	float startPosition=0;
 	int betweenDist=0;
 	float levelButtonSize=96;
 	
@@ -213,7 +213,8 @@ public class MainMenuGui : MonoBehaviour {
 			if(levelsMenu)
 			{
 				GUI.Box(new Rect(0,0,Screen.width,Screen.height),"",Templates.getInstance().campaigns_bg.box);
-			
+				GUI.Box(new Rect(0,Screen.height*0.07f,Screen.width,Screen.height*0.85f),"",Templates.getInstance().mission_bg.box);
+				
 				startPosition=Templates.ResolutionProblems.getLevelsStartPosition(Screen.width);
 				
 				STAR_X_OFFSET=Templates.ResolutionProblems.getLevelsStarOffsetX(Screen.width);
@@ -251,7 +252,7 @@ public class MainMenuGui : MonoBehaviour {
 				bool aa=true;
 				
 				GUI.skin=Templates.getInstance().none_scroll_skin;
-				scrollPos = GUI.BeginScrollView(new Rect(0,startPosition,Screen.width,Screen.height),scrollPos,new Rect(0,startPosition,startPosition+Templates.ResolutionProblems.getLevelButtonStartW(Screen.width)/2*levels.Count+Templates.ResolutionProblems.getLevelButtonStartW(Screen.width)/2+startPosition,Screen.height-2*startPosition));
+				scrollPos = GUI.BeginScrollView(new Rect(Screen.width*0.07f,startPosition,Screen.width*0.63f,Screen.height),scrollPos,new Rect(0,startPosition,startPosition+Templates.ResolutionProblems.getLevelButtonStartW(Screen.width)/2*levels.Count+Templates.ResolutionProblems.getLevelButtonStartW(Screen.width)/2+startPosition,Screen.height-2*startPosition));
 				scrollPos+=new Vector2(mouseXDiff/400,0);
 				
 				levelButtonSize=Templates.ResolutionProblems.getLevelsButtonSize(Screen.width);
@@ -365,6 +366,8 @@ public class MainMenuGui : MonoBehaviour {
 					}
 					i++;
 					GUI.skin=null;
+					
+					
 				}
 				
 				if(levelSelected>=0)
