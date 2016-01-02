@@ -1,52 +1,43 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <levels>
-	<level num="1" levelName="This is level one" file="mission1" hint="They can't stop us
-Let 'em try
-For heavy metal
-We will die!
-
-Quit my job this morning said forever
-I would hold my head up high
-Cause I need metal in my life
-Just like an eagle needs to fly
-" rankReached="0" description="English is a West Germanic language that was first spoken in early medieval England and is now a global lingua franca.[4][5] It is an official language of almost 60 sovereign states, the most commonly spoken language in the United Kingdom, the United States, Canada, Australia, Ireland, and New Zealand, and a widely spoken language in countries in the Caribbean, Africa, and South Asia.[6] It is the third most common native language in the world, after Mandarin and Spanish.[7] It is widely learned as a second language and is an official language of the United Nations, of the European Union, and of many other world and regional international organisations."/>
-	<level num="2" levelName="This is level two" file="mission2"/>
-	<level num="3" levelName="This is level two" file="mission3"/>
-	<level num="4" levelName="This is level two" file="mission4" rankReached="1"/>
-	<level num="5" levelName="This is level two" file="mission5"/>
-	<level num="6" levelName="This is level two" file="mission6"/>
-	<level num="7" levelName="This is level two" file="mission7"/>
-	<level num="8" levelName="This is level two" file="mission8" rankReached="2"/>
-	<level num="9" levelName="This is level two" file="mission9"/>
-	<level num="10" levelName="This is level two" file="mission10"/>
-	<level num="11" levelName="This is level two" file="mission11"/>
-	<level num="12" levelName="This is level two" file="mission12"/>
-	<level num="13" levelName="This is level two" file="mission13" rankReached="3"/>
-	<level num="14" levelName="This is level two" file="mission14"/>
-	<level num="15" levelName="This is level two" file="mission15"/>
-	<level num="16" levelName="This is level two" file="mission16"/>
-	<level num="17" levelName="This is level two" file="mission17" rankReached="4"/>
-	<level num="18" levelName="This is level two" file="mission18"/>
-	<level num="19" levelName="This is level two" file="mission19"/>
-	<level num="20" levelName="This is level two" file="mission20"/>
-	<level num="21" levelName="This is level two" file="mission21"/>
-	<level num="22" levelName="This is level two" file="mission22" rankReached="5"/>
-	<level num="23" levelName="This is level two" file="mission23"/>
-	<level num="24" levelName="This is level two" file="mission24" rankReached="6"/>
-	<level num="25" levelName="This is level two" file="mission25"/>
-	<level num="26" levelName="This is level two" file="mission26"/>
-	<level num="27" levelName="This is level two" file="mission27" rankReached="7"/>
-	<level num="28" levelName="This is level two" file="mission28"/>
-	<level num="29" levelName="This is level two" file="mission29" rankReached="8"/>
-	<level num="30" levelName="This is level two" file="mission30"/>
-	<level num="31" levelName="This is level two" file="dogfight1"/>
-	<level num="32" levelName="This is level two" file="dogfight2" rankReached="9"/>
-	<level num="33" levelName="This is level two" file="dogfight3"/>
-	<level num="34" levelName="This is level two" file="dogfight4"/>
-	<level num="35" levelName="This is level two" file="dogfight5"/>
-	<level num="36" levelName="This is level two" file="dogfight6" rankReached="10"/>
-	<level num="37" levelName="This is level two" file="dogfight7"/>
-	<level num="38" levelName="This is level two" file="dogfight8"/>
-	<level num="39" levelName="This is level two" file="dogfight9" rankReached="11"/>
-	<level num="40" levelName="This is level two" file="dogfight10"/>
+	<level num="1" levelName="First encounter" file="mission1" hint="Use fighter's ability to make a 180-degree turn." description="Theocracy fighter was spotted in Corporation space. The pilot rejected to obey and leave."/>
+	<level num="2" levelName="Dangerous patrol" file="mission2" hint="Keep your ships together." description="Corporate patrol met a wing of Teaocracy fighters."/>
+	<level num="3" levelName="Fast response" file="mission3" hint="Use torpedoes!" description="Theocracy forces invade Corporation territory. High command dispatched two assault bots to repel the invasion."/>
+	<level num="4" levelName="Escalation" file="mission4" rankReached="1" hint="Use abilities and predict enemy movements." description="Conflict escalates. Tension grows. The threat to civilian population araised for the first time."/>
+	<level num="5" levelName="Orbital defence" file="mission5" hint="Try to keep the fighter alive and use rear turret of Faith Enforcers." description="Operation to repel the raid on planet Novius orbit."/>
+	<level num="6" levelName="Counter-attack" file="mission6" hint="Use missiles from the very first turn and cover behind an asteroid." description="High command decides that time for the first counterattack has come."/>
+	<level num="7" levelName="Offensive continues" file="mission7" hint="Use missiles and torpedoes. Beware of mines!" description="Offensive operation is in progress. Corporate forces met a picket which consists of frigate class ships."/>
+	<level num="8" levelName="Baptism of fire" file="mission8" rankReached="2" hint="Hit and run tactics using missiles and asteroids as covers will be helpful here." description="Corporation performs field test of its new ship class - Corvette."/>
+	<level num="9" levelName="Tactical advantages" file="mission9" hint="Keep the distance, use missiles and beware of enemy missiles." description="Corvette shown excellent results in real battle. High command decided to expand the use of this ship class in battle operations."/>
+	<level num="10" levelName="Ambush" file="mission10" hint="Get out of the encirclement as soon as you can, then use hit'n'run tactics." description="Corporation corvette was ambushed."/>
+	<level num="11" levelName="Heavy artillery" file="mission11" description="First appearance of heavy ships withing the conflict."/>
+	<level num="12" levelName="Operation 'New Old World'" file="mission12" description="First clash of comparatively large fleets."/>
+	<level num="13" levelName="Tactical opportunity" file="mission13" rankReached="3" hint="Use fighter's ability to make a 180-degree turn." description="Outstanding tactical decisions of Corporation fleet officers have lured big unit of theocrats into an ambush."/>
+	<level num="14" levelName="Fierceful resistance" file="mission14" hint="Use fighter's ability to make a 180-degree turn." description="Corporation squadron faced fierce resistance in the depth of Theocratic territory."/>
+	<level num="15" levelName="Rogue attack" file="mission15" hint="Use fighter's ability to make a 180-degree turn." description="Light corporation squadron attacks theocracy battleship."/>
+	<level num="16" levelName="Maneuverable fight" file="mission16" hint="Use fighter's ability to make a 180-degree turn." description="Corporate middle class ships confronts light theocracy squadron."/>
+	<level num="17" levelName="Capital experiment" file="mission17" rankReached="4" hint="Use fighter's ability to make a 180-degree turn." description="Corporation brings new experimental ship into action, this time it’s a capital ship  - battlecruiser."/>
+	<level num="18" levelName="Bloody trick" file="mission18" hint="Use fighter's ability to make a 180-degree turn." description="Theocracy responds to commissioned battlecruiser with fierce ambush."/>
+	<level num="19" levelName="Retreat" file="mission19" hint="Use fighter's ability to make a 180-degree turn." description="Squadron of heavy ships led by battlecruiser is retreating, suffering heavy casualties."/>
+	<level num="20" levelName="Fighting the beasts" file="mission20" hint="Use fighter's ability to make a 180-degree turn." description="First clash with enemy dreadnoughts."/>
+	<level num="21" levelName="Intrusion" file="mission21" hint="Use fighter's ability to make a 180-degree turn." description="Light Corporate squadron managed to infiltrate enemy territory."/>
+	<level num="22" levelName="Asteroid belt" file="mission22" rankReached="5" hint="Use fighter's ability to make a 180-degree turn." description="Tough fight in asteroid field."/>
+	<level num="23" levelName="Strategic goal" file="mission23" hint="Use fighter's ability to make a 180-degree turn." description="Battle for tactically important space station deep inside of Theocracy territories."/>
+	<level num="24" levelName="Developing the success" file="mission24" rankReached="6" hint="Use fighter's ability to make a 180-degree turn." description="Success of previous operation allowed to reach one other densely populated Theocracy planet."/>
+	<level num="25" levelName="Capital on the horison" file="mission25" hint="Use fighter's ability to make a 180-degree turn." description="Fast raid to the direction of Theocracy capital."/>
+	<level num="26" levelName="Rush" file="mission26" hint="Use fighter's ability to make a 180-degree turn." description="Light wing of Corporate forces have to fight its way through heavy Theocracy outpost."/>
+	<level num="27" levelName="Mission: possible" file="mission27" rankReached="7" hint="Use fighter's ability to make a 180-degree turn." description="Special forces squadron fights for an important strategical point."/>
+	<level num="28" levelName="The threat" file="mission28" hint="Use fighter's ability to make a 180-degree turn." description="Surprise counterattack of Theocracy fleet puts Corporate shipyards under threat."/>
+	<level num="29" levelName="Approaching the capital" file="mission29" rankReached="8" hint="Use fighter's ability to make a 180-degree turn." description="Fleet of the Corporation assaults final frontier before Theocracy capital."/>
+	<level num="30" levelName="Final assault" file="mission30" hint="Use fighter's ability to make a 180-degree turn." description="Final battle on the Theocracy capital planet. It is our chance finally put the end to the war."/>
+	<level num="31" levelName="Dogfight 1" file="dogfight1"/>
+	<level num="32" levelName="Dogfight 2" file="dogfight2" rankReached="9"/>
+	<level num="33" levelName="Dogfight 3" file="dogfight3"/>
+	<level num="34" levelName="Dogfight 4" file="dogfight4"/>
+	<level num="35" levelName="Dogfight 5" file="dogfight5"/>
+	<level num="36" levelName="Dogfight 6" file="dogfight6" rankReached="10"/>
+	<level num="37" levelName="Dogfight 7" file="dogfight7"/>
+	<level num="38" levelName="Dogfight 8" file="dogfight8"/>
+	<level num="39" levelName="Dogfight 9" file="dogfight9" rankReached="11"/>
+	<level num="40" levelName="Dogfight 10" file="dogfight10"/>
 </levels>
